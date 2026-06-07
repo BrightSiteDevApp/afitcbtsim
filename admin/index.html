@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Add Questions</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="../static/main.css">
+    <style>
+        /* Modern Admin Layout */
+        .admin-layout { 
+            max-width: 900px; 
+            margin: 2rem auto; 
+            padding: 0 5%; 
+        }
+        
+        .form-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+        }
+
+        /* Upgraded Inputs */
+        textarea, select, input[type="text"] { 
+            width: 100%; 
+            padding: 0.85rem 1rem; 
+            border: 1px solid #d1d5db; 
+            border-radius: 8px; 
+            font-family: 'Poppins', sans-serif; 
+            font-size: 0.95rem;
+            background-color: #f9fafb;
+            transition: all 0.2s ease;
+        }
+
+        textarea:focus, select:focus, input[type="text"]:focus {
+            border-color: var(--brand-blue);
+            background-color: var(--white);
+            box-shadow: 0 0 0 4px rgba(45, 142, 255, 0.1);
+            outline: none;
+        }
+
+        textarea { 
+            resize: vertical; 
+            min-height: 120px; 
+        }
+
+        .input-group label {
+            color: var(--text-dark);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Logo Alignment */
+        .admin-logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: flex-start;
+        }
+
+        /* The Success Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #10b981;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            right: 30px;
+            top: 30px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        #toast.show { 
+            visibility: visible; 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .admin-layout { margin: 1rem auto; }
+            .form-grid { grid-template-columns: 1fr; gap: 15px; }
+            .submit-area { flex-direction: column; }
+            #submit-btn { width: 100%; height: 50px; margin-top: 10px; }
+        }
+    </style>
+</head>
+<body style="background-color: #f3f4f6;">
+
+    <div id="toast">✅ Question Added Successfully!</div>
+
+    <nav class="dashboard-nav">
+        <div class="admin-logo-wrapper">
+            <img src="../static/img/logo.jpg" alt="Logo" style="height: 40px; border-radius: 4px;"> 
+            <span style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">Admin Portal</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">Log Out</button>
+    </nav>
+
+    <main class="admin-layout">
+        <div class="dash-card">
+            <h2 style="border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem;">Add New Question</h2>
+            
+            <form id="question-form" onsubmit="addQuestion(event)" style="margin-top: 1.5rem;">
+                
+                <div class="input-group">
+                    <label>Subject</label>
+                    <select id="subject" required>
+                        <option value="">Select Subject...</option>
+                        <option value="English">English</option>
+                        <option value="Math">Mathematics</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Chemistry">Chemistry</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Question Text</label>
+                    <textarea id="question_text" placeholder="Type the question here..." required></textarea>
+                </div>
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Option A</label>
+                        <input type="text" id="option_a" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Option B</label>
+                        <input type="text" id="option_b" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Option C</label>
+                        <input type="text" id="option_c" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Option D</label>
+                        <input type="text" id="option_d" required>
+                    </div>
+                </div>
+
+                <div class="form-grid submit-area" style="align-items: end; margin-top: 15px;">
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label>Correct Answer</label>
+                        <select id="correct_answer" required>
+                            <option value="">Select Correct Option...</option>
+                            <option value="A">Option A</option>
+                            <option value="B">Option B</option>
+                            <option value="C">Option C</option>
+                            <option value="D">Option D</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" id="submit-btn" class="btn-primary" style="height: 48px; font-size: 1rem;">Add Question Fast ⚡</button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../static/app.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) return window.location.href = '../login/index.html';
+
+            const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
+            if (profile.role !== 'admin') {
+                alert("ACCESS DENIED: You are not an administrator.");
+                window.location.href = '../dashboard/index.html';
+            }
+        });
+
+        async function addQuestion(event) {
+            event.preventDefault(); 
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = 'Adding...';
+            btn.disabled = true;
+
+            const questionData = {
+                subject: document.getElementById('subject').value,
+                question_text: document.getElementById('question_text').value,
+                option_a: document.getElementById('option_a').value,
+                option_b: document.getElementById('option_b').value,
+                option_c: document.getElementById('option_c').value,
+                option_d: document.getElementById('option_d').value,
+                correct_answer: document.getElementById('correct_answer').value,
+                is_free_tier: false 
+            };
+
+            const { error } = await supabaseClient.from('questions').insert([questionData]);
+
+            if (error) {
+                alert("Error adding question: " + error.message);
+                btn.innerText = 'Add Question Fast ⚡';
+                btn.disabled = false;
+            } else {
+                showToast();
+
+                document.getElementById('question_text').value = '';
+                document.getElementById('option_a').value = '';
+                document.getElementById('option_b').value = '';
+                document.getElementById('option_c').value = '';
+                document.getElementById('option_d').value = '';
+                document.getElementById('correct_answer').value = '';
+
+                document.getElementById('question_text').focus();
+
+                btn.innerText = 'Add Question Fast ⚡';
+                btn.disabled = false;
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
+        }
+
+        window.logout = async function() {
+            await supabaseClient.auth.signOut();
+            localStorage.removeItem('cbt_session_token');
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Brightsitedev CBT</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/main.css">
+    <style>
+        /* Specific tweaks for the premium profile card */
+        .profile-header-card {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brand-blue), #1e3a8a);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 2.2rem;
+            box-shadow: 0 10px 25px rgba(45, 142, 255, 0.3);
+            border: 4px solid var(--white);
+        }
+
+        .profile-info h2 { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 0.2rem; line-height: 1.2; }
+        .profile-info p { color: #64748b; font-size: 0.95rem; font-weight: 500; }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Read-only premium input styling */
+        .readonly-input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc; /* Slight gray to show it's locked */
+            color: #334155;
+            font-weight: 600;
+            cursor: not-allowed;
+        }
+
+        .btn-danger-outline {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #fef2f2;
+            color: #ef4444;
+            padding: 1rem 2rem;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 2rem;
+            width: 100%;
+        }
+
+        .btn-danger-outline:hover { background-color: #ef4444; color: var(--white); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2); }
+
+        @media (max-width: 768px) {
+            .profile-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .profile-header-card { flex-direction: column; text-align: center; gap: 1rem; }
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="sidebar-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../static/img/logo.jpg" alt="Logo">
+            <span>Brightsitedev</span>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li>
+                <a href="../dashboard/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> Dashboard</a>
+            </li>
+            <li>
+                <a href="../exams/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>Exam</a>
+            </li>
+            <li>
+                <a href="#"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> My Results</a>
+            </li>
+            <li class="active">
+                <a href="#"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> Profile</a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn-sidebar" onclick="logout()">Log Out</button>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+            </button>
+            <div class="avatar" id="top-avatar">?</div>
+        </header>
+
+        <main class="dashboard-content">
+            <div style="margin-bottom: 2rem;">
+                <h1 style="font-size: 2rem; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">Account Settings</h1>
+                <p style="color: #64748b; font-size: 1.05rem;">Review your personal information and application details.</p>
+            </div>
+
+            <div class="dash-card" style="max-width: 900px;">
+                
+                <div class="profile-header-card">
+                    <div class="profile-avatar-large" id="main-profile-avatar">?</div>
+                    <div class="profile-info">
+                        <h2 id="display-name">Loading...</h2>
+                        <p id="display-email">Loading email...</p>
+                        <span class="score-badge badge-blue" style="margin-top: 8px;">Aspirant Account</span>
+                    </div>
+                </div>
+
+                <div class="profile-grid">
+                    <div class="input-group">
+                        <label>Full Legal Name</label>
+                        <input type="text" id="val-name" class="readonly-input" readonly value="Loading...">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Phone Number</label>
+                        <input type="text" id="val-phone" class="readonly-input" readonly value="Loading...">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Program Type</label>
+                        <input type="text" id="val-program" class="readonly-input" readonly value="Loading...">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Course Applied For</label>
+                        <input type="text" id="val-course" class="readonly-input" readonly value="Loading...">
+                    </div>
+
+                    <div class="input-group">
+                        <label>State of Origin</label>
+                        <input type="text" id="val-state" class="readonly-input" readonly value="Loading...">
+                    </div>
+
+                    <div class="input-group">
+                        <label>JAMB Score</label>
+                        <input type="text" id="val-jamb" class="readonly-input" readonly value="Loading...">
+                    </div>
+                </div>
+
+                <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 1rem; display: flex; align-items: center; gap: 8px;">
+                    <svg style="width: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    To update these details, please contact the system administrator.
+                </p>
+
+                <button class="btn-danger-outline" onclick="logout()">
+                    <svg style="width: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Log Out of Account
+                </button>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../static/app.js"></script>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('mobile-overlay').classList.toggle('active');
+        }
+
+        document.addEventListener("DOMContentLoaded", initializeProfile);
+
+        async function initializeProfile() {
+            const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
+            if (!session || authError) return window.location.href = '../login/index.html';
+
+            // Display Email immediately from Auth
+            document.getElementById('display-email').innerText = session.user.email;
+
+            // Fetch Profile Data
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+            // Security Check
+            const localSessionToken = localStorage.getItem('cbt_session_token');
+            if (profile.current_session_token !== localSessionToken) {
+                alert("Security Alert: Logged in from another device.");
+                return logout();
+            }
+
+            // Populate the UI
+            if (profile.full_name) {
+                document.getElementById('display-name').innerText = profile.full_name;
+                document.getElementById('val-name').value = profile.full_name;
+                
+                // Generate Avatar Initials
+                const nameParts = profile.full_name.trim().split(/\s+/);
+                let initials = nameParts[0].charAt(0).toUpperCase();
+                if (nameParts.length > 1) initials += nameParts[1].charAt(0).toUpperCase();
+                
+                document.getElementById('top-avatar').innerText = initials;
+                document.getElementById('main-profile-avatar').innerText = initials;
+            }
+
+            // Inject the rest of the Bio Data
+            document.getElementById('val-phone').value = profile.phone_number || "Not Provided";
+            document.getElementById('val-program').value = profile.program_type || "Not Provided";
+            document.getElementById('val-course').value = profile.course_applied || "Not Provided";
+            document.getElementById('val-state').value = profile.state_of_origin || "Not Provided";
+            document.getElementById('val-jamb').value = profile.jamb_score || "N/A";
+        }
+
+        window.logout = async function() {
+            await supabaseClient.auth.signOut();
+            localStorage.removeItem('cbt_session_token');
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>

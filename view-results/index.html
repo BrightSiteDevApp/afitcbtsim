@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Results - Brightsitedev CBT</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/main.css">
+    
+    <style>
+        /* MOBILE OVERFLOW KILLER - STRICT BOX SIZING */
+        html, body { max-width: 100vw !important; overflow-x: hidden !important; margin: 0; padding: 0; }
+        *, *::before, *::after { box-sizing: border-box !important; }
+
+        /* RESULTS PAGE SPECIFIC STYLES */
+        .results-wrapper {
+            animation: fadeIn 0.4s ease;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ANALYTICS CARDS */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .analytic-card {
+            background: white; padding: 2rem; border-radius: 20px;
+            border: 1px solid #e2e8f0; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+            display: flex; align-items: center; gap: 20px;
+            width: 100%; max-width: 100%;
+        }
+
+        .analytic-icon {
+            width: 60px; height: 60px; border-radius: 15px;
+            display: flex; justify-content: center; align-items: center; flex-shrink: 0;
+        }
+        
+        .analytic-icon.blue { background: #eff6ff; color: #2563eb; }
+        .analytic-icon.green { background: #dcfce7; color: #16a34a; }
+        .analytic-icon.purple { background: #faf5ff; color: #ea580c; }
+
+        .analytic-info h4 { margin: 0 0 5px 0; font-size: 0.95rem; color: #64748b; font-weight: 600; text-transform: uppercase; }
+        .analytic-info div { font-size: 2rem; font-weight: 800; color: #0f172a; line-height: 1; }
+
+        /* FULL HISTORY TABLE */
+        .full-history-section {
+            background: white; padding: 2.5rem; border-radius: 20px;
+            border: 1px solid #e2e8f0; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+            width: 100%; max-width: 100%;
+        }
+
+        .table-responsive { width: 100%; max-width: 100vw; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; white-space: nowrap; }
+        .data-table th { background: #f8fafc; color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; padding: 1.2rem 1rem; text-align: left; }
+        .data-table td { padding: 1.2rem 1rem; border-bottom: 1px solid #e2e8f0; color: #1e293b; vertical-align: middle; }
+        .data-table tr:hover { background-color: #f8fafc; transition: background 0.2s; }
+        
+        .badge-green { background: #dcfce7; color: #166534; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;}
+        .badge-orange { background: #ffedd5; color: #9a3412; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;}
+
+        /* 🔥 STRICT MOBILE LOCKDOWN 🔥 */
+        @media (max-width: 900px) {
+            .dashboard-content { 
+                padding: 1rem !important; 
+                width: 100vw !important;
+                max-width: 100vw !important;
+            }
+            
+            /* Fix the Welcome Banner Bleed & Stack Elements */
+            .welcome-banner {
+                padding: 1.5rem !important;
+                border-radius: 16px !important;
+                width: 100% !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 1.5rem;
+            }
+            .welcome-text {
+                max-width: 100% !important;
+            }
+            .welcome-banner button {
+                width: 100% !important;
+            }
+
+            .analytics-grid { 
+                grid-template-columns: 1fr; 
+                gap: 1rem; 
+            }
+            
+            .analytic-card {
+                padding: 1.5rem !important;
+            }
+
+            .full-history-section { 
+                padding: 1.5rem !important; 
+            }
+            
+            .data-table th, .data-table td { 
+                padding: 0.8rem 0.5rem; 
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="sidebar-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../static/img/logo.jpg" alt="Logo">
+            <span>Brightsitedev</span>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li>
+                <a href="../dashboard/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> Dashboard</a>
+            </li>
+            <li>
+                <a href="../exams/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Exams</a>
+            </li>
+            <li class="active">
+                <a href="#"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> My Results</a>
+            </li>
+            <li>
+                <a href="../profile/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> Profile</a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn-sidebar" onclick="logout()">Log Out</button>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        
+        <header class="top-header">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+            </button>
+            <div class="avatar" id="user-avatar">?</div>
+        </header>
+
+        <main class="dashboard-content">
+            
+            <div class="welcome-banner" style="margin-bottom: 2rem; position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); padding: 2.5rem; border-radius: 20px;">
+                <div class="welcome-text" style="position: relative; z-index: 2; max-width: 60%;">
+                    <h1 style="color: white; margin: 0 0 10px 0; font-size: 2rem;">Performance Analytics</h1>
+                    <p style="color: #93c5fd; margin: 0; font-size: 1rem; line-height: 1.5;">Review your complete examination history and track your aggregate progress over time.</p>
+                </div>
+
+                <div style="position: absolute; right: 0; top: -50px; opacity: 0.15; pointer-events: none;">
+                    <svg width="350" height="350" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#ffffff" d="M42.7,-62.4C55.3,-53.1,65.4,-39.8,71.2,-24.8C77,-9.8,78.5,6.8,73.4,21.3C68.3,35.8,56.6,48.1,43.1,57C29.6,65.9,14.8,71.4,-0.6,72.2C-15.9,73,-31.8,69,-44.6,59.8C-57.4,50.6,-67.2,36.2,-71.4,20.4C-75.6,4.6,-74.2,-11.7,-67.4,-25.1C-60.6,-38.5,-48.4,-49,-35.1,-57.8C-21.8,-66.6,-10.9,-73.7,2.2,-76.7C15.3,-79.7,30.1,-71.7,42.7,-62.4Z" transform="translate(100 100) scale(1.1)" />
+                    </svg>
+                </div>
+                
+                <div style="position: relative; z-index: 2;">
+                    <button onclick="window.location.href='../exams/index.html'" style="background: white; color: #1e40af; border: none; padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
+                        Take New Exam
+                    </button>
+                </div>
+            </div>
+
+            <div class="results-wrapper">
+                
+                <div class="analytics-grid">
+                    <div class="analytic-card">
+                        <div class="analytic-icon blue">
+                            <svg style="width: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        </div>
+                        <div class="analytic-info">
+                            <h4>Exams Completed</h4>
+                            <div id="stat-total-exams">0</div>
+                        </div>
+                    </div>
+
+                    <div class="analytic-card">
+                        <div class="analytic-icon green">
+                            <svg style="width: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                        </div>
+                        <div class="analytic-info">
+                            <h4>Highest Aggregate</h4>
+                            <div><span id="stat-high-score">0</span><span style="font-size: 1.2rem; color: #94a3b8;">%</span></div>
+                        </div>
+                    </div>
+
+                    <div class="analytic-card">
+                        <div class="analytic-icon purple">
+                            <svg style="width: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                        <div class="analytic-info">
+                            <h4>Average Aggregate</h4>
+                            <div><span id="stat-avg-score">0</span><span style="font-size: 1.2rem; color: #94a3b8;">%</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="full-history-section">
+                    <h2 style="margin-top: 0; font-size: 1.5rem; color: #0f172a; margin-bottom: 1.5rem;">Complete Examination Record</h2>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date Taken</th>
+                                    <th>Subject Breakdown</th>
+                                    <th>Post-UTME</th>
+                                    <th>Final Aggregate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="full-history-body">
+                                <tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 3rem;">Loading your academic records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../static/app.js"></script>
+
+    <script>
+        let userProfile = null;
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('mobile-overlay').classList.toggle('active');
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
+            if (!session || authError) return window.location.href = '../login/index.html';
+
+            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
+            userProfile = profile;
+
+            if (profile.full_name) {
+                const nameParts = profile.full_name.trim().split(/\s+/);
+                let initials = nameParts[0].charAt(0).toUpperCase();
+                if (nameParts.length > 1) initials += nameParts[1].charAt(0).toUpperCase();
+                document.getElementById('user-avatar').innerText = initials;
+            }
+
+            fetchAllHistory(session.user.id);
+        });
+
+        async function fetchAllHistory(userId) {
+            const { data, error } = await supabaseClient
+                .from('results')
+                .select('*')
+                .eq('student_id', userId)
+                .order('submitted_at', { ascending: false });
+                
+            const tbody = document.getElementById('full-history-body');
+            
+            if (error || !data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 3rem;">No examination records found. Complete a test to generate data.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = ''; 
+            
+            const jambScore = userProfile.jamb_score || 0;
+            const jambWeight = jambScore / 8;
+
+            let highestAggregate = 0;
+            let totalAggregateSum = 0;
+
+            data.forEach((row) => {
+                const dateObj = new Date(row.submitted_at);
+                const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const formattedTime = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                
+                const badgeClass = row.total_score >= 25 ? 'badge-green' : 'badge-orange';
+                const finalAggregate = parseFloat((jambWeight + row.total_score).toFixed(1));
+                
+                if (finalAggregate > highestAggregate) highestAggregate = finalAggregate;
+                totalAggregateSum += finalAggregate;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <strong style="color: #0f172a;">${formattedDate}</strong><br>
+                        <span style="font-size: 0.85rem; color: #64748b;">${formattedTime}</span>
+                    </td>
+                    <td style="font-size: 0.9rem; color: #475569; line-height: 1.6;">
+                        ENG: <strong>${row.english_score}</strong> &nbsp;|&nbsp; MTH: <strong>${row.math_score}</strong><br>
+                        PHY: <strong>${row.physics_score}</strong> &nbsp;|&nbsp; CHM: <strong>${row.chemistry_score}</strong>
+                    </td>
+                    <td><span class="score-badge ${badgeClass}">${row.total_score} / 50</span></td>
+                    <td><strong style="font-size: 1.2rem; color: #2563eb;">${finalAggregate}%</strong></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('stat-total-exams').innerText = data.length;
+            document.getElementById('stat-high-score').innerText = highestAggregate;
+            
+            const averageAggregate = (totalAggregateSum / data.length).toFixed(1);
+            document.getElementById('stat-avg-score').innerText = averageAggregate;
+        }
+
+        window.logout = async function() {
+            await supabaseClient.auth.signOut();
+            localStorage.removeItem('cbt_session_token');
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>

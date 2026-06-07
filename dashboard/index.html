@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Brightsitedev CBT</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/main.css">
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+</head>
+<body class="dashboard-body">
+
+    <div class="sidebar-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../static/img/logo.jpg" alt="Logo">
+            <span>Brightsitedev</span>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li class="active">
+                <a href="#"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> Dashboard</a>
+            </li>
+            <li>
+                <a href="../exams/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>Exams</a>
+            </li>
+            <li>
+                <a href="#"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> My Results</a>
+            </li>
+            <li>
+                <a href="../profile/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> Profile</a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn-sidebar" onclick="logout()">Log Out</button>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        
+        <header class="top-header">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+            </button>
+            <div class="avatar" id="user-avatar">?</div>
+        </header>
+
+        <main class="dashboard-content">
+            
+            <div class="welcome-banner">
+                <div class="welcome-text">
+                    <h1><span id="time-greeting">Welcome</span>, <span id="welcome-name">Aspirant</span>.</h1>
+                    <p>Track your progress, challenge the leaderboard, and master the AFIT CBT exam.</p>
+                    <button id="main-action-btn" class="btn-glass">Loading...</button>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <h4>Exams Taken</h4>
+                        <div class="stat-val"><span id="tests-count">0</span></div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <h4>Account Plan</h4>
+                        <div class="stat-val" id="account-status" style="font-size: 1.2rem; margin-top: 5px; color: #16a34a;">Free Tier</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <h4>Average Score</h4>
+                        <div class="stat-val" id="avg-score">0 <span style="font-size: 1rem; color: #94a3b8;">/ 50</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <div class="dash-card">
+                    <h3>
+                        <svg style="width: 20px; color: var(--brand-blue);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Performance History
+                    </h3>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Breakdown</th>
+                                    <th>Total Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-body">
+                                <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading history...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="dash-card">
+                    <h3>
+                        <svg style="width: 20px; color: #ea580c;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Top 5 Achievers
+                    </h3>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Aspirant</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-body">
+                                <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading results...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../static/app.js"></script>
+
+   <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('mobile-overlay').classList.toggle('active');
+        }
+
+        // Generate Time-based greeting
+        function setTimeGreeting() {
+            const hour = new Date().getHours();
+            let greeting = 'Good Evening';
+            if (hour >= 5 && hour < 12) greeting = 'Good Morning';
+            else if (hour >= 12 && hour < 17) greeting = 'Good Afternoon';
+            document.getElementById('time-greeting').innerText = greeting;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeGreeting();
+            initializeDashboard();
+        });
+
+        async function initializeDashboard() {
+            const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
+            if (!session || authError) return window.location.href = '../login/index.html';
+
+            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
+            const localSessionToken = localStorage.getItem('cbt_session_token');
+            if (profile.current_session_token !== localSessionToken) {
+                alert("Security Alert: Logged in from another device.");
+                return logout();
+            }
+
+            if (profile.full_name) {
+                const nameParts = profile.full_name.trim().split(/\s+/);
+                document.getElementById('welcome-name').innerText = nameParts[0];
+                let initials = nameParts[0].charAt(0).toUpperCase();
+                if (nameParts.length > 1) initials += nameParts[1].charAt(0).toUpperCase();
+                document.getElementById('user-avatar').innerText = initials;
+            }
+
+            document.getElementById('tests-count').innerText = profile.tests_taken;
+            const statusText = document.getElementById('account-status');
+            const actionBtn = document.getElementById('main-action-btn');
+
+            if (profile.has_paid) {
+                statusText.innerText = 'Premium Access';
+                actionBtn.innerText = 'Start Unlimited Practice →';
+                actionBtn.onclick = () => window.location.href = '../exams/index.html'; 
+            } else {
+                if (profile.tests_taken >= 2) {
+                    actionBtn.innerText = 'Unlock Premium (₦1,000)';
+                    
+                    // 🚀 UPDATED: Now triggers Paystack and passes the user's email and Supabase ID
+                    actionBtn.onclick = () => initiatePayment(session.user.email, session.user.id);
+                    
+                } else {
+                    actionBtn.innerText = `Start Free Test (${2 - profile.tests_taken} Left) →`;
+                    actionBtn.onclick = () => window.location.href = '../exams/index.html'; 
+                }
+            }
+
+            fetchLeaderboard();
+            fetchUserHistory(session.user.id);
+        }
+
+        // 🚀 NEW: The Paystack Engine
+        function initiatePayment(email, userId) {
+            let handler = PaystackPop.setup({
+                key: 'pk_live_f1ca0bad0d6913267fb525e6c58cd2c447a1ae29', // <-- PASTE YOUR PAYSTACK TEST KEY HERE
+                email: email,
+                amount: 1050 * 100, // Amount in kobo (1000 Naira = 100000 kobo)
+                currency: 'NGN',
+                ref: 'AFIT_' + Math.floor((Math.random() * 1000000000) + 1), // Generates unique receipt ID
+                metadata: {
+                    custom_fields: [
+                        {
+                            display_name: "Student ID",
+                            variable_name: "student_id",
+                            value: userId // Securely passes Supabase ID to the Webhook!
+                        }
+                    ]
+                },
+                callback: function(response) {
+                    // Tell them to wait a few seconds so the Webhook has time to update the database
+                    alert('Payment successful! Verifying your account upgrade. The page will refresh momentarily.');
+                    setTimeout(() => {
+                        window.location.reload(); 
+                    }, 3000);
+                },
+                onClose: function() {
+                    alert('Payment process was cancelled.');
+                }
+            });
+            handler.openIframe();
+        }
+
+        async function fetchUserHistory(userId) {
+            const { data, error } = await supabaseClient.from('results').select('*').eq('student_id', userId).order('submitted_at', { ascending: false });
+            const tbody = document.getElementById('history-body');
+            const avgDisplay = document.getElementById('avg-score');
+            
+            if (error || !data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">No exams taken yet. Start practicing!</td></tr>';
+                return;
+            }
+
+            let totalSum = 0;
+            tbody.innerHTML = ''; 
+            
+            data.forEach((row) => {
+                totalSum += row.total_score;
+                const formattedDate = new Date(row.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                
+                const badgeClass = row.total_score >= 25 ? 'badge-green' : 'badge-orange';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${formattedDate}</strong></td>
+                    <td style="font-size: 0.85rem; color: #64748b; line-height: 1.6;">
+                        ENG: <strong>${row.english_score}</strong> | MTH: <strong>${row.math_score}</strong><br>
+                        PHY: <strong>${row.physics_score}</strong> | CHM: <strong>${row.chemistry_score}</strong>
+                    </td>
+                    <td><span class="score-badge ${badgeClass}">${row.total_score} / 50</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const average = (totalSum / data.length).toFixed(1);
+            avgDisplay.innerHTML = `${average} <span style="font-size: 1rem; color: #94a3b8;">/ 50</span>`;
+        }
+
+        async function fetchLeaderboard() {
+            const { data, error } = await supabaseClient.from('results').select(`total_score, profiles (full_name)`).order('total_score', { ascending: false }).limit(5); 
+            const tbody = document.getElementById('leaderboard-body');
+            
+            if (error || !data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">No results yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = ''; 
+            
+            data.forEach((row, index) => {
+                const nameParts = row.profiles.full_name.trim().split(/\s+/);
+                let initials = nameParts[0].charAt(0).toUpperCase();
+                if(nameParts.length > 1) initials += nameParts[1].charAt(0).toUpperCase();
+
+                let rankDisplay = `<span style="color: #64748b; font-weight: 700;">#${index + 1}</span>`;
+                if (index === 0) rankDisplay = '🥇';
+                if (index === 1) rankDisplay = '🥈';
+                if (index === 2) rankDisplay = '🥉';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-size: 1.2rem; text-align: center; width: 50px;">${rankDisplay}</td>
+                    <td>
+                        <div style="display: flex; align-items: center;">
+                            <div class="mini-avatar">${initials}</div>
+                            <span style="font-weight: 600; color: #1e293b;">${row.profiles.full_name}</span>
+                        </div>
+                    </td>
+                    <td><span class="score-badge badge-blue">${row.total_score}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.logout = async function() {
+            await supabaseClient.auth.signOut();
+            localStorage.removeItem('cbt_session_token');
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>
