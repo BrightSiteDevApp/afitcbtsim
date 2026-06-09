@@ -3,23 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brightsitedev POST UTME DRILLER (AFIT)</title>
+
+<link rel="icon" type="image/svg+xml" href="static/img/afitcbtsim-logo.svg">
+<link rel="icon" type="image/png" sizes="512x512" href="static/img/afitcbtsim-logo.png">
+<link rel="icon" type="image/png" sizes="192x192" href="static/img/afitcbtsim-logo1.png">
+<link rel="apple-touch-icon" href="static/img/apple-touch-icon.png">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+
+
+    <!-- ================= ENTERPRISE SEO TAGS ================= -->
+    <title>AFIT CBT Simulator | Secure Your Admission - afitcbtsim</title>
+    <meta name="description" content="The ultimate Post-UTME mock examination platform for Air Force Institute of Technology (AFIT) aspirants. Practice with authentic past questions and secure your admission today.">
+    <meta name="keywords" content="AFIT, CBT Simulator, Post-UTME, Air Force Institute of Technology, Mock Exam, Past Questions, Brightsitedev, afitcbtsim">
+    <meta name="author" content="BrightSideDev">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    
+    <!-- Open Graph / Social Media Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="AFIT CBT Simulator | Secure Your Admission">
+    <meta property="og:description" content="Master the exact AFIT Post-UTME CBT environment. Practice with authentic past questions and track your readiness with advanced analytics.">
+    <meta property="og:image" content="static/img/logo.jpg">
+    <meta property="og:site_name" content="AFIT CBT Simulator">
+    <!-- ======================================================= -->
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="static/main.css">
+
+    <style>
+        /* PREMIUM "COMING SOON" TOAST NOTIFICATION */
+        .coming-soon-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(150px); /* Hidden by default */
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 1px solid #334155;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncy animation */
+        }
+        
+        .coming-soon-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* BRIGHTSITEDEV BRANDING HOVER */
+        .built-by-badge a:hover {
+            color: #bae6fd !important;
+            text-decoration: underline !important;
+        }
+    </style>
 </head>
 <body class="landing-body">
 
+    <!-- THE TOAST NOTIFICATION ELEMENT -->
+    <div id="coming-soon-toast" class="coming-soon-toast">
+        <svg style="width: 20px; color: #38bdf8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <span>Platform launching soon! Stay tuned.</span>
+    </div>
+
     <nav class="public-nav">
-        <div class="logo">
-            <img src="static/img/logo.jpg" alt="Brightsitedev Logo" style="border-radius: 6px;">
-        </div>
+       <div class="logo" style="display: flex; align-items: center;">
+    <!-- Beautiful AFIT CBT Logo SVG -->
+    <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); flex-shrink: 0;">
+        <rect width="100" height="100" rx="22" fill="url(#logo-grad)"/>
+        <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
+        <path d="M32 54 L45 67 L75 32" stroke="#38bdf8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs>
+            <linearGradient id="logo-grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0f172a"/>
+                <stop offset="1" stop-color="#1d4ed8"/>
+            </linearGradient>
+        </defs>
+    </svg>
+    <span style="font-weight: 800; color: #1e293b; margin-left: 12px; font-size: 1.2rem; letter-spacing: -0.5px;">AFIT CBT SIM</span>
+</div>
         <div class="nav-buttons" id="nav-btn-container">
-            <a href="login/index.html" class="login-btn">Log In</a>
-            <a href="login/index.html" class="signup-btn">Start Practicing Free</a>
+            <a href="#" onclick="showComingSoon(event)" class="login-btn">Log In</a>
+            <a href="#" onclick="showComingSoon(event)" class="signup-btn">Start Practicing Free</a>
         </div>
     </nav>
 
@@ -34,7 +107,7 @@
                 <p>Don't leave your future to chance. Master the exact Post-UTME CBT environment, practice with authentic past questions, and track your readiness with advanced analytics.</p>
                 
                 <div class="hero-actions">
-                    <a href="login/index.html" class="cta-btn-massive" id="hero-main-btn">Claim Your 2 Free Tests</a>
+                    <a href="#" onclick="showComingSoon(event)" class="cta-btn-massive" id="hero-main-btn">Claim Your 2 Free Tests</a>
                 </div>
 
                 <div class="social-proof">
@@ -44,7 +117,7 @@
                         <div class="mini-avatar-img" style="background: #f59e0b;">J</div>
                         <div class="mini-avatar-img" style="background: #8b5cf6;">E</div>
                     </div>
-                    <span>Join <strong>1,200+</strong> smart aspirants practicing today.</span>
+                    <span>Join <strong>100+</strong> smart aspirants practicing today.</span>
                 </div>
             </div>
         </section>
@@ -69,7 +142,7 @@
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                     </div>
                     <h3>Massive Question Bank</h3>
-                    <p>Gain unlimited access to thousands of standard questions across Mathematics, Physics, Chemistry, and English. No more guessing what might come out.</p>
+                    <p>Gain unlimited access to thousands of standard questions across Mathematics, Physics, Chemistry, English, Literature, Government, Commerce, and Economics. No more guessing what might come out.</p>
                 </div>
 
                 <div class="premium-feature-card">
@@ -86,23 +159,54 @@
             <div class="cta-content">
                 <h2>Your Admission Won't Wait.</h2>
                 <p>Start your first mock exam right now in less than 30 seconds. No credit card required.</p>
-                <a href="login/index.html" class="cta-btn-light" id="footer-main-btn">Create Free Account</a>
+                <a href="#" onclick="showComingSoon(event)" class="cta-btn-light" id="footer-main-btn">Create Free Account</a>
             </div>
         </section>
     </main>
 
-    <footer class="premium-footer">
-        <div class="footer-logo">
-            <img src="static/img/logo.jpg" alt="Logo" style="border-radius: 4px; height: 30px;">
-            <span>Brightsitedev CBT</span>
+    <footer class="premium-footer" style="padding-bottom: 2rem;">
+        <div class="footer-logo" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+    <!-- Smaller Footer SVG -->
+    <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 6px;">
+        <rect width="100" height="100" rx="22" fill="url(#logo-grad-footer)"/>
+        <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
+        <path d="M32 54 L45 67 L75 32" stroke="#38bdf8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs>
+            <linearGradient id="logo-grad-footer" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0f172a"/>
+                <stop offset="1" stop-color="#1d4ed8"/>
+            </linearGradient>
+        </defs>
+    </svg>
+    <span style="font-weight: 700; color: #1e293b;">AFIT CBT SIM</span>
+</div>
+        <p>&copy; 2026 AFIT CBT Simulator. Engineered for Excellence.</p>
+        
+        <!-- PROUDLY BUILT BY BRIGHTSITEDEV -->
+        <div class="built-by-badge" style="margin-top: 20px; font-size: 0.85rem; color: #94a3b8; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg style="width: 16px; color: #10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Proudly built & powered by <a href="https://brightsitedev.tech" target="_blank" style="color: #38bdf8; text-decoration: none; font-weight: 600; transition: color 0.2s;">BrightSideDev</a>
         </div>
-        <p>&copy; 2026 Brightsitedev. Engineered for Excellence.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="static/app.js" defer></script>
     
     <script>
+        // --- TOAST NOTIFICATION LOGIC ---
+        function showComingSoon(e) {
+            if (e) e.preventDefault();
+            const toast = document.getElementById('coming-soon-toast');
+            toast.classList.add('show');
+            
+            // Hide after 3.5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        // --- SESSION OVERRIDE LOGIC ---
+        // (Keeps the buttons active if you, the admin, are already logged in locally)
         window.addEventListener('DOMContentLoaded', async () => {
             if (typeof supabaseClient === 'undefined') return;
             const { data: { session } } = await supabaseClient.auth.getSession();
@@ -115,6 +219,7 @@
                 const heroBtn = document.getElementById('hero-main-btn');
                 if(heroBtn) {
                     heroBtn.href = "dashboard/index.html";
+                    heroBtn.onclick = null; // Remove the "Coming Soon" block
                     heroBtn.innerText = "Continue Practicing";
                 }
 
@@ -122,6 +227,7 @@
                 const footBtn = document.getElementById('footer-main-btn');
                 if(footBtn) {
                     footBtn.href = "dashboard/index.html";
+                    footBtn.onclick = null; // Remove the "Coming Soon" block
                     footBtn.innerText = "Go to Dashboard";
                 }
             }

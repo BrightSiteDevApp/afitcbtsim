@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Results - Brightsitedev CBT</title>
+    <title>My Results - AFIT CBT Simulator</title>
+    
+    <!-- Favicon Stack for SEO and Mobile -->
+    <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
+<link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
+<link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
+<link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
+<link rel="icon" href="../favicon.ico" type="image/x-icon">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,9 +124,19 @@
     <div class="sidebar-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
 
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <img src="../static/img/logo.jpg" alt="Logo">
-            <span>Brightsitedev</span>
+        <div class="sidebar-header" style="display: flex; align-items: center; gap: 12px; padding: 1rem 0;">
+            <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 8px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(37,99,235,0.3);">
+                <rect width="100" height="100" rx="22" fill="url(#logo-grad-results)"/>
+                <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
+                <path d="M32 54 L45 67 L75 32" stroke="#38bdf8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                    <linearGradient id="logo-grad-results" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#0f172a"/>
+                        <stop offset="1" stop-color="#1d4ed8"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <span style="font-weight: 800; font-size: 1.15rem; color: #1e293b; letter-spacing: -0.5px; white-space: nowrap;">AFIT CBT SIM</span>
         </div>
         
         <ul class="sidebar-nav">
@@ -293,6 +310,28 @@
                 if (finalAggregate > highestAggregate) highestAggregate = finalAggregate;
                 totalAggregateSum += finalAggregate;
 
+                // 🚀 DYNAMIC SUBJECT GENERATOR FOR FULL HISTORY TABLE
+                const allScores = [
+                    { name: 'ENG', val: row.english_score },
+                    { name: 'GNS', val: row.gns_score },
+                    { name: 'MTH', val: row.math_score },
+                    { name: 'PHY', val: row.physics_score },
+                    { name: 'CHM', val: row.chemistry_score },
+                    { name: 'ECO', val: row.economics_score },
+                    { name: 'LIT', val: row.literature_score },
+                    { name: 'GOV', val: row.government_score },
+                    { name: 'COM', val: row.commerce_score }
+                ].filter(s => s.val !== undefined && s.val !== null && s.val > 0);
+
+                if (allScores.length === 0) allScores.push({ name: 'ENG', val: 0 }); // Fallback
+
+                // Map into a two-column layout dynamically
+                let breakdownHtml = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">`;
+                allScores.forEach(s => {
+                    breakdownHtml += `<span>${s.name}: <strong>${s.val}</strong></span>`;
+                });
+                breakdownHtml += `</div>`;
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
@@ -300,8 +339,7 @@
                         <span style="font-size: 0.85rem; color: #64748b;">${formattedTime}</span>
                     </td>
                     <td style="font-size: 0.9rem; color: #475569; line-height: 1.6;">
-                        ENG: <strong>${row.english_score}</strong> &nbsp;|&nbsp; MTH: <strong>${row.math_score}</strong><br>
-                        PHY: <strong>${row.physics_score}</strong> &nbsp;|&nbsp; CHM: <strong>${row.chemistry_score}</strong>
+                        ${breakdownHtml}
                     </td>
                     <td><span class="score-badge ${badgeClass}">${row.total_score} / 50</span></td>
                     <td><strong style="font-size: 1.2rem; color: #2563eb;">${finalAggregate}%</strong></td>
