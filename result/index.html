@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam Results - AFIT CBT Simulator</title>
 
-     <!-- Favicon Stack for SEO and Mobile -->
-    <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
-<link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
-<link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
-<link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
-<link rel="icon" href="../favicon.ico" type="image/x-icon">
+     <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
+    <link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
+    <link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,6 +17,7 @@
     <link rel="stylesheet" href="../static/main.css">
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         body { background-color: #f8fafc; color: #0f172a; margin: 0; padding: 0; }
@@ -81,12 +81,38 @@
         .subject-card h4 { margin: 0 0 5px 0; color: #64748b; font-size: 0.85rem; text-transform: uppercase; }
         .subject-card p { margin: 0; font-size: 1.5rem; font-weight: 800; color: #2563eb; }
 
+        /* BUTTONS */
         .action-btn {
             display: block; width: 100%; background: #0f172a; color: white;
             text-align: center; padding: 1.2rem; border-radius: 12px; font-weight: 700;
-            text-decoration: none; margin-top: 2rem; transition: transform 0.2s; border: none; cursor: pointer;
+            text-decoration: none; margin-top: 1rem; transition: transform 0.2s; border: none; cursor: pointer;
+            font-size: 1rem; font-family: 'Poppins', sans-serif;
         }
         .action-btn:hover { transform: translateY(-2px); }
+        
+        .download-btn {
+            background: #2563eb; 
+            margin-top: 2rem;
+        }
+        .download-btn:hover {
+            background: #1d4ed8; 
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        /* HIDDEN CAPTURE CARD DESIGN */
+        #capture-area {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 700px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 50px;
+            border-radius: 24px;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+            z-index: -100;
+        }
 
         /* MOBILE RESPONSIVENESS */
         @media (max-width: 900px) {
@@ -99,14 +125,54 @@
 </head>
 <body>
 
+    <div id="capture-area">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 25px; margin-bottom: 30px;">
+            <div style="display: flex; align-items: center;">
+                <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                    <rect width="100" height="100" rx="22" fill="#2563eb"/>
+                    <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
+                    <path d="M32 54 L45 67 L75 32" stroke="#bae6fd" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div style="margin-left: 20px;">
+                    <h2 style="margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -0.5px;">AFIT CBT Simulator</h2>
+                    <p style="margin: 0; color: #93c5fd; font-size: 1.1rem; font-weight: 500;">Mock Result</p>
+                </div>
+            </div>
+            
+            <div style="text-align: right; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 8px;">
+                <p style="margin: 0; color: #cbd5e1; font-size: 0.95rem; font-weight: 600;" id="card-date">--</p>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 40px;">
+            <p style="margin: 0; color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Aspirant Profile</p>
+            <h3 style="margin: 5px 0 0 0; font-size: 2.2rem; font-weight: 800;" id="card-name">Aspirant Name</h3>
+            <p style="margin: 5px 0 0 0; color: #cbd5e1; font-size: 1.2rem; font-weight: 500;" id="card-course">Course Applied For</p>
+        </div>
+
+        <div style="display: flex; gap: 20px;">
+            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; flex: 1; text-align: center;">
+                <p style="margin: 0; color: #93c5fd; font-weight: 600; font-size: 1.1rem;">Post-UTME Score</p>
+                <h1 style="margin: 10px 0 0 0; font-size: 3.5rem; font-weight: 800;" id="card-score">--/50</h1>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; flex: 1; text-align: center; border: 3px solid #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);">
+                <p style="margin: 0; color: #93c5fd; font-weight: 600; font-size: 1.1rem;">Aggregate</p>
+                <h1 style="margin: 10px 0 0 0; font-size: 3.5rem; font-weight: 800; color: #60a5fa;" id="card-agg">--%</h1>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            <p style="margin: 0; font-size: 0.9rem; color: #64748b; font-weight: 500;">Engineered for Excellence by Brightsitedev</p>
+        </div>
+    </div>
     <nav class="result-nav">
-        <div style="font-weight: 800; font-size: 1.2rem; color: #1e293b;">Brightsitedev CBT</div>
+        <div style="font-weight: 800; font-size: 1.2rem; color: #1e293b;">AFIT CBT Simulator</div>
         <div style="color: #64748b; font-weight: 600;" id="status-badge">Processing Results...</div>
     </nav>
 
     <div class="result-wrapper">
         <div class="aggregate-panel">
-            <h2 style="margin-top: 0; font-size: 1.5rem; color: #93c5fd;">Admission Aggregate</h2>
+            <h2 style="margin-top: 0; font-size: 1.5rem; color: #93c5fd;">Aggregate</h2>
             <div class="score-circle">
                 <h1 id="ui-aggregate">--</h1>
                 <span>out of 100%</span>
@@ -138,6 +204,10 @@
             <div class="subject-grid" id="subject-container">
                 </div>
 
+            <button class="action-btn download-btn" id="dl-btn" onclick="downloadResultCard()">
+                <svg style="width: 20px; vertical-align: middle; margin-right: 8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Download Result Card
+            </button>
             <button class="action-btn" onclick="window.location.href='../dashboard/index.html'">Return to Dashboard</button>
         </div>
     </div>
@@ -158,14 +228,14 @@
             
             const examData = JSON.parse(rawExamData);
             
-            // 2. Authenticate & Fetch Profile for JAMB Score
+            // 2. Authenticate & Fetch Profile
             const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
             if (!session || authError) return window.location.href = '../login/index.html';
 
             const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
             
             // 3. THE MATHEMATICS ENGINE
-            const totalQuestions = examData.totalQuestions || 50; // Updated default to 50
+            const totalQuestions = examData.totalQuestions || 50; 
             const correctAnswers = examData.correctCount || 0;
             
             // Scale Post-UTME to be strictly out of 50
@@ -173,7 +243,7 @@
             const postUtmeScore = parseFloat(rawPostUtme.toFixed(1));
 
             // JAMB Calculation
-            const jambScore = profile.jamb_score || 0; // Fallback to 0 if they bypassed it
+            const jambScore = profile.jamb_score || 0; 
             const jambWeight = parseFloat((jambScore / 8).toFixed(1));
 
             // Final Formula Fusion
@@ -188,10 +258,8 @@
             // Populate Subject Grid dynamically
             const subContainer = document.getElementById('subject-container');
             for (const [subject, score] of Object.entries(examData.breakdown)) {
-                // Only show subjects they actually took
                 if (score > 0 || ['english', 'mathematics', 'gns'].includes(subject)) { 
                     
-                    // Format subject names beautifully (e.g. "gns" -> "GNS", "english" -> "English")
                     let displaySubject = subject.charAt(0).toUpperCase() + subject.slice(1);
                     if (subject === 'gns') displaySubject = 'GNS';
 
@@ -202,13 +270,22 @@
                 }
             }
 
+            // POPULATE THE HIDDEN CARD FOR DOWNLOADING
+            document.getElementById('card-name').innerText = profile.full_name || 'Aspirant';
+            document.getElementById('card-course').innerText = profile.course_applied || 'General Assessment';
+            document.getElementById('card-score').innerText = postUtmeScore + ' / 50';
+            document.getElementById('card-agg').innerText = finalAggregate + '%';
+            
+            // Add current date dynamically to the image card
+            const today = new Date();
+            document.getElementById('card-date').innerText = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
             // Trigger Premium Confetti Celebration
             confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#2563eb', '#3b82f6', '#93c5fd'] });
 
             // 5. SAVE TO SUPABASE DATABASE
             document.getElementById('status-badge').innerText = 'Saving to Database...';
 
-            // Push to Results Table
             const { error: insertError } = await supabaseClient.from('results').insert({
                 student_id: session.user.id,
                 total_score: postUtmeScore, 
@@ -228,19 +305,46 @@
                 document.getElementById('status-badge').innerText = 'Error Saving! Please screenshot your score.';
                 document.getElementById('status-badge').style.color = '#ef4444';
             } else {
-                // Increment tests taken in Profiles table only if result saved successfully
                 await supabaseClient.from('profiles').update({ 
                     tests_taken: (profile.tests_taken || 0) + 1 
-                }).eq('id', session.user.id);w
+                }).eq('id', session.user.id); 
 
                 document.getElementById('status-badge').innerText = 'Results Saved ✓';
                 document.getElementById('status-badge').style.color = '#10b981';
 
-                // 6. Security: Wipe local storage so they can't refresh and save duplicate scores
+                // Wipe local storage
                 localStorage.removeItem('cbt_recent_exam');
                 localStorage.removeItem('cbt_user_answers');
             }
         });
+
+        // HTML2CANVAS DOWNLOAD FUNCTION
+        function downloadResultCard() {
+            const btn = document.getElementById('dl-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<svg style="width: 20px; vertical-align: middle; margin-right: 8px;" class="animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating Image...`;
+            
+            const captureArea = document.getElementById('capture-area');
+            
+            // Bring card into view instantly behind the scenes for capture
+            captureArea.style.left = '0';
+            
+            html2canvas(captureArea, { scale: 2, backgroundColor: null }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'AFIT_Mock_Result.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Hide it again
+                captureArea.style.left = '-9999px';
+                btn.innerHTML = originalText;
+            }).catch(err => {
+                console.error("Image generation failed", err);
+                captureArea.style.left = '-9999px';
+                btn.innerHTML = originalText;
+                alert("Could not generate image. Please try taking a normal screenshot.");
+            });
+        }
     </script>
 </body>
 </html>

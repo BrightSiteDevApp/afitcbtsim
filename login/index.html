@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - AFIT CBT Simulator</title>
     <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
-<link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
-<link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
-<link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
-<link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
+    <link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
         <div class="auth-banner">
             <div class="banner-content">
                 <h2>Your Journey to Success Starts Here.</h2>
-                <p>Join hundreads of aspirants preparing smarter, faster, and better for the Post-UTME. Master your subjects with our time-bound CBT engine.</p>
+                <p>Join hundreds of aspirants preparing smarter, faster, and better for the Post-UTME. Master your subjects with our time-bound CBT engine.</p>
                 
                 <div class="banner-graphic">
                     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -36,40 +36,52 @@
         <div class="auth-form-container">
             <div class="auth-form-wrapper">
                 
-               <div class="logo" style="display: flex; align-items: center;">
-    <!-- Beautiful AFIT CBT Logo SVG -->
-    <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); flex-shrink: 0;">
-        <rect width="100" height="100" rx="22" fill="url(#logo-grad)"/>
-        <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
-        <path d="M32 54 L45 67 L75 32" stroke="#38bdf8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
-        <defs>
-            <linearGradient id="logo-grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#0f172a"/>
-                <stop offset="1" stop-color="#1d4ed8"/>
-            </linearGradient>
-        </defs>
-    </svg>
-    <span style="font-weight: 800; color: #1e293b; margin-left: 12px; font-size: 1.2rem; letter-spacing: -0.5px;">AFIT CBT SIM</span>
-</div>
+                <div class="logo" style="display: flex; align-items: center; margin-bottom: 2rem;">
+                    <!-- Beautiful AFIT CBT Logo SVG -->
+                    <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); flex-shrink: 0;">
+                        <rect width="100" height="100" rx="22" fill="url(#logo-grad)"/>
+                        <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
+                        <path d="M32 54 L45 67 L75 32" stroke="#38bdf8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logo-grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#0f172a"/>
+                                <stop offset="1" stop-color="#1d4ed8"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span style="font-weight: 800; color: #1e293b; margin-left: 12px; font-size: 1.2rem; letter-spacing: -0.5px;">AFIT CBT SIM</span>
+                </div>
                 
-                <h2 class="auth-title">Welcome, Aspirant</h2>
-                <p class="auth-subtitle">Enter your email to receive a secure, passwordless login code.</p>
-
-                <form id="email-form" onsubmit="requestOTP(event)">
-                    <div class="input-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" placeholder="name@example.com" maxlength="60" required>
+                <!-- PUBLIC COMING SOON MESSAGE -->
+                <div id="coming-soon-block" style="text-align: center; padding: 2rem 0;">
+                    <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; background: #eff6ff; color: #2563eb; border-radius: 50%; margin-bottom: 1rem;">
+                        <svg style="width: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <button type="submit" id="request-btn" class="auth-btn">Continue with Email</button>
-                </form>
+                    <h2 style="font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 10px;">Launching Soon</h2>
+                    <p style="color: #64748b; line-height: 1.6;">We are currently finalizing the ultimate AFIT Post-UTME simulator. The platform will be open to the public shortly!</p>
+                </div>
 
-                <form id="otp-form" class="hidden" onsubmit="verifyOTP(event)">
-                    <div class="input-group">
-                        <label for="otp">Enter 6-Digit Code</label>
-                        <input type="text" id="otp" placeholder="123456" pattern="[0-9]*" maxlength="8" required style="letter-spacing: 5px; font-size: 1.2rem; text-align: center; font-weight: 600;">
-                    </div>
-                    <button type="submit" id="verify-btn" class="auth-btn">Verify & Secure Login</button>
-                </form>
+                <!-- SECRET LOGIN FORMS -->
+                <div id="secret-login-block" style="display: none;">
+                    <h2 class="auth-title">Welcome, Admin</h2>
+                    <p class="auth-subtitle">Enter your email to receive a secure, passwordless login code.</p>
+
+                    <form id="email-form" onsubmit="requestOTP(event)">
+                        <div class="input-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" placeholder="name@example.com" maxlength="60" required>
+                        </div>
+                        <button type="submit" id="request-btn" class="auth-btn">Continue with Email</button>
+                    </form>
+
+                    <form id="otp-form" class="hidden" onsubmit="verifyOTP(event)">
+                        <div class="input-group">
+                            <label for="otp">Enter 6-Digit Code</label>
+                            <input type="text" id="otp" placeholder="123456" pattern="[0-9]*" maxlength="8" required style="letter-spacing: 5px; font-size: 1.2rem; text-align: center; font-weight: 600;">
+                        </div>
+                        <button type="submit" id="verify-btn" class="auth-btn">Verify & Secure Login</button>
+                    </form>
+                </div>
 
                 <div id="auth-message"></div>
                 
@@ -84,10 +96,18 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../static/app.js"></script>
     <script>
-        // Smart Redirect Logic
         window.addEventListener('DOMContentLoaded', async () => {
+            
+            // 🚀 THE SECRET BACKDOOR LOGIC
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('mode') === 'admin') {
+                document.getElementById('coming-soon-block').style.display = 'none';
+                document.getElementById('secret-login-block').style.display = 'block';
+            }
+
+            // Smart Redirect Logic for already logged-in users
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) window.location.href = '../dashboard/index.html';
+            if (session) window.location.href = '../dashboard/';
         });
     </script>
 </body>

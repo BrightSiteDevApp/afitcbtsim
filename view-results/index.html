@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Results - AFIT CBT Simulator</title>
     
-    <!-- Favicon Stack for SEO and Mobile -->
     <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
-<link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
-<link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
-<link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
-<link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
+    <link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/main.css">
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         /* MOBILE OVERFLOW KILLER - STRICT BOX SIZING */
         html, body { max-width: 100vw !important; overflow-x: hidden !important; margin: 0; padding: 0; }
@@ -59,21 +60,59 @@
         .analytic-info h4 { margin: 0 0 5px 0; font-size: 0.95rem; color: #64748b; font-weight: 600; text-transform: uppercase; }
         .analytic-info div { font-size: 2rem; font-weight: 800; color: #0f172a; line-height: 1; }
 
-        /* FULL HISTORY TABLE */
+        /* FULL HISTORY TABLE WITH SCROLLING FOR 115 RESULTS */
         .full-history-section {
             background: white; padding: 2.5rem; border-radius: 20px;
             border: 1px solid #e2e8f0; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
             width: 100%; max-width: 100%;
         }
 
-        .table-responsive { width: 100%; max-width: 100vw; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; white-space: nowrap; }
-        .data-table th { background: #f8fafc; color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; padding: 1.2rem 1rem; text-align: left; }
+        .table-responsive { 
+            width: 100%; 
+            max-width: 100vw; 
+            max-height: 600px; /* Keeps the table from getting too long */
+            overflow-y: auto; 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch; 
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+        
+        .data-table { width: 100%; border-collapse: collapse; white-space: nowrap; margin: 0; }
+        .data-table th { 
+            background: #f8fafc; color: #64748b; font-weight: 700; text-transform: uppercase; 
+            font-size: 0.85rem; padding: 1.2rem 1rem; text-align: left;
+            position: sticky; top: 0; z-index: 10; /* Sticky header */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
         .data-table td { padding: 1.2rem 1rem; border-bottom: 1px solid #e2e8f0; color: #1e293b; vertical-align: middle; }
-        .data-table tr:hover { background-color: #f8fafc; transition: background 0.2s; }
+        .data-table tr:hover { background-color: #f1f5f9; transition: background 0.2s; }
         
         .badge-green { background: #dcfce7; color: #166534; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;}
         .badge-orange { background: #ffedd5; color: #9a3412; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;}
+
+        /* BUTTON FOR HISTORY DOWNLOAD */
+        .dl-row-btn {
+            background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;
+            padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; font-family: 'Poppins', sans-serif; font-size: 0.85rem; white-space: nowrap;
+        }
+        .dl-row-btn:hover { background: #2563eb; color: white; box-shadow: 0 4px 10px rgba(37,99,235,0.2); }
+
+        /* HIDDEN CAPTURE CARD DESIGN */
+        #capture-area {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 700px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 50px;
+            border-radius: 24px;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+            z-index: -100;
+        }
 
         /* 🔥 STRICT MOBILE LOCKDOWN 🔥 */
         @media (max-width: 900px) {
@@ -83,7 +122,6 @@
                 max-width: 100vw !important;
             }
             
-            /* Fix the Welcome Banner Bleed & Stack Elements */
             .welcome-banner {
                 padding: 1.5rem !important;
                 border-radius: 16px !important;
@@ -92,35 +130,57 @@
                 align-items: flex-start !important;
                 gap: 1.5rem;
             }
-            .welcome-text {
-                max-width: 100% !important;
-            }
-            .welcome-banner button {
-                width: 100% !important;
-            }
+            .welcome-text { max-width: 100% !important; }
+            .welcome-banner button { width: 100% !important; }
 
-            .analytics-grid { 
-                grid-template-columns: 1fr; 
-                gap: 1rem; 
-            }
-            
-            .analytic-card {
-                padding: 1.5rem !important;
-            }
-
-            .full-history-section { 
-                padding: 1.5rem !important; 
-            }
-            
-            .data-table th, .data-table td { 
-                padding: 0.8rem 0.5rem; 
-                font-size: 0.85rem;
-            }
+            .analytics-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .analytic-card { padding: 1.5rem !important; }
+            .full-history-section { padding: 1.5rem !important; }
+            .data-table th, .data-table td { padding: 0.8rem 0.5rem; font-size: 0.85rem; }
         }
     </style>
 </head>
 <body class="dashboard-body">
 
+    <div id="capture-area">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 25px; margin-bottom: 30px;">
+            <div style="display: flex; align-items: center;">
+                <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                    <rect width="100" height="100" rx="22" fill="#2563eb"/>
+                    <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
+                    <path d="M32 54 L45 67 L75 32" stroke="#bae6fd" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div style="margin-left: 20px;">
+                    <h2 style="margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -0.5px;">AFIT CBT Simulator</h2>
+                    <p style="margin: 0; color: #93c5fd; font-size: 1.1rem; font-weight: 500;">Mock Result</p>
+                </div>
+            </div>
+            <div style="text-align: right; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 8px;">
+                <p style="margin: 0; color: #cbd5e1; font-size: 0.95rem; font-weight: 600;" id="card-date">--</p>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 40px;">
+            <p style="margin: 0; color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Aspirant Profile</p>
+            <h3 style="margin: 5px 0 0 0; font-size: 2.2rem; font-weight: 800;" id="card-name">Aspirant Name</h3>
+            <p style="margin: 5px 0 0 0; color: #cbd5e1; font-size: 1.2rem; font-weight: 500;" id="card-course">Course Applied For</p>
+        </div>
+
+        <div style="display: flex; gap: 20px;">
+            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; flex: 1; text-align: center;">
+                <p style="margin: 0; color: #93c5fd; font-weight: 600; font-size: 1.1rem;">Post-UTME Score</p>
+                <h1 style="margin: 10px 0 0 0; font-size: 3.5rem; font-weight: 800;" id="card-score">--/50</h1>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; flex: 1; text-align: center; border: 3px solid #3b82f6; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);">
+                <p style="margin: 0; color: #93c5fd; font-weight: 600; font-size: 1.1rem;">Aggregate</p>
+                <h1 style="margin: 10px 0 0 0; font-size: 3.5rem; font-weight: 800; color: #60a5fa;" id="card-agg">--%</h1>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            <p style="margin: 0; font-size: 0.9rem; color: #64748b; font-weight: 500;">Engineered for Excellence by Brightsitedev</p>
+        </div>
+    </div>
     <div class="sidebar-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
 
     <aside class="sidebar" id="sidebar">
@@ -178,14 +238,14 @@
                     <p style="color: #93c5fd; margin: 0; font-size: 1rem; line-height: 1.5;">Review your complete examination history and track your aggregate progress over time.</p>
                 </div>
 
-                <div style="position: absolute; right: 0; top: -50px; opacity: 0.15; pointer-events: none;">
-                    <svg width="350" height="350" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#ffffff" d="M42.7,-62.4C55.3,-53.1,65.4,-39.8,71.2,-24.8C77,-9.8,78.5,6.8,73.4,21.3C68.3,35.8,56.6,48.1,43.1,57C29.6,65.9,14.8,71.4,-0.6,72.2C-15.9,73,-31.8,69,-44.6,59.8C-57.4,50.6,-67.2,36.2,-71.4,20.4C-75.6,4.6,-74.2,-11.7,-67.4,-25.1C-60.6,-38.5,-48.4,-49,-35.1,-57.8C-21.8,-66.6,-10.9,-73.7,2.2,-76.7C15.3,-79.7,30.1,-71.7,42.7,-62.4Z" transform="translate(100 100) scale(1.1)" />
+                <div style="position: absolute; right: -50px; top: -50px; opacity: 0.08; pointer-events: none;">
+                    <svg width="300" height="300" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="100" cy="100" r="90" fill="#ffffff"/>
                     </svg>
                 </div>
                 
                 <div style="position: relative; z-index: 2;">
-                    <button onclick="window.location.href='../exams/index.html'" style="background: white; color: #1e40af; border: none; padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
+                    <button onclick="window.location.href='../exams/index.html'" style="background: white; color: #1e40af; border: none; padding: 1rem 1.8rem; border-radius: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.15); transition: transform 0.2s; white-space: nowrap;">
                         Take New Exam
                     </button>
                 </div>
@@ -226,7 +286,7 @@
                 </div>
 
                 <div class="full-history-section">
-                    <h2 style="margin-top: 0; font-size: 1.5rem; color: #0f172a; margin-bottom: 1.5rem;">Complete Examination Record</h2>
+                    <h2 style="margin-top: 0; font-size: 1.5rem; color: #0f172a; margin-bottom: 1.5rem;">Recent Examination Records</h2>
                     
                     <div class="table-responsive">
                         <table class="data-table">
@@ -236,10 +296,11 @@
                                     <th>Subject Breakdown</th>
                                     <th>Post-UTME</th>
                                     <th>Final Aggregate</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="full-history-body">
-                                <tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 3rem;">Loading your academic records...</td></tr>
+                                <tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 3rem;">Loading your academic records...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -278,16 +339,18 @@
         });
 
         async function fetchAllHistory(userId) {
+            // 🚀 EXPANDED TO SHOW RECENT 115 EXAMS AS REQUESTED
             const { data, error } = await supabaseClient
                 .from('results')
                 .select('*')
                 .eq('student_id', userId)
-                .order('submitted_at', { ascending: false });
+                .order('submitted_at', { ascending: false })
+                .limit(115);
                 
             const tbody = document.getElementById('full-history-body');
             
             if (error || !data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 3rem;">No examination records found. Complete a test to generate data.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 3rem;">No examination records found. Complete a test to generate data.</td></tr>';
                 return;
             }
 
@@ -310,7 +373,6 @@
                 if (finalAggregate > highestAggregate) highestAggregate = finalAggregate;
                 totalAggregateSum += finalAggregate;
 
-                // 🚀 DYNAMIC SUBJECT GENERATOR FOR FULL HISTORY TABLE
                 const allScores = [
                     { name: 'ENG', val: row.english_score },
                     { name: 'GNS', val: row.gns_score },
@@ -325,7 +387,6 @@
 
                 if (allScores.length === 0) allScores.push({ name: 'ENG', val: 0 }); // Fallback
 
-                // Map into a two-column layout dynamically
                 let breakdownHtml = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">`;
                 allScores.forEach(s => {
                     breakdownHtml += `<span>${s.name}: <strong>${s.val}</strong></span>`;
@@ -343,6 +404,11 @@
                     </td>
                     <td><span class="score-badge ${badgeClass}">${row.total_score} / 50</span></td>
                     <td><strong style="font-size: 1.2rem; color: #2563eb;">${finalAggregate}%</strong></td>
+                    <td>
+                        <button class="dl-row-btn" onclick="downloadHistoryResult('${formattedDate}', '${row.total_score}', '${finalAggregate}', this)">
+                            Download
+                        </button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -352,6 +418,44 @@
             
             const averageAggregate = (totalAggregateSum / data.length).toFixed(1);
             document.getElementById('stat-avg-score').innerText = averageAggregate;
+        }
+
+        // 🚀 DYNAMIC DOWNLOAD ENGINE FOR HISTORY ROWS
+        function downloadHistoryResult(dateString, putmeScore, aggregate, btnElement) {
+            const originalText = btnElement.innerHTML;
+            btnElement.innerHTML = 'Generating...';
+            btnElement.disabled = true;
+
+            // 1. Populate the hidden card with THIS row's specific data
+            document.getElementById('card-date').innerText = dateString;
+            document.getElementById('card-name').innerText = userProfile.full_name || 'Aspirant';
+            document.getElementById('card-course').innerText = userProfile.course_applied || 'General Assessment';
+            document.getElementById('card-score').innerText = putmeScore + ' / 50';
+            document.getElementById('card-agg').innerText = aggregate + '%';
+
+            const captureArea = document.getElementById('capture-area');
+            
+            // 2. Bring the card into view instantly (behind the scenes)
+            captureArea.style.left = '0';
+            
+            // 3. Take the screenshot
+            html2canvas(captureArea, { scale: 2, backgroundColor: null }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `AFIT_Mock_Result_${dateString.replace(/ /g, '_')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Hide card and restore button
+                captureArea.style.left = '-9999px';
+                btnElement.innerHTML = originalText;
+                btnElement.disabled = false;
+            }).catch(err => {
+                console.error("Image generation failed", err);
+                captureArea.style.left = '-9999px';
+                btnElement.innerHTML = originalText;
+                btnElement.disabled = false;
+                alert("Could not generate image. Please try again.");
+            });
         }
 
         window.logout = async function() {
