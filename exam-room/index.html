@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Examination - AFIT CBT Simulator</title>
-     <!-- Favicon Stack for SEO and Mobile -->
-    <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
-<link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
-<link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
-<link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
-<link rel="icon" href="../favicon.ico" type="image/x-icon">
+     <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
+    <link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
+    <link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -161,7 +160,7 @@
         <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Post-UTME Examination</h1>
         <p style="color: #94a3b8; max-width: 600px; line-height: 1.6;">
             <strong>WARNING:</strong> This exam operates under strict anti-malpractice protocols. 
-            Do not minimize your browser, switch tabs, or exit full screen. Doing so will result in an automatic strike. 3 strikes will submit your exam immediately.
+            Do not minimize your browser, switch tabs, hit the "Back" button, or exit full screen. Doing so will result in an automatic strike. 3 strikes will submit your exam immediately.
         </p>
         <button class="start-btn" id="init-btn" onclick="initiateExam()">Loading Profile...</button>
     </div>
@@ -236,6 +235,7 @@
         let examActive = false;
         let strikes = 0;
         const MAX_STRIKES = 3;
+        let isDeliberateSubmit = false; // Flag to check if they clicked "Submit"
 
         document.addEventListener("DOMContentLoaded", async () => {
             const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
@@ -243,6 +243,15 @@
 
             const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
             userProfile = profile;
+
+            // 🚀 BROWSER HISTORY TRAP (Prevents hitting back button without warning)
+            history.pushState(null, null, location.href);
+            window.onpopstate = function () {
+                if (examActive) {
+                    history.go(1); // Force them forward again
+                    issueStrike("You attempted to use the Browser Back button during an active exam.");
+                }
+            };
 
             const startBtn = document.getElementById('init-btn');
             startBtn.innerText = 'I Understand - Start Exam';
@@ -254,7 +263,7 @@
 
             let elem = document.documentElement;
             if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(err => console.log(err));
+                elem.requestFullscreen().catch(err => console.log("Fullscreen ignored"));
             }
 
             document.getElementById('start-gate').style.display = 'none';
@@ -264,18 +273,46 @@
             
             setTimeout(() => {
                 examActive = true;
+                // 🚀 DROP A COOKIE TRACKER: Flag that an exam is currently running
+                localStorage.setItem('cbt_active_exam_trap', 'TRUE');
                 startTimer(40 * 60); 
             }, 2000);
         }
 
+        // 🚀 BROWSER REFRESH/CLOSE WARNING
+        window.addEventListener('beforeunload', function (e) {
+            if (examActive && !isDeliberateSubmit) {
+                e.preventDefault();
+                e.returnValue = 'You are currently in an exam. Leaving this page will result in a ZERO score.';
+            }
+        });
+
+        // 🚀 ABANDONMENT PENALTY (If they somehow closed the tab and returned later)
+        if (localStorage.getItem('cbt_active_exam_trap') === 'TRUE') {
+            localStorage.removeItem('cbt_active_exam_trap');
+            alert("SYSTEM ALERT: You abandoned an ongoing exam session. Your previous paper was submitted automatically and marked as 0.");
+            // We force a 0 submission and kick them to results
+            forceZeroSubmission();
+        }
+
+        function forceZeroSubmission() {
+            const examData = {
+                totalQuestions: 50,
+                correctCount: 0,
+                breakdown: { english: 0, mathematics: 0, physics: 0, chemistry: 0, gns: 0, economics: 0, literature: 0, government: 0, commerce: 0 }
+            };
+            localStorage.setItem('cbt_recent_exam', JSON.stringify(examData));
+            window.location.href = '../result/index.html';
+        }
+
         document.addEventListener("visibilitychange", () => {
-            if (document.hidden && examActive) {
+            if (document.hidden && examActive && !isDeliberateSubmit) {
                 issueStrike("You switched tabs or minimized the browser.");
             }
         });
 
         document.addEventListener("fullscreenchange", () => {
-            if (!document.fullscreenElement && examActive) {
+            if (!document.fullscreenElement && examActive && !isDeliberateSubmit) {
                 issueStrike("You exited Full Screen mode.");
             }
         });
@@ -307,7 +344,6 @@
             try {
                 const course = userProfile.course_applied || "";
                 let subjectsToFetch = [];
-                // 🚀 EXACT 50-Question Distribution [English, GNS, Subject 1, Subject 2, Subject 3]
                 let limits = [15, 5, 10, 10, 10]; 
 
                 // 🧠 DYNAMIC SUBJECT ALGORITHM
@@ -315,7 +351,6 @@
                     subjectsToFetch = ['english', 'gns', 'economics', 'literature', 'government'];
                 } 
                 else if (course.includes("Accounting") || course.includes("Business") || course.includes("Economics")) {
-                    // Extract elective from brackets e.g., "Business Administration [Commerce]"
                     const match = course.match(/\[(.*?)\]/);
                     const elective = match ? match[1].toLowerCase() : 'commerce'; 
                     subjectsToFetch = ['english', 'gns', 'mathematic', 'economics', elective];
@@ -387,7 +422,6 @@
         function render() {
             const q = questions[index];
             
-            // Reverted specifically: No more (2026) here
             document.getElementById('q-subject-text').innerText = `${(q.subject || "Subject").toUpperCase()} • Q${index + 1} of ${questions.length}`;
             document.getElementById('q-db-id').innerText = `Report ID: ${q.short_id || q.id}`;
             
@@ -431,10 +465,12 @@
                 if (!confirm(confirmMsg)) return;
             }
 
+            // 🚀 SUCCESSFUL SUBMISSION: Turn off traps
+            isDeliberateSubmit = true;
             examActive = false;
+            localStorage.removeItem('cbt_active_exam_trap');
             
             let correctCount = 0;
-            // 🚀 Includes GNS tracking
             let breakdown = { english: 0, gns: 0, mathematics: 0, physics: 0, chemistry: 0, literature: 0, government: 0, commerce: 0, economics: 0 };
 
             questions.forEach((q, i) => {
