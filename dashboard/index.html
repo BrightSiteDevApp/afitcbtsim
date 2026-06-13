@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - AFIT CBT Simulator</title>
     
-    <!-- Favicon Stack for SEO and Mobile -->
     <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
-<link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
-<link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
-<link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
-<link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
+    <link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -22,7 +21,6 @@
     <div class="sidebar-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
 
     <aside class="sidebar" id="sidebar">
-        <!-- RESPONSIVE SIDEBAR LOGO -->
         <div class="sidebar-header" style="display: flex; align-items: center; gap: 12px; padding: 1rem 0;">
             <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 8px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(37,99,235,0.3);">
                 <rect width="100" height="100" rx="22" fill="url(#logo-grad-dash)"/>
@@ -208,7 +206,16 @@
             const statusText = document.getElementById('account-status');
             const actionBtn = document.getElementById('main-action-btn');
 
-           // 🚀 BETA TESTING LOCKDOWN LOGIC
+            // 🚀 1. GET HACKER-PROOF SERVER TIME
+            const { data: serverTimeStr } = await supabaseClient.rpc('get_server_time');
+            const currentTime = serverTimeStr ? new Date(serverTimeStr) : new Date();
+
+            // 🚀 2. SET YOUR BETA TIME WINDOW
+            // Format: YYYY-MM-DDTHH:MM:SS+01:00 (+01:00 ensures it is exact Nigerian Time / WAT)
+            const betaStart = new Date("2026-06-13T18:00:00+01:00"); // 6:00 PM
+            const betaEnd = new Date("2026-06-13T22:00:00+01:00");   // 10:00 PM
+
+            // 🚀 3. BETA TESTING LOCKDOWN LOGIC
             if (actualTestsTaken >= 1) {
                 // Wipe the dashboard screen
                 document.querySelector('.dashboard-content').innerHTML = `
@@ -221,49 +228,39 @@
                         </p>
                     </div>
                 `;
-                // Hide the navigation links so they can't bypass the lockdown
                 document.querySelector('.sidebar-nav').style.display = 'none';
                 document.querySelector('.mobile-menu-btn').style.display = 'none';
-                return; // Stop running the rest of the dashboard
+                return; 
             }
 
-            // Beta Tester hasn't taken a test yet
-            statusText.innerText = 'Beta Tester';
-            actionBtn.innerText = 'Start Beta Test →'; 
-            actionBtn.style.background = '#16a34a'; // Green go button
-            actionBtn.onclick = () => window.location.href = '../exam-room/index.html'; 
+            // 🚀 4. TIME WINDOW LOGIC
+            if (currentTime < betaStart) {
+                // Too Early
+                statusText.innerText = 'Beta Scheduled';
+                actionBtn.innerText = 'Opens at 6:00 PM 🕒';
+                actionBtn.style.background = '#94a3b8'; // Gray out the button
+                actionBtn.style.cursor = 'not-allowed';
+                actionBtn.onclick = () => alert("The Beta Test has not started yet. Please return at 6:00 PM.");
+                
+            } else if (currentTime > betaEnd) {
+                // Too Late
+                statusText.innerText = 'Beta Closed';
+                actionBtn.innerText = 'Beta Window Closed 🔒';
+                actionBtn.style.background = '#ef4444'; // Red button
+                actionBtn.style.cursor = 'not-allowed';
+                actionBtn.onclick = () => alert("The Beta Test window has officially closed. Thank you for your interest!");
+                
+            } else {
+                // Inside the window! (Between 6pm and 10pm)
+                statusText.innerText = 'Beta Tester';
+                actionBtn.innerText = 'Start Beta Test →'; 
+                actionBtn.style.background = '#16a34a'; // Green go button
+                actionBtn.style.cursor = 'pointer';
+                actionBtn.onclick = () => window.location.href = '../exam-room/index.html'; 
+            }
 
             fetchLeaderboard();
             fetchUserHistory(session.user.id);
-        }
-
-        function initiatePayment(email, userId) {
-            let handler = PaystackPop.setup({
-                key: 'pk_live_f1ca0bad0d6913267fb525e6c58cd2c447a1ae29',
-                email: email,
-                amount: 1050 * 100,
-                currency: 'NGN',
-                ref: 'AFIT_' + Math.floor((Math.random() * 1000000000) + 1),
-                metadata: {
-                    custom_fields: [
-                        {
-                            display_name: "Student ID",
-                            variable_name: "student_id",
-                            value: userId 
-                        }
-                    ]
-                },
-                callback: function(response) {
-                    alert('Payment successful! Verifying your account upgrade. The page will refresh momentarily.');
-                    setTimeout(() => {
-                        window.location.reload(); 
-                    }, 3000);
-                },
-                onClose: function() {
-                    alert('Payment process was cancelled.');
-                }
-            });
-            handler.openIframe();
         }
 
         async function fetchUserHistory(userId) {
