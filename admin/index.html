@@ -3,237 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Add Questions</title>
+    <title>Admin Command Center - AFIT CBT Simulator</title>
+    
+    <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
+    <link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
+    <link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/main.css">
+    
     <style>
-        /* Modern Admin Layout */
-        .admin-layout { 
-            max-width: 900px; 
-            margin: 2rem auto; 
-            padding: 0 5%; 
+        body { background-color: #f0f4f8; color: #0f172a; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+        
+        /* ADMIN LOGIN OVERLAY */
+        #admin-auth-gate {
+            position: fixed; inset: 0; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            z-index: 9999; display: flex; justify-content: center; align-items: center; padding: 20px;
+        }
+        .admin-login-card {
+            background: white; padding: 3rem; border-radius: 24px; width: 100%; max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center;
+        }
+        .admin-input {
+            width: 100%; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 1.5rem;
+            font-family: 'Poppins', sans-serif; font-size: 1rem; box-sizing: border-box; text-align: center;
+        }
+        .admin-btn {
+            background: #2563eb; color: white; width: 100%; padding: 1rem; border: none; border-radius: 12px;
+            font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: background 0.3s;
+        }
+        .admin-btn:hover { background: #1d4ed8; }
+
+        /* DASHBOARD LAYOUT */
+        #admin-dashboard { display: none; }
+        
+        .admin-nav {
+            height: 70px; background: white; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 5%; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100;
         }
         
-        .form-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 20px; 
-        }
+        .admin-wrapper { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
 
-        /* Upgraded Inputs */
-        textarea, select, input[type="text"] { 
-            width: 100%; 
-            padding: 0.85rem 1rem; 
-            border: 1px solid #d1d5db; 
-            border-radius: 8px; 
-            font-family: 'Poppins', sans-serif; 
-            font-size: 0.95rem;
-            background-color: #f9fafb;
-            transition: all 0.2s ease;
+        /* KPI CARDS */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .kpi-card {
+            background: white; padding: 2rem; border-radius: 20px; border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); display: flex; flex-direction: column;
         }
+        .kpi-title { color: #64748b; font-size: 0.9rem; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; }
+        .kpi-value { font-size: 2.5rem; font-weight: 800; color: #0f172a; line-height: 1; }
+        .kpi-value.blue { color: #2563eb; }
+        .kpi-value.green { color: #10b981; }
 
-        textarea:focus, select:focus, input[type="text"]:focus {
-            border-color: var(--brand-blue);
-            background-color: var(--white);
-            box-shadow: 0 0 0 4px rgba(45, 142, 255, 0.1);
-            outline: none;
-        }
-
-        textarea { 
-            resize: vertical; 
-            min-height: 120px; 
-        }
-
-        .input-group label {
-            color: var(--text-dark);
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Logo Alignment */
-        .admin-logo-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            justify-content: flex-start;
-        }
-
-        /* The Success Toast Notification */
-        #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #10b981;
-            color: #fff;
-            text-align: center;
-            border-radius: 8px;
-            padding: 16px;
-            position: fixed;
-            z-index: 1000;
-            right: 30px;
-            top: 30px;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-            transform: translateY(-20px);
-            opacity: 0;
-            transition: opacity 0.3s, transform 0.3s;
+        /* DATA SECTIONS */
+        .data-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+        
+        .data-panel {
+            background: white; padding: 2.5rem; border-radius: 24px; border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
         }
         
-        #toast.show { 
-            visibility: visible; 
-            opacity: 1; 
-            transform: translateY(0); 
-        }
+        .panel-heading { font-size: 1.2rem; font-weight: 800; color: #1e293b; margin: 0 0 1.5rem 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem; }
 
-        /* --- MOBILE RESPONSIVENESS --- */
-        @media (max-width: 768px) {
-            .admin-layout { margin: 1rem auto; }
-            .form-grid { grid-template-columns: 1fr; gap: 15px; }
-            .submit-area { flex-direction: column; }
-            #submit-btn { width: 100%; height: 50px; margin-top: 10px; }
+        /* TABLES */
+        .admin-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .admin-table th { color: #64748b; font-size: 0.8rem; text-transform: uppercase; padding: 1rem 0; border-bottom: 2px solid #e2e8f0; }
+        .admin-table td { padding: 1.2rem 0; border-bottom: 1px solid #f1f5f9; font-weight: 500; color: #334155; }
+        .admin-table tr:last-child td { border-bottom: none; }
+
+        /* COURSE DISTRIBUTION PILLS */
+        .course-list { display: flex; flex-direction: column; gap: 1rem; }
+        .course-item { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 1rem; border-radius: 12px; }
+        .course-name { font-weight: 600; color: #1e293b; font-size: 0.9rem;}
+        .course-count { background: #dbeafe; color: #1e40af; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 800; font-size: 0.85rem;}
+
+        @media (max-width: 900px) {
+            .data-grid { grid-template-columns: 1fr; }
+            .admin-wrapper { padding: 0 1rem; }
         }
     </style>
 </head>
-<body style="background-color: #f3f4f6;">
+<body>
 
-    <div id="toast">✅ Question Added Successfully!</div>
-
-    <nav class="dashboard-nav">
-        <div class="admin-logo-wrapper">
-            <img src="../static/img/logo.jpg" alt="Logo" style="height: 40px; border-radius: 4px;"> 
-            <span style="font-size: 1.1rem; font-weight: 600; color: var(--text-dark);">Admin Portal</span>
-        </div>
-        <button class="logout-btn" onclick="logout()">Log Out</button>
-    </nav>
-
-    <main class="admin-layout">
-        <div class="dash-card">
-            <h2 style="border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem;">Add New Question</h2>
+    <div id="admin-auth-gate">
+        <div class="admin-login-card">
+            <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 16px; margin-bottom: 1rem; box-shadow: 0 10px 20px rgba(37,99,235,0.3);">
+                <rect width="100" height="100" rx="22" fill="#2563eb"/>
+                <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
+            </svg>
+            <h2 style="margin: 0 0 5px 0; font-size: 1.8rem; color: #0f172a;">Command Center</h2>
+            <p style="color: #64748b; margin-bottom: 2rem;">Authorized Personnel Only</p>
             
-            <form id="question-form" onsubmit="addQuestion(event)" style="margin-top: 1.5rem;">
-                
-                <div class="input-group">
-                    <label>Subject</label>
-                    <select id="subject" required>
-                        <option value="">Select Subject...</option>
-                        <option value="English">English</option>
-                        <option value="Math">Mathematics</option>
-                        <option value="Physics">Physics</option>
-                        <option value="Chemistry">Chemistry</option>
-                    </select>
-                </div>
-
-                <div class="input-group">
-                    <label>Question Text</label>
-                    <textarea id="question_text" placeholder="Type the question here..." required></textarea>
-                </div>
-
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label>Option A</label>
-                        <input type="text" id="option_a" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Option B</label>
-                        <input type="text" id="option_b" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Option C</label>
-                        <input type="text" id="option_c" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Option D</label>
-                        <input type="text" id="option_d" required>
-                    </div>
-                </div>
-
-                <div class="form-grid submit-area" style="align-items: end; margin-top: 15px;">
-                    <div class="input-group" style="margin-bottom: 0;">
-                        <label>Correct Answer</label>
-                        <select id="correct_answer" required>
-                            <option value="">Select Correct Option...</option>
-                            <option value="A">Option A</option>
-                            <option value="B">Option B</option>
-                            <option value="C">Option C</option>
-                            <option value="D">Option D</option>
-                        </select>
-                    </div>
-                    
-                    <button type="submit" id="submit-btn" class="btn-primary" style="height: 48px; font-size: 1rem;">Add Question Fast ⚡</button>
-                </div>
-
+            <form id="admin-login-form" onsubmit="handleAdminLogin(event)">
+                <input type="email" id="admin-email" class="admin-input" placeholder="Admin Email" required>
+                <input type="password" id="admin-password" class="admin-input" placeholder="Secure Password" required>
+                <button type="submit" id="admin-login-btn" class="admin-btn">Access Dashboard</button>
             </form>
+            <p id="admin-error" style="color: #ef4444; font-weight: 600; margin-top: 1rem; display: none;"></p>
         </div>
-    </main>
+    </div>
+
+    <div id="admin-dashboard">
+        <nav class="admin-nav">
+            <div style="font-weight: 800; font-size: 1.2rem; color: #1e293b; display: flex; align-items: center; gap: 10px;">
+                <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="100" height="100" rx="22" fill="#2563eb"/>
+                    <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
+                </svg>
+                AFIT CBT Simulator <span style="color: #94a3b8; font-weight: 500;">| Admin</span>
+            </div>
+            <button onclick="adminLogout()" style="background: none; border: none; color: #ef4444; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif;">Disconnect</button>
+        </nav>
+
+        <div class="admin-wrapper">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h1 style="margin: 0; font-size: 2rem; color: #0f172a;">System Overview</h1>
+                    <p style="margin: 5px 0 0 0; color: #64748b;">Live telemetry from the CBT engine.</p>
+                </div>
+                <button onclick="fetchAdminData()" style="background: white; border: 1px solid #e2e8f0; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; color: #475569;">Refresh Data 🔄</button>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <span class="kpi-title">Total Registered Users</span>
+                    <span class="kpi-value blue" id="kpi-users">--</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Total Exams Submitted</span>
+                    <span class="kpi-value" id="kpi-exams">--</span>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-title">Global Avg. Aggregate</span>
+                    <span class="kpi-value green" id="kpi-avg">--%</span>
+                </div>
+            </div>
+
+            <div class="data-grid">
+                
+                <div class="data-panel">
+                    <h2 class="panel-heading">Recent Examination Activity</h2>
+                    <div style="overflow-x: auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Aspirant Name</th>
+                                    <th>Post-UTME Score</th>
+                                    <th>Time Submitted</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activity-body">
+                                <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">Fetching live data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="data-panel">
+                    <h2 class="panel-heading">Top Demographics</h2>
+                    <div class="course-list" id="course-body">
+                        <div style="text-align: center; color: #94a3b8; padding: 2rem;">Analyzing profiles...</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../static/app.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) return window.location.href = '../login/index.html';
+        // 🚀 ADMIN FAILSAFE: Initializes Supabase even if app.js crashes
+        if (typeof supabaseClient === 'undefined') {
+            const supabaseUrl = 'PASTE_YOUR_SUPABASE_URL_HERE';
+            const supabaseKey = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
+            window.supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        }
 
-            const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
-            if (profile.role !== 'admin') {
-                alert("ACCESS DENIED: You are not an administrator.");
-                window.location.href = '../dashboard/index.html';
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Check if Admin is already logged in
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
+                if (profile && profile.role === 'admin') {
+                    openDashboard();
+                } else {
+                    // Not an admin, boot them out
+                    await supabaseClient.auth.signOut();
+                }
             }
         });
 
-        async function addQuestion(event) {
-            event.preventDefault(); 
-            const btn = document.getElementById('submit-btn');
-            btn.innerText = 'Adding...';
+        // --- SECURE LOGIN HANDLER ---
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('admin-login-btn');
+            const errorTxt = document.getElementById('admin-error');
+            
+            btn.innerText = "Authenticating...";
             btn.disabled = true;
+            errorTxt.style.display = 'none';
 
-            const questionData = {
-                subject: document.getElementById('subject').value,
-                question_text: document.getElementById('question_text').value,
-                option_a: document.getElementById('option_a').value,
-                option_b: document.getElementById('option_b').value,
-                option_c: document.getElementById('option_c').value,
-                option_d: document.getElementById('option_d').value,
-                correct_answer: document.getElementById('correct_answer').value,
-                is_free_tier: false 
-            };
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
 
-            const { error } = await supabaseClient.from('questions').insert([questionData]);
+            try {
+                // 1. Attempt standard password login
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
 
-            if (error) {
-                alert("Error adding question: " + error.message);
-                btn.innerText = 'Add Question Fast ⚡';
-                btn.disabled = false;
-            } else {
-                showToast();
+                if (error) throw error;
 
-                document.getElementById('question_text').value = '';
-                document.getElementById('option_a').value = '';
-                document.getElementById('option_b').value = '';
-                document.getElementById('option_c').value = '';
-                document.getElementById('option_d').value = '';
-                document.getElementById('correct_answer').value = '';
+                // 2. Verify Role
+                const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', data.session.user.id).single();
+                
+                if (!profile || profile.role !== 'admin') {
+                    await supabaseClient.auth.signOut();
+                    throw new Error("Access Denied: Account lacks administrative clearance.");
+                }
 
-                document.getElementById('question_text').focus();
+                openDashboard();
 
-                btn.innerText = 'Add Question Fast ⚡';
+            } catch (err) {
+                errorTxt.innerText = err.message;
+                errorTxt.style.display = 'block';
+                btn.innerText = "Access Dashboard";
                 btn.disabled = false;
             }
         }
 
-        function showToast() {
-            const toast = document.getElementById("toast");
-            toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
+        function openDashboard() {
+            document.getElementById('admin-auth-gate').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'block';
+            fetchAdminData();
         }
 
-        window.logout = async function() {
+        // --- FETCH AND RENDER DATA ---
+        async function fetchAdminData() {
+            try {
+                // Call the SQL Function we created
+                const { data, error } = await supabaseClient.rpc('get_admin_stats');
+                
+                if (error) throw error;
+
+                // Update KPIs
+                document.getElementById('kpi-users').innerText = data.total_users;
+                document.getElementById('kpi-exams').innerText = data.total_exams;
+                document.getElementById('kpi-avg').innerText = data.avg_score + '%';
+
+                // Update Activity Table
+                const actBody = document.getElementById('activity-body');
+                actBody.innerHTML = '';
+                if (data.recent_activity.length === 0) {
+                    actBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8;">No recent activity.</td></tr>';
+                } else {
+                    data.recent_activity.forEach(act => {
+                        const dateObj = new Date(act.submitted_at);
+                        const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' on ' + dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        
+                        actBody.innerHTML += `
+                            <tr>
+                                <td><strong>${act.full_name || 'Unknown'}</strong></td>
+                                <td style="color: #10b981; font-weight: 800;">${act.total_score} / 50</td>
+                                <td style="color: #64748b; font-size: 0.85rem;">${timeStr}</td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                // Update Course Demographics
+                const courseBody = document.getElementById('course-body');
+                courseBody.innerHTML = '';
+                if (data.course_stats.length === 0) {
+                    courseBody.innerHTML = '<div style="text-align: center; color: #94a3b8;">No demographic data available.</div>';
+                } else {
+                    data.course_stats.forEach(course => {
+                        courseBody.innerHTML += `
+                            <div class="course-item">
+                                <span class="course-name">${course.name.replace(/\[.*?\]/g, '').trim()}</span>
+                                <span class="course-count">${course.count} Students</span>
+                            </div>
+                        `;
+                    });
+                }
+
+            } catch (err) {
+                console.error("Dashboard Error:", err);
+                alert("Failed to load telemetry. Please ensure your session is active.");
+            }
+        }
+
+        async function adminLogout() {
             await supabaseClient.auth.signOut();
-            localStorage.removeItem('cbt_session_token');
-            window.location.href = '../index.html';
+            window.location.reload();
         }
     </script>
 </body>
