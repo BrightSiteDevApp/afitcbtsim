@@ -6,23 +6,20 @@
     <title>Available Exams - AFIT CBT Simulator</title>
     
     <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
-<link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
-<link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
-<link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
-<link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
+    <link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/main.css">
-    <script src="https://js.paystack.co/v1/inline.js"></script>
     
     <style>
-        /* MOBILE OVERFLOW KILLER - STRICT BOX SIZING */
         html, body { max-width: 100vw !important; overflow-x: hidden !important; margin: 0; padding: 0; }
         *, *::before, *::after { box-sizing: border-box !important; }
 
-        /* DESKTOP GRID */
         .exam-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -31,14 +28,12 @@
             align-items: start;
         }
 
-        /* DASHBOARD CARDS */
         .dash-card-alt {
             background: white; padding: 2rem; border-radius: 20px;
             border: 1px solid #e2e8f0; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
             width: 100%; max-width: 100%;
         }
 
-        /* PREMIUM LAUNCH CARD */
         .premium-launch-card {
             background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
             padding: 2.5rem 2rem; border-radius: 20px; color: white; text-align: center;
@@ -48,7 +43,6 @@
             width: 100%; max-width: 100%; border: none;
         }
 
-        /* RULE ICONS */
         .rule-item { display: flex; gap: 15px; margin-bottom: 1.5rem; }
         .rule-item:last-child { margin-bottom: 0; }
         .rule-icon {
@@ -60,7 +54,6 @@
         .rule-text h4 { margin: 0 0 5px 0; font-size: 1rem; color: #1e293b; }
         .rule-text p { margin: 0; color: #64748b; font-size: 0.9rem; line-height: 1.5; }
 
-        /* BUTTONS & BADGES */
         .btn-launch {
             background: #2563eb; color: white; border: none; padding: 1.2rem 2rem;
             width: 100%; border-radius: 12px; font-weight: 800; font-size: 1.1rem;
@@ -76,46 +69,15 @@
         .badge-green { background: #dcfce7; color: #166534; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 700; font-size: 0.85rem;}
         .badge-orange { background: #ffedd5; color: #9a3412; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 700; font-size: 0.85rem;}
 
-        /* 🔥 STRICT MOBILE LOCKDOWN 🔥 */
         @media (max-width: 900px) {
-            .dashboard-content { 
-                padding: 1rem !important; /* Overrides main.css padding */
-                width: 100vw !important;
-                max-width: 100vw !important;
-            }
-            
-            /* Fix the Welcome Banner Bleed */
-            .welcome-banner {
-                padding: 1.5rem !important;
-                border-radius: 16px !important;
-                width: 100% !important;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-            }
-
-            .exam-grid {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-                width: 100% !important;
-            }
-
+            .dashboard-content { padding: 1rem !important; width: 100vw !important; max-width: 100vw !important; }
+            .welcome-banner { padding: 1.5rem !important; border-radius: 16px !important; width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; }
+            .exam-grid { display: flex; flex-direction: column; gap: 1rem; width: 100% !important; }
             .exam-launch-col { order: 1; width: 100% !important; }
             .exam-rules-col { order: 2; width: 100% !important; }
-            
-            .premium-launch-card { 
-                position: static; 
-                padding: 2rem 1.5rem !important; 
-            }
-            
-            .dash-card-alt {
-                padding: 1.5rem !important;
-            }
-
-            .data-table th, .data-table td {
-                padding: 0.8rem 0.5rem; 
-                font-size: 0.85rem;
-            }
+            .premium-launch-card { position: static; padding: 2rem 1.5rem !important; }
+            .dash-card-alt { padding: 1.5rem !important; }
+            .data-table th, .data-table td { padding: 0.8rem 0.5rem; font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -223,7 +185,7 @@
                             <div style="font-size: 2.2rem; font-weight: 800; color: white;" id="user-jamb-score">--</div>
                         </div>
 
-                        <button class="btn-launch" id="start-exam-btn" onclick="launchExam()">Start Examination</button>
+                        <button class="btn-launch" id="start-exam-btn">Loading...</button>
                     </div>
                 </div>
             </div>
@@ -288,61 +250,60 @@
 
             document.getElementById('user-jamb-score').innerText = profile.jamb_score || 'Not Set';
 
+            // 🚀 1. GET HACKER-PROOF SERVER TIME
+            const { data: serverTimeStr } = await supabaseClient.rpc('get_server_time');
+            const currentTime = serverTimeStr ? new Date(serverTimeStr) : new Date();
+
+            // 🚀 2. SET YOUR BETA TIME WINDOW
+            const betaStart = new Date("2026-06-13T18:00:00+01:00"); // 6:00 PM
+            const betaEnd = new Date("2026-06-13T22:00:00+01:00");   // 10:00 PM
+
             const planStatus = document.getElementById('plan-status');
             const launchBtn = document.getElementById('start-exam-btn');
 
-            if (profile.has_paid) {
-                planStatus.innerText = "Premium Plan: Unlimited Access";
-                launchBtn.innerText = "Start Examination";
+            // 🚀 3. CHECK TEST LIMIT FOR BETA
+            const actualTestsTaken = profile.tests_taken || 0;
+            
+            if (actualTestsTaken >= 1) {
+                // Wipe the content area if they try to access exams directly
+                document.querySelector('.dashboard-content').innerHTML = `
+                    <div style="text-align: center; margin-top: 10vh; padding: 2rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🚀</div>
+                        <h1 style="font-size: 2.5rem; color: #0f172a; margin-bottom: 1rem;">Beta Testing Completed!</h1>
+                        <p style="color: #64748b; font-size: 1.2rem; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                            Thank you for participating in the AFIT CBT Simulator Beta. Your test data has been successfully recorded. 
+                        </p>
+                    </div>
+                `;
+                document.querySelector('.sidebar-nav').style.display = 'none';
+                document.querySelector('.mobile-menu-btn').style.display = 'none';
+                return; 
+            }
+
+            // 🚀 4. ENFORCE TIME WINDOW
+            if (currentTime < betaStart) {
+                planStatus.innerText = 'Beta Scheduled';
+                launchBtn.innerText = 'Opens at 6:00 PM 🕒';
+                launchBtn.style.background = '#94a3b8'; 
+                launchBtn.style.cursor = 'not-allowed';
+                launchBtn.onclick = () => alert("The Beta Test has not started yet. Please return at 6:00 PM.");
+                
+            } else if (currentTime > betaEnd) {
+                planStatus.innerText = 'Beta Closed';
+                launchBtn.innerText = 'Beta Window Closed 🔒';
+                launchBtn.style.background = '#ef4444'; 
+                launchBtn.style.cursor = 'not-allowed';
+                launchBtn.onclick = () => alert("The Beta Test window has officially closed. Thank you for your interest!");
+                
             } else {
-                if (profile.tests_taken >= 2) {
-                    planStatus.innerText = "Free Limit Reached (2/2)";
-                    launchBtn.innerText = "Unlock Premium (₦1,050)";
-                    launchBtn.style.background = "#ea580c";
-                    launchBtn.onclick = () => initiatePayment(currentUserEmail, currentUserId);
-                } else {
-                    planStatus.innerText = `Free Tier: ${2 - profile.tests_taken} Tests Remaining`;
-                }
+                planStatus.innerText = 'Beta Tester';
+                launchBtn.innerText = 'Start Beta Test →'; 
+                launchBtn.style.background = '#16a34a'; 
+                launchBtn.onclick = () => window.location.href = '../exam-room/index.html'; 
             }
 
             fetchHistory(session.user.id);
         });
-
-        function launchExam() {
-            if (userProfile && (userProfile.has_paid || userProfile.tests_taken < 2)) {
-                window.location.href = '../exam-room/index.html';
-            }
-        }
-
-        // PAYSTACK INLINE POPUP FUNCTION
-        function initiatePayment(email, userId) {
-            let handler = PaystackPop.setup({
-                key: 'pk_live_f1ca0bad0d6913267fb525e6c58cd2c447a1ae29', 
-                email: email,
-                amount: 1050 * 100, // 1050 Naira in kobo
-                currency: 'NGN',
-                ref: 'AFIT_' + Math.floor((Math.random() * 1000000000) + 1),
-                metadata: {
-                    custom_fields: [
-                        {
-                            display_name: "Student ID",
-                            variable_name: "student_id",
-                            value: userId
-                        }
-                    ]
-                },
-                callback: function(response) {
-                    alert('Payment successful! Verifying your account upgrade. The page will refresh momentarily.');
-                    setTimeout(() => {
-                        window.location.reload(); 
-                    }, 3000);
-                },
-                onClose: function() {
-                    alert('Payment process was cancelled.');
-                }
-            });
-            handler.openIframe();
-        }
 
         async function fetchHistory(userId) {
             const { data, error } = await supabaseClient
