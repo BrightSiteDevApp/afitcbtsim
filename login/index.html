@@ -37,7 +37,6 @@
             <div class="auth-form-wrapper">
                 
                 <div class="logo" style="display: flex; align-items: center; margin-bottom: 2rem;">
-                    <!-- Beautiful AFIT CBT Logo SVG -->
                     <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); flex-shrink: 0;">
                         <rect width="100" height="100" rx="22" fill="url(#logo-grad)"/>
                         <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
@@ -52,7 +51,6 @@
                     <span style="font-weight: 800; color: #1e293b; margin-left: 12px; font-size: 1.2rem; letter-spacing: -0.5px;">AFIT CBT SIM</span>
                 </div>
                 
-                <!-- PUBLIC COMING SOON MESSAGE -->
                 <div id="coming-soon-block" style="text-align: center; padding: 2rem 0;">
                     <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; background: #eff6ff; color: #2563eb; border-radius: 50%; margin-bottom: 1rem;">
                         <svg style="width: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -61,10 +59,9 @@
                     <p style="color: #64748b; line-height: 1.6;">We are currently finalizing the ultimate AFIT Post-UTME simulator. The platform will be open to the public shortly!</p>
                 </div>
 
-                <!-- SECRET LOGIN FORMS -->
                 <div id="secret-login-block" style="display: none;">
-                    <h2 class="auth-title">Welcome, Admin</h2>
-                    <p class="auth-subtitle">Enter your email to receive a secure, passwordless login code.</p>
+                    <h2 class="auth-title">Beta Access</h2>
+                    <p class="auth-subtitle">Enter your registered email to receive a secure login code.</p>
 
                     <form id="email-form" onsubmit="requestOTP(event)">
                         <div class="input-group">
@@ -96,18 +93,127 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../static/app.js"></script>
     <script>
+
+        // 🚀 CUSTOM OTP REQUEST: Intercepts the request to check the allowlist first
+        window.requestOTP = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('request-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Checking Credentials...";
+            btn.disabled = true;
+
+            const emailInput = document.getElementById('email').value.toLowerCase().trim();
+            const messageDiv = document.getElementById('auth-message');
+
+            try {
+               // 1. Check the Beta Allowlist FIRST
+                const { data: allowlistData, error: allowlistError } = await supabaseClient
+                    .from('beta_allowlist')
+                    .select('email')
+                    .ilike('email', emailInput) // ilike ignores case-sensitivity
+                    .maybeSingle();
+
+                if (allowlistError || !allowlistData) {
+                    // Custom Error for unauthorized users
+                    messageDiv.innerHTML = `
+                        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 15px; margin-top: 15px;">
+                            <p style="color: #ef4444; font-weight: 600; margin: 0 0 5px 0;">Access Denied</p>
+                            <p style="color: #b91c1c; font-size: 0.9rem; margin: 0; line-height: 1.4;">
+                                Your email is not on the approved beta testing list. Please wait for the official public launch!
+                            </p>
+                        </div>
+                    `;
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    return; 
+                }
+
+                // 2. Email is approved, proceed with OTP
+                btn.innerText = "Sending Code...";
+                const { error: otpError } = await supabaseClient.auth.signInWithOtp({
+                    email: emailInput,
+                    options: {
+                        shouldCreateUser: true
+                    }
+                });
+
+                if (otpError) throw otpError;
+
+                document.getElementById('email-form').classList.add('hidden');
+                document.getElementById('otp-form').classList.remove('hidden');
+                messageDiv.innerHTML = `<p style="color: #10b981; font-weight: 600; margin-top: 15px; text-align: center;">Verification code sent to your email!</p>`;
+
+            } catch (error) {
+                messageDiv.innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${error.message}</p>`;
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        // 🚀 CUSTOM LOGIN ROUTER: Overrides the default app.js login routing
+        window.verifyOTP = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('verify-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Verifying...";
+            btn.disabled = true;
+
+            const email = document.getElementById('email').value.toLowerCase().trim();
+            const otp = document.getElementById('otp').value;
+
+            try {
+                // 1. Verify the code with Supabase
+                const { data, error } = await supabaseClient.auth.verifyOtp({
+                    email: email,
+                    token: otp,
+                    type: 'email'
+                });
+
+                if (error) throw error;
+
+                // 2. Fetch the user's profile to see if they are new
+                const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', data.session.user.id).single();
+
+                // 3. Set session token for security
+                const sessionToken = Math.random().toString(36).substr(2);
+                localStorage.setItem('cbt_session_token', sessionToken);
+                await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', data.session.user.id);
+
+                // 4. THE ROUTING LOGIC
+                if (!profile || !profile.full_name || profile.full_name.trim() === "") {
+                    window.location.href = '../bio-data/index.html';
+                } else {
+                    window.location.href = '../dashboard/index.html';
+                }
+
+            } catch (error) {
+                document.getElementById('auth-message').innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">${error.message}</p>`;
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        };
+
         window.addEventListener('DOMContentLoaded', async () => {
             
-            // 🚀 THE SECRET BACKDOOR LOGIC
+            // 🚀 THE BETA TESTER DOOR LOGIC
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('mode') === 'admin') {
+            if (urlParams.get('access') === 'beta') {
                 document.getElementById('coming-soon-block').style.display = 'none';
                 document.getElementById('secret-login-block').style.display = 'block';
             }
 
             // Smart Redirect Logic for already logged-in users
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) window.location.href = '../dashboard/';
+            
+            if (session) {
+                const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', session.user.id).single();
+                
+                if (!profile || !profile.full_name || profile.full_name.trim() === "") {
+                    window.location.href = '../bio-data/index.html';
+                } else {
+                    window.location.href = '../dashboard/index.html';
+                }
+            }
         });
     </script>
 </body>

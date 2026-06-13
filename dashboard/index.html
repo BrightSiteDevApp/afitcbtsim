@@ -208,19 +208,30 @@
             const statusText = document.getElementById('account-status');
             const actionBtn = document.getElementById('main-action-btn');
 
-            if (profile.has_paid) {
-                statusText.innerText = 'Premium Access';
-                actionBtn.innerText = 'Start Exam →'; 
-                actionBtn.onclick = () => window.location.href = '../exams/index.html'; 
-            } else {
-                if (actualTestsTaken >= 2) {
-                    actionBtn.innerText = 'Unlock Full Access (₦1,050)'; 
-                    actionBtn.onclick = () => initiatePayment(session.user.email, session.user.id);
-                } else {
-                    actionBtn.innerText = `Start Free Test (${2 - actualTestsTaken} Left) →`;
-                    actionBtn.onclick = () => window.location.href = '../exams/index.html'; 
-                }
+           // 🚀 BETA TESTING LOCKDOWN LOGIC
+            if (actualTestsTaken >= 1) {
+                // Wipe the dashboard screen
+                document.querySelector('.dashboard-content').innerHTML = `
+                    <div style="text-align: center; margin-top: 10vh; padding: 2rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🚀</div>
+                        <h1 style="font-size: 2.5rem; color: #0f172a; margin-bottom: 1rem;">Beta Testing Completed!</h1>
+                        <p style="color: #64748b; font-size: 1.2rem; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                            Thank you for participating in the AFIT CBT Simulator Beta. Your test data has been successfully recorded. 
+                            Stay tuned to your email for updates on our official launch!
+                        </p>
+                    </div>
+                `;
+                // Hide the navigation links so they can't bypass the lockdown
+                document.querySelector('.sidebar-nav').style.display = 'none';
+                document.querySelector('.mobile-menu-btn').style.display = 'none';
+                return; // Stop running the rest of the dashboard
             }
+
+            // Beta Tester hasn't taken a test yet
+            statusText.innerText = 'Beta Tester';
+            actionBtn.innerText = 'Start Beta Test →'; 
+            actionBtn.style.background = '#16a34a'; // Green go button
+            actionBtn.onclick = () => window.location.href = '../exam-room/index.html'; 
 
             fetchLeaderboard();
             fetchUserHistory(session.user.id);

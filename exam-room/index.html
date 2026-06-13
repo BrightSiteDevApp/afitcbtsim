@@ -325,8 +325,12 @@
                     subjectsToFetch = ['english', 'gns', 'mathematic', 'physics', 'chemistry'];
                 }
 
+                // Map subjects to the new True Randomization SQL Function
                 const fetchPromises = subjectsToFetch.map((subj, idx) => {
-                    return supabaseClient.from('questions').select('*').ilike('subject', `%${subj}%`).limit(limits[idx]);
+                    return supabaseClient.rpc('get_random_questions', { 
+                        subj_param: subj, 
+                        lim_param: limits[idx] 
+                    });
                 });
 
                 const results = await Promise.all(fetchPromises);
