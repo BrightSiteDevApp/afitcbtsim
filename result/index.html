@@ -13,113 +13,163 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/main.css">
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        body { background-color: #f8fafc; color: #0f172a; margin: 0; padding: 0; }
+        /* PREMIUM BACKGROUND: Soft slate with a subtle dot grid */
+        body { 
+            background-color: #f0f4f8; 
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: #0f172a; 
+            margin: 0; padding: 0; 
+            font-family: 'Poppins', sans-serif;
+        }
         
+        /* FLOATING GLASS NAV */
         .result-nav {
-            height: 70px; background: white; 
+            height: 70px; 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 5%; border-bottom: 1px solid #e2e8f0;
+            padding: 0 5%; 
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            position: sticky; top: 0; z-index: 100;
         }
 
         .result-wrapper {
-            max-width: 1200px; margin: 3rem auto; padding: 0 2rem;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+            max-width: 900px; 
+            margin: 2rem auto 4rem auto; 
+            padding: 0 1.5rem;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* LEFT SIDE: Aggregate Display */
-        .aggregate-panel {
-            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-            border-radius: 24px; padding: 4rem 2rem; text-align: center; color: white;
-            box-shadow: 0 25px 50px -12px rgba(30, 58, 138, 0.25);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(30px); } 
+            to { opacity: 1; transform: translateY(0); } 
         }
 
-        .score-circle {
-            width: 200px; height: 200px; border-radius: 50%;
-            background: rgba(255,255,255,0.1); border: 8px solid #3b82f6;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            margin-bottom: 2rem; box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+        /* HERO SECTION: Animated Gradient */
+        .premium-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+            border-radius: 32px;
+            padding: 4rem 2rem 6rem 2rem; /* Extra bottom padding for overlap */
+            text-align: center; 
+            color: white;
+            box-shadow: 0 25px 50px -12px rgba(30, 58, 138, 0.4);
+            position: relative;
+            overflow: hidden;
         }
 
-        .score-circle h1 { font-size: 3.5rem; margin: 0; font-weight: 800; line-height: 1; }
-        .score-circle span { font-size: 1rem; color: #93c5fd; font-weight: 600; margin-top: 5px; }
-
-        /* RIGHT SIDE: Breakdown & Math */
-        .breakdown-panel {
-            background: white; border-radius: 24px; padding: 3rem;
-            border: 1px solid #e2e8f0; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05);
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .math-box {
-            background: #f1f5f9; border-radius: 16px; padding: 1.5rem;
-            margin-bottom: 1.5rem; border-left: 5px solid #2563eb;
+        /* Hero Accents */
+        .hero-glow {
+            position: absolute; top: -50%; left: 50%; transform: translateX(-50%);
+            width: 400px; height: 400px; background: rgba(96, 165, 250, 0.3);
+            filter: blur(80px); border-radius: 50%; pointer-events: none;
         }
+
+        .hero-label {
+            font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;
+            color: #93c5fd; font-weight: 600; margin-bottom: 10px;
+        }
+
+        .massive-score {
+            font-size: 5.5rem; font-weight: 800; line-height: 1; margin: 0;
+            text-shadow: 0 0 30px rgba(255,255,255,0.2);
+            letter-spacing: -2px;
+        }
+
+        /* OVERLAPPING STATS CARDS */
+        .stats-overlap-container {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+            margin-top: -3rem; /* THIS creates the overlap effect */
+            position: relative; z-index: 10;
+            padding: 0 1.5rem;
+        }
+
+        .stat-glass-card {
+            background: white; border-radius: 20px; padding: 1.5rem;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.8);
+            text-align: center; transition: transform 0.3s ease;
+        }
+        .stat-glass-card:hover { transform: translateY(-5px); }
         
-        .math-row {
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 1.1rem; padding: 0.5rem 0; border-bottom: 1px solid #e2e8f0;
+        .stat-title { font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: #0f172a; }
+        .stat-value.highlight { color: #2563eb; }
+        .stat-value.success { color: #10b981; }
+
+        /* SUBJECTS SECTION */
+        .details-section {
+            background: white; border-radius: 32px; padding: 3rem; margin-top: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;
         }
-        .math-row:last-child { border-bottom: none; }
-        .math-label { color: #64748b; font-weight: 600; }
-        .math-value { font-weight: 800; color: #0f172a; }
+
+        .section-heading { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin: 0 0 1.5rem 0; text-align: center;}
 
         .subject-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;
         }
 
-        .subject-card {
-            background: white; border: 1px solid #e2e8f0; border-radius: 12px;
-            padding: 1rem; text-align: center;
+        .subject-pill {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px;
+            padding: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .subject-card h4 { margin: 0 0 5px 0; color: #64748b; font-size: 0.85rem; text-transform: uppercase; }
-        .subject-card p { margin: 0; font-size: 1.5rem; font-weight: 800; color: #2563eb; }
+        .subject-pill h4 { margin: 0; color: #64748b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .subject-pill p { margin: 5px 0 0 0; font-size: 1.5rem; font-weight: 800; color: #0f172a; }
 
-        /* BUTTONS */
-        .action-btn {
-            display: block; width: 100%; background: #0f172a; color: white;
-            text-align: center; padding: 1.2rem; border-radius: 12px; font-weight: 700;
-            text-decoration: none; margin-top: 1rem; transition: transform 0.2s; border: none; cursor: pointer;
-            font-size: 1rem; font-family: 'Poppins', sans-serif;
-        }
-        .action-btn:hover { transform: translateY(-2px); }
-        
-        .download-btn {
-            background: #2563eb; 
-            margin-top: 2rem;
-        }
-        .download-btn:hover {
-            background: #1d4ed8; 
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        /* PREMIUM BUTTONS */
+        .action-row {
+            display: flex; gap: 1.5rem; margin-top: 3rem; justify-content: center;
         }
 
-        /* HIDDEN CAPTURE CARD DESIGN */
+        .btn-premium {
+            padding: 1.2rem 2.5rem; border-radius: 16px; font-weight: 700; font-size: 1.05rem;
+            cursor: pointer; transition: all 0.3s ease; border: none; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        .btn-primary {
+            background: #2563eb; color: white;
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+        }
+        .btn-primary:hover { background: #1d4ed8; transform: translateY(-3px); box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.5); }
+
+        .btn-secondary {
+            background: white; color: #0f172a; border: 2px solid #e2e8f0;
+        }
+        .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-3px); }
+
+
+        /* HIDDEN CAPTURE CARD DESIGN (UNTOUCHED) */
         #capture-area {
-            position: absolute;
-            left: -9999px;
-            top: 0;
-            width: 700px;
+            position: absolute; left: -9999px; top: 0; width: 700px;
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            color: white;
-            padding: 50px;
-            border-radius: 24px;
-            font-family: 'Poppins', sans-serif;
-            box-sizing: border-box;
-            z-index: -100;
+            color: white; padding: 50px; border-radius: 24px;
+            font-family: 'Poppins', sans-serif; box-sizing: border-box; z-index: -100;
         }
 
         /* MOBILE RESPONSIVENESS */
-        @media (max-width: 900px) {
-            .result-wrapper { grid-template-columns: 1fr; padding: 0 1rem; margin: 2rem auto; }
-            .aggregate-panel { padding: 3rem 1.5rem; }
-            .breakdown-panel { padding: 2rem 1.5rem; }
-            .subject-grid { grid-template-columns: 1fr; }
+        @media (max-width: 768px) {
+            .premium-hero { padding: 3rem 1.5rem 5rem 1.5rem; border-radius: 24px; }
+            .massive-score { font-size: 4rem; }
+            .stats-overlap-container { grid-template-columns: 1fr; gap: 1rem; margin-top: -2rem; }
+            .details-section { padding: 2rem 1.5rem; border-radius: 24px; }
+            .action-row { flex-direction: column; gap: 1rem; }
+            .btn-premium { width: 100%; }
         }
     </style>
 </head>
@@ -166,50 +216,66 @@
         </div>
     </div>
     <nav class="result-nav">
-        <div style="font-weight: 800; font-size: 1.2rem; color: #1e293b;">AFIT CBT Simulator</div>
-        <div style="color: #64748b; font-weight: 600;" id="status-badge">Processing Results...</div>
+        <div class="logo" style="display: flex; align-items: center;">
+            <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); flex-shrink: 0;">
+                <rect width="100" height="100" rx="22" fill="url(#logo-grad)"/>
+                <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
+                <path d="M32 54 L45 67 L75 32" stroke="#38bdf8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                    <linearGradient id="logo-grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#0f172a"/>
+                        <stop offset="1" stop-color="#1d4ed8"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <span style="font-weight: 800; color: #1e293b; margin-left: 12px; font-size: 1.2rem; letter-spacing: -0.5px;">AFIT CBT SIM</span>
+        </div>
+        <div style="color: #64748b; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 5px;" id="status-badge">
+            <svg class="animate-spin" style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Processing...
+        </div>
     </nav>
 
     <div class="result-wrapper">
-        <div class="aggregate-panel">
-            <h2 style="margin-top: 0; font-size: 1.5rem; color: #93c5fd;">Aggregate</h2>
-            <div class="score-circle">
-                <h1 id="ui-aggregate">--</h1>
-                <span>out of 100%</span>
-            </div>
-            <p style="color: #bfdbfe; font-size: 1.1rem; max-width: 300px; line-height: 1.6;">
-                Your final score combines your JAMB result (divided by 8) and your Post-UTME performance.
-            </p>
+        
+        <div class="premium-hero">
+            <div class="hero-glow"></div>
+            <div class="hero-label">Final Aggregate Score</div>
+            <h1 class="massive-score" id="ui-aggregate">--</h1>
         </div>
 
-        <div class="breakdown-panel">
-            <h2 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.8rem;">Calculation Breakdown</h2>
-            
-            <div class="math-box">
-                <div class="math-row">
-                    <span class="math-label">JAMB Score Provided</span>
-                    <span class="math-value" id="ui-jamb-raw">--</span>
-                </div>
-                <div class="math-row">
-                    <span class="math-label">JAMB Weight (Score ÷ 8)</span>
-                    <span class="math-value" id="ui-jamb-weight">--</span>
-                </div>
-                <div class="math-row" style="margin-top: 10px;">
-                    <span class="math-label">Post-UTME Score</span>
-                    <span class="math-value" style="color: #16a34a;" id="ui-putme-score">-- / 50</span>
-                </div>
+        <div class="stats-overlap-container">
+            <div class="stat-glass-card">
+                <div class="stat-title">JAMB Score</div>
+                <div class="stat-value" id="ui-jamb-raw">--</div>
             </div>
+            <div class="stat-glass-card">
+                <div class="stat-title">JAMB Points (÷8)</div>
+                <div class="stat-value highlight" id="ui-jamb-weight">-- pts</div>
+            </div>
+            <div class="stat-glass-card">
+                <div class="stat-title">Post-UTME Score</div>
+                <div class="stat-value success" id="ui-putme-score">-- / 50</div>
+            </div>
+        </div>
 
-            <h3 style="margin-bottom: 10px; color: #0f172a;">Subject Performance</h3>
+        <div class="details-section">
+            <h3 class="section-heading">Subject Performance Breakdown</h3>
+            
             <div class="subject-grid" id="subject-container">
                 </div>
 
-            <button class="action-btn download-btn" id="dl-btn" onclick="downloadResultCard()">
-                <svg style="width: 20px; vertical-align: middle; margin-right: 8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                Download Result Card
-            </button>
-            <button class="action-btn" onclick="window.location.href='../dashboard/index.html'">Return to Dashboard</button>
+            <div class="action-row">
+                <button class="btn-premium btn-secondary" onclick="window.location.href='../dashboard/index.html'">
+                    Return to Dashboard
+                </button>
+                <button class="btn-premium btn-primary" id="dl-btn" onclick="downloadResultCard()">
+                    <svg style="width: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Download Result
+                </button>
+            </div>
         </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -252,19 +318,36 @@
             // 4. UPDATE THE UI
             document.getElementById('ui-aggregate').innerText = finalAggregate + '%';
             document.getElementById('ui-jamb-raw').innerText = jambScore;
-            document.getElementById('ui-jamb-weight').innerText = jambWeight + ' pts';
+            document.getElementById('ui-jamb-weight').innerText = jambWeight;
             document.getElementById('ui-putme-score').innerText = postUtmeScore + ' / 50';
 
-            // Populate Subject Grid dynamically
+            // 🚀 SMART SUBJECT FILTERING
+            // Replicate the exact course check from the exam room to know what to display
+            const course = profile.course_applied || "";
+            let expectedSubjects = [];
+            
+            if (course.includes("International Relations")) {
+                expectedSubjects = ['english', 'gns', 'economics', 'literature', 'government'];
+            } else if (course.includes("Accounting") || course.includes("Business") || course.includes("Economics")) {
+                const match = course.match(/\[(.*?)\]/);
+                const elective = match ? match[1].toLowerCase() : 'commerce';
+                expectedSubjects = ['english', 'gns', 'mathematics', 'economics', elective];
+            } else {
+                // Default Science/Engineering
+                expectedSubjects = ['english', 'gns', 'mathematics', 'physics', 'chemistry'];
+            }
+
+            // Populate Subject Grid dynamically (Only subjects they were tested on!)
             const subContainer = document.getElementById('subject-container');
             for (const [subject, score] of Object.entries(examData.breakdown)) {
-                if (score > 0 || ['english', 'mathematics', 'gns'].includes(subject)) { 
+                // Check if the subject is in their expected list
+                if (expectedSubjects.includes(subject.toLowerCase())) { 
                     
                     let displaySubject = subject.charAt(0).toUpperCase() + subject.slice(1);
                     if (subject === 'gns') displaySubject = 'GNS';
 
                     const div = document.createElement('div');
-                    div.className = 'subject-card';
+                    div.className = 'subject-pill';
                     div.innerHTML = `<h4>${displaySubject}</h4><p>${score}</p>`;
                     subContainer.appendChild(div);
                 }
@@ -276,15 +359,15 @@
             document.getElementById('card-score').innerText = postUtmeScore + ' / 50';
             document.getElementById('card-agg').innerText = finalAggregate + '%';
             
-            // Add current date dynamically to the image card
             const today = new Date();
             document.getElementById('card-date').innerText = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
             // Trigger Premium Confetti Celebration
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#2563eb', '#3b82f6', '#93c5fd'] });
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#2563eb', '#3b82f6', '#93c5fd', '#10b981'] });
 
             // 5. SAVE TO SUPABASE DATABASE
-            document.getElementById('status-badge').innerText = 'Saving to Database...';
+            const badge = document.getElementById('status-badge');
+            badge.innerHTML = `<svg class="animate-spin" style="width: 16px; height: 16px; margin-right: 5px;" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...`;
 
             const { error: insertError } = await supabaseClient.from('results').insert({
                 student_id: session.user.id,
@@ -302,15 +385,15 @@
 
             if (insertError) {
                 console.error("Save Error:", insertError);
-                document.getElementById('status-badge').innerText = 'Error Saving! Please screenshot your score.';
-                document.getElementById('status-badge').style.color = '#ef4444';
+                badge.innerText = '⚠️ Error Saving! Screenshot score.';
+                badge.style.color = '#ef4444';
             } else {
                 await supabaseClient.from('profiles').update({ 
                     tests_taken: (profile.tests_taken || 0) + 1 
                 }).eq('id', session.user.id); 
 
-                document.getElementById('status-badge').innerText = 'Results Saved ✓';
-                document.getElementById('status-badge').style.color = '#10b981';
+                badge.innerHTML = `<svg style="width: 16px; margin-right: 5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Saved Successfully`;
+                badge.style.color = '#10b981';
 
                 // Wipe local storage
                 localStorage.removeItem('cbt_recent_exam');
@@ -322,7 +405,7 @@
         function downloadResultCard() {
             const btn = document.getElementById('dl-btn');
             const originalText = btn.innerHTML;
-            btn.innerHTML = `<svg style="width: 20px; vertical-align: middle; margin-right: 8px;" class="animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating Image...`;
+            btn.innerHTML = `<svg style="width: 20px;" class="animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating...`;
             
             const captureArea = document.getElementById('capture-area');
             
