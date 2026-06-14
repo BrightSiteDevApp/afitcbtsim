@@ -15,6 +15,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/main.css">
     
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
@@ -24,7 +36,7 @@
             color: #0f172a;
             margin: 0; height: 100vh; overflow: hidden;
             font-family: 'Poppins', sans-serif;
-            -webkit-user-select: none; user-select: none; /* Security 1: No Copying */
+            -webkit-user-select: none; user-select: none;
         }
 
         .exam-layout { display: flex; flex-direction: column; height: 100vh; display: none; }
@@ -235,7 +247,7 @@
         let examActive = false;
         let strikes = 0;
         const MAX_STRIKES = 3;
-        let isDeliberateSubmit = false; // Flag to check if they clicked "Submit"
+        let isDeliberateSubmit = false; 
 
         document.addEventListener("DOMContentLoaded", async () => {
             const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
@@ -244,11 +256,10 @@
             const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
             userProfile = profile;
 
-            // 🚀 BROWSER HISTORY TRAP (Prevents hitting back button without warning)
             history.pushState(null, null, location.href);
             window.onpopstate = function () {
                 if (examActive) {
-                    history.go(1); // Force them forward again
+                    history.go(1); 
                     issueStrike("You attempted to use the Browser Back button during an active exam.");
                 }
             };
@@ -273,13 +284,11 @@
             
             setTimeout(() => {
                 examActive = true;
-                // 🚀 DROP A COOKIE TRACKER: Flag that an exam is currently running
                 localStorage.setItem('cbt_active_exam_trap', 'TRUE');
                 startTimer(40 * 60); 
             }, 2000);
         }
 
-        // 🚀 BROWSER REFRESH/CLOSE WARNING
         window.addEventListener('beforeunload', function (e) {
             if (examActive && !isDeliberateSubmit) {
                 e.preventDefault();
@@ -287,11 +296,9 @@
             }
         });
 
-        // 🚀 ABANDONMENT PENALTY (If they somehow closed the tab and returned later)
         if (localStorage.getItem('cbt_active_exam_trap') === 'TRUE') {
             localStorage.removeItem('cbt_active_exam_trap');
             alert("SYSTEM ALERT: You abandoned an ongoing exam session. Your previous paper was submitted automatically and marked as 0.");
-            // We force a 0 submission and kick them to results
             forceZeroSubmission();
         }
 
@@ -335,9 +342,76 @@
             if (elem.requestFullscreen) elem.requestFullscreen().catch(err => console.log(err));
         }
 
-        function clean(txt) {
+        // 🚀 THE ULTIMATE UNIVERSAL MOJIBAKE DECODER
+        const MOJIBAKE_MAP = {
+            // Documented PDF Corruptions
+            "a\u0161": "\\sqrt{", // "aš " -> \sqrt
+            "â€²â€²": "-",      // â′′ -> -
+            "âr′": "-",        // âr′ -> -
+            "\\l_s": "\\theta",// \l_s -> \theta
+            "\\l,": "\\theta", // \l, -> \theta
+            "i\\in": "\\pi",   // i\in -> \pi
+            "Î\\_s": "\\theta", // Î_s -> \theta
+            "kgmal": "kgm^{-3}",
+            "Nma 2": "Nm^{-2}",
+            "msâˆ’1": "ms^{-1}",
+            "msâˆ’2": "ms^{-2}",
+            
+            // Quotes & Punctuation
+            "â€™": "'", "â€˜": "'", "â€œ": '"', "â€": '"', "â€": '"', 
+            "â€š": "‚", "â€ž": "„", "â€“": "-", "â€”": "-", "â€¦": "...", "â€¢": "•",
+            
+            // Currencies
+            "â‚¬": "€", "Â£": "£", "â‚¦": "₦",
+            
+            // Math, Science, and Chemistry Operators
+            "âˆ’": "−", "â‰¡": "≡", "â‰ˆ": "≈", "âˆ¼": "∼", "âˆ": "∝",
+            "âˆ«": "∫", "âˆ‘": "∑", "âˆЏ": "∏", "âˆ†": "Δ", "âˆ‡": "∇",
+            "âˆˆ": "∈", "âˆ‰": "∉", "âˆ©": "∩", "âˆª": "∪", "âˆ´": "∴", "âˆµ": "∵",
+            "âˆ—": "∗", "âˆ˜": "∘", "âŠ‚": "⊂", "âŠƒ": "⊃", "âŠ†": "⊆", "âŠ‡": "⊇",
+            "âŠ•": "⊕", "âŠ—": "⊗", "âŠ¥": "⊥", "â‹…": "⋅",
+            "Ã—": "×", "Ã·": "÷", "Â°": "°", "Â±": "±", "â‰ ": "≠",
+            "â‰¤": "≤", "â‰¥": "≥", "âˆž": "∞", "âˆš": "√",
+            "Â²": "^2", "Â³": "^3", "Â¹": "^1",
+            "Â¼": "¼", "Â½": "½", "Â¾": "¾",
+            
+            // Arrows and Reactions
+            "â†’": "→", "â‡Œ": "⇌", "â†": "←", "â†‘": "↑", "â†“": "↓", "â†”": "↔",
+            "â‡’": "⇒", "â‡": "⇐", "â‡‘": "⇑", "â‡“": "⇓", "â‡”": "⇔",
+            
+            // Greek Alphabet
+            "Î±": "α", "Î²": "β", "Î³": "γ", "Î´": "δ", "Îµ": "ε", "Î¶": "ζ", 
+            "Î·": "η", "Î¸": "θ", "Î¹": "ι", "Îº": "κ", "Î»": "λ", "Î¼": "μ", "Âµ": "μ",
+            "Î½": "ν", "Î¾": "ξ", "Î¿": "ο", "Ï€": "π", "Ï": "ρ", "Ï‚": "ς", 
+            "Ïƒ": "σ", "Ï„": "τ", "Ï…": "υ", "Ï†": "φ", "Ï‡": "χ", "Ïˆ": "ψ", "Ï‰": "ω",
+            
+            // Lingering garbage
+            "Â": " " 
+        };
+
+        const MOJIBAKE_KEYS = Object.keys(MOJIBAKE_MAP).sort((a, b) => b.length - a.length);
+
+        function prepText(txt) {
             if (!txt) return "";
-            return txt.replace(/â€™/g, "'").replace(/â€¦/g, "...").replace(/â€“/g, "-").replace(/â€œ/g, '"').replace(/â€/g, '"').replace(/Â/g, " ");
+            let c = txt;
+            
+            // 1. Decode Mojibake First
+            for (let i = 0; i < MOJIBAKE_KEYS.length; i++) {
+                const corrupted = MOJIBAKE_KEYS[i];
+                const fixed = MOJIBAKE_MAP[corrupted];
+                c = c.split(corrupted).join(fixed);
+            }
+            
+            // 2. The Auto-Delimiter (Wraps raw latex in \( \))
+            const mathCommands = ['\\frac', '\\theta', '\\pi', '\\sqrt', '\\alpha', '\\beta', '\\int', '\\sum', '\\sin', '\\cos', '\\tan', '^'];
+            const hasMath = mathCommands.some(cmd => c.includes(cmd));
+            const hasDelimiters = c.includes('$') || c.includes('\\(') || c.includes('\\[');
+            
+            if (hasMath && !hasDelimiters) {
+                c = '\\( ' + c + ' \\)';
+            }
+            
+            return c;
         }
 
         async function fetchExamQuestions() {
@@ -346,7 +420,6 @@
                 let subjectsToFetch = [];
                 let limits = [15, 5, 10, 10, 10]; 
 
-                // 🧠 DYNAMIC SUBJECT ALGORITHM
                 if (course.includes("International Relations")) {
                     subjectsToFetch = ['english', 'gns', 'economics', 'literature', 'government'];
                 } 
@@ -356,11 +429,9 @@
                     subjectsToFetch = ['english', 'gns', 'mathematic', 'economics', elective];
                 } 
                 else {
-                    // Default Science/Engineering
                     subjectsToFetch = ['english', 'gns', 'mathematic', 'physics', 'chemistry'];
                 }
 
-                // Map subjects to the new True Randomization SQL Function
                 const fetchPromises = subjectsToFetch.map((subj, idx) => {
                     return supabaseClient.rpc('get_random_questions', { 
                         subj_param: subj, 
@@ -381,7 +452,6 @@
                     return;
                 }
                 
-                // Shuffle Engine
                 for (let i = allQuestions.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [allQuestions[i], allQuestions[j]] = [allQuestions[j], allQuestions[i]];
@@ -425,11 +495,12 @@
             document.getElementById('q-subject-text').innerText = `${(q.subject || "Subject").toUpperCase()} • Q${index + 1} of ${questions.length}`;
             document.getElementById('q-db-id').innerText = `Report ID: ${q.short_id || q.id}`;
             
-            document.getElementById('q-body').innerText = clean(q.question_text);
-            document.getElementById('text-A').innerText = clean(q.option_a);
-            document.getElementById('text-B').innerText = clean(q.option_b);
-            document.getElementById('text-C').innerText = clean(q.option_c);
-            document.getElementById('text-D').innerText = clean(q.option_d || q.option_D);
+            // Note: We MUST use innerText here so HTML brackets (< and >) in Math equations don't break the layout!
+            document.getElementById('q-body').innerText = prepText(q.question_text);
+            document.getElementById('text-A').innerText = prepText(q.option_a);
+            document.getElementById('text-B').innerText = prepText(q.option_b);
+            document.getElementById('text-C').innerText = prepText(q.option_c);
+            document.getElementById('text-D').innerText = prepText(q.option_d || q.option_D);
             
             ['A', 'B', 'C', 'D'].forEach(opt => document.getElementById(`box-${opt}`).classList.remove('selected'));
             
@@ -445,6 +516,7 @@
                 activeDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
             }
 
+            // Command MathJax to render the raw text into beautiful equations!
             if (window.MathJax) MathJax.typesetPromise();
         }
 
@@ -465,7 +537,6 @@
                 if (!confirm(confirmMsg)) return;
             }
 
-            // 🚀 SUCCESSFUL SUBMISSION: Turn off traps
             isDeliberateSubmit = true;
             examActive = false;
             localStorage.removeItem('cbt_active_exam_trap');
@@ -501,7 +572,6 @@
             window.location.href = '../result/index.html';
         }
 
-        // --- TIMER ENGINE ---
         function startTimer(duration) {
             let timer = duration, minutes, seconds;
             let display = document.getElementById('exam-timer');
