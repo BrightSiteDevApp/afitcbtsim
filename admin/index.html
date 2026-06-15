@@ -18,6 +18,12 @@
     <style>
         body { background-color: #f0f4f8; color: #0f172a; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
         
+        /* Custom Scrollbar for Premium Feel */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
         /* ADMIN LOGIN OVERLAY */
         #admin-auth-gate {
             position: fixed; inset: 0; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
@@ -45,7 +51,7 @@
             padding: 0 5%; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100;
         }
         
-        .admin-wrapper { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .admin-wrapper { max-width: 1300px; margin: 2rem auto; padding: 0 2rem; }
 
         /* KPI CARDS */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
@@ -63,15 +69,33 @@
         
         .data-panel {
             background: white; padding: 2.5rem; border-radius: 24px; border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); display: flex; flex-direction: column;
         }
         
-        .panel-heading { font-size: 1.2rem; font-weight: 800; color: #1e293b; margin: 0 0 1.5rem 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem; }
+        .panel-heading { 
+            font-size: 1.2rem; font-weight: 800; color: #1e293b; margin: 0 0 1.5rem 0; 
+            border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .badge { background: #eff6ff; color: #2563eb; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+
+        /* SCROLLABLE CONTAINERS */
+        .scroll-container {
+            flex-grow: 1;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
 
         /* TABLES */
         .admin-table { width: 100%; border-collapse: collapse; text-align: left; }
-        .admin-table th { color: #64748b; font-size: 0.8rem; text-transform: uppercase; padding: 1rem 0; border-bottom: 2px solid #e2e8f0; }
+        .admin-table th { 
+            color: #64748b; font-size: 0.8rem; text-transform: uppercase; padding: 1rem 0; 
+            border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; background: white; z-index: 10;
+        }
         .admin-table td { padding: 1.2rem 0; border-bottom: 1px solid #f1f5f9; font-weight: 500; color: #334155; }
+        .admin-table tr:hover td { background-color: #f8fafc; }
         .admin-table tr:last-child td { border-bottom: none; }
 
         /* COURSE DISTRIBUTION PILLS */
@@ -83,6 +107,9 @@
         @media (max-width: 900px) {
             .data-grid { grid-template-columns: 1fr; }
             .admin-wrapper { padding: 0 1rem; }
+            .data-panel { padding: 1.5rem; }
+            .admin-table th, .admin-table td { padding: 0.8rem 0; font-size: 0.85rem; }
+            .scroll-container { max-height: 400px; }
         }
     </style>
 </head>
@@ -120,12 +147,12 @@
 
         <div class="admin-wrapper">
             
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 15px;">
                 <div>
                     <h1 style="margin: 0; font-size: 2rem; color: #0f172a;">System Overview</h1>
                     <p style="margin: 5px 0 0 0; color: #64748b;">Live telemetry from the CBT engine.</p>
                 </div>
-                <button onclick="fetchAdminData()" style="background: white; border: 1px solid #e2e8f0; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; color: #475569;">Refresh Data 🔄</button>
+                <button onclick="fetchAdminData()" style="background: white; border: 1px solid #e2e8f0; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; color: #475569; transition: all 0.2s;">Refresh Data 🔄</button>
             </div>
 
             <div class="kpi-grid">
@@ -146,8 +173,11 @@
             <div class="data-grid">
                 
                 <div class="data-panel">
-                    <h2 class="panel-heading">Recent Examination Activity</h2>
-                    <div style="overflow-x: auto;">
+                    <h2 class="panel-heading">
+                        All Examination Records
+                        <span class="badge" id="badge-exams">0 Total</span>
+                    </h2>
+                    <div class="scroll-container">
                         <table class="admin-table">
                             <thead>
                                 <tr>
@@ -164,9 +194,14 @@
                 </div>
 
                 <div class="data-panel">
-                    <h2 class="panel-heading">Top Demographics</h2>
-                    <div class="course-list" id="course-body">
-                        <div style="text-align: center; color: #94a3b8; padding: 2rem;">Analyzing profiles...</div>
+                    <h2 class="panel-heading">
+                        All Demographics
+                        <span class="badge" id="badge-courses">0 Courses</span>
+                    </h2>
+                    <div class="scroll-container">
+                        <div class="course-list" id="course-body">
+                            <div style="text-align: center; color: #94a3b8; padding: 2rem;">Analyzing profiles...</div>
+                        </div>
                     </div>
                 </div>
 
@@ -187,20 +222,17 @@
         }
 
         document.addEventListener("DOMContentLoaded", async () => {
-            // Check if Admin is already logged in
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
                 const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
                 if (profile && profile.role === 'admin') {
                     openDashboard();
                 } else {
-                    // Not an admin, boot them out
                     await supabaseClient.auth.signOut();
                 }
             }
         });
 
-        // --- SECURE LOGIN HANDLER ---
         async function handleAdminLogin(e) {
             e.preventDefault();
             const btn = document.getElementById('admin-login-btn');
@@ -214,7 +246,6 @@
             const password = document.getElementById('admin-password').value;
 
             try {
-                // 1. Attempt standard password login
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password,
@@ -222,7 +253,6 @@
 
                 if (error) throw error;
 
-                // 2. Verify Role
                 const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', data.session.user.id).single();
                 
                 if (!profile || profile.role !== 'admin') {
@@ -246,12 +276,9 @@
             fetchAdminData();
         }
 
-        // --- FETCH AND RENDER DATA ---
         async function fetchAdminData() {
             try {
-                // Call the SQL Function we created
                 const { data, error } = await supabaseClient.rpc('get_admin_stats');
-                
                 if (error) throw error;
 
                 // Update KPIs
@@ -259,19 +286,21 @@
                 document.getElementById('kpi-exams').innerText = data.total_exams;
                 document.getElementById('kpi-avg').innerText = data.avg_score + '%';
 
-                // Update Activity Table
+                // Update Activity Table (ALL ROWS)
                 const actBody = document.getElementById('activity-body');
+                document.getElementById('badge-exams').innerText = data.recent_activity.length + ' Total';
                 actBody.innerHTML = '';
+                
                 if (data.recent_activity.length === 0) {
-                    actBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8;">No recent activity.</td></tr>';
+                    actBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">No results found.</td></tr>';
                 } else {
                     data.recent_activity.forEach(act => {
                         const dateObj = new Date(act.submitted_at);
-                        const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' on ' + dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        const timeStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' at ' + dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
                         
                         actBody.innerHTML += `
                             <tr>
-                                <td><strong>${act.full_name || 'Unknown'}</strong></td>
+                                <td style="padding-left: 10px;"><strong>${act.full_name || 'Unknown Aspirant'}</strong></td>
                                 <td style="color: #10b981; font-weight: 800;">${act.total_score} / 50</td>
                                 <td style="color: #64748b; font-size: 0.85rem;">${timeStr}</td>
                             </tr>
@@ -279,17 +308,19 @@
                     });
                 }
 
-                // Update Course Demographics
+                // Update Course Demographics (ALL COURSES)
                 const courseBody = document.getElementById('course-body');
+                document.getElementById('badge-courses').innerText = data.course_stats.length + ' Courses';
                 courseBody.innerHTML = '';
+                
                 if (data.course_stats.length === 0) {
-                    courseBody.innerHTML = '<div style="text-align: center; color: #94a3b8;">No demographic data available.</div>';
+                    courseBody.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 2rem;">No demographic data available.</div>';
                 } else {
                     data.course_stats.forEach(course => {
                         courseBody.innerHTML += `
                             <div class="course-item">
                                 <span class="course-name">${course.name.replace(/\[.*?\]/g, '').trim()}</span>
-                                <span class="course-count">${course.count} Students</span>
+                                <span class="course-count">${course.count}</span>
                             </div>
                         `;
                     });

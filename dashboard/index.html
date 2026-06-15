@@ -212,8 +212,8 @@
 
             // 🚀 2. SET YOUR BETA TIME WINDOW
             // Format: YYYY-MM-DDTHH:MM:SS+01:00 (+01:00 ensures it is exact Nigerian Time / WAT)
-            const betaStart = new Date("2026-06-13T18:00:00+01:00"); // 6:00 PM
-            const betaEnd = new Date("2026-06-13T22:00:00+01:00");   // 10:00 PM
+            const betaStart = new Date("2026-06-15T18:00:00+01:00"); // 6:00 PM
+            const betaEnd = new Date("2026-06-15T22:00:00+01:00");   // 10:00 PM
 
             // 🚀 3. BETA TESTING LOCKDOWN LOGIC
             if (actualTestsTaken >= 1) {
@@ -256,7 +256,7 @@
                 actionBtn.innerText = 'Start Beta Test →'; 
                 actionBtn.style.background = '#16a34a'; // Green go button
                 actionBtn.style.cursor = 'pointer';
-                actionBtn.onclick = () => window.location.href = '../exam-room/index.html'; 
+                actionBtn.onclick = () => window.location.href = '../exam-room/'; 
             }
 
             fetchLeaderboard();
