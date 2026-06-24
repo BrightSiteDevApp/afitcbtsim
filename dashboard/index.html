@@ -14,6 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/main.css">
+    
     <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
 <body class="dashboard-body">
@@ -73,7 +74,7 @@
                 <div class="welcome-text">
                     <h1><span id="time-greeting">Welcome</span>, <span id="welcome-name">Aspirant</span>.</h1>
                     <p>Track your progress, challenge the leaderboard, and master the AFIT CBT exam.</p>
-                    <button id="main-action-btn" class="btn-glass">Loading...</button>
+                    <div id="action-buttons-container" style="display: flex; gap: 15px; margin-top: 1.5rem; flex-wrap: wrap;"></div>
                 </div>
             </div>
 
@@ -190,6 +191,7 @@
                 return logout();
             }
 
+            // Fetch true test count from results table to prevent bypasses
             const { data: resultsData } = await supabaseClient.from('results').select('id').eq('student_id', session.user.id);
             const actualTestsTaken = resultsData ? resultsData.length : 0;
             
@@ -204,63 +206,73 @@
             }
 
             const statusText = document.getElementById('account-status');
-            const actionBtn = document.getElementById('main-action-btn');
+            const actionContainer = document.getElementById('action-buttons-container');
 
-            // 🚀 1. GET HACKER-PROOF SERVER TIME
-            const { data: serverTimeStr } = await supabaseClient.rpc('get_server_time');
-            const currentTime = serverTimeStr ? new Date(serverTimeStr) : new Date();
+            // 🚀 LAUNCH/MONETIZATION LOGIC (1 Free Test Max)
+            actionContainer.innerHTML = '';
 
-            // 🚀 2. SET YOUR BETA TIME WINDOW
-            // Format: YYYY-MM-DDTHH:MM:SS+01:00 (+01:00 ensures it is exact Nigerian Time / WAT)
-            const betaStart = new Date("2026-06-20T18:00:00+01:00"); // 6:00 PM
-            const betaEnd = new Date("2026-06-20T22:00:00+01:00");   // 10:00 PM
-
-            // 🚀 3. BETA TESTING LOCKDOWN LOGIC
-            if (actualTestsTaken >= 1) {
-                // Wipe the dashboard screen
-                document.querySelector('.dashboard-content').innerHTML = `
-                    <div style="text-align: center; margin-top: 10vh; padding: 2rem;">
-                        <div style="font-size: 4rem; margin-bottom: 1rem;">🚀</div>
-                        <h1 style="font-size: 2.5rem; color: #0f172a; margin-bottom: 1rem;">Beta Testing Completed!</h1>
-                        <p style="color: #64748b; font-size: 1.2rem; max-width: 600px; margin: 0 auto; line-height: 1.6;">
-                            Thank you for participating in the AFIT CBT Simulator Beta. Your test data has been successfully recorded. 
-                            Stay tuned to your email for updates on our official launch!
-                        </p>
-                    </div>
+            if (profile.has_paid) {
+                statusText.innerText = 'Premium Access';
+                statusText.style.color = '#16a34a';
+                actionContainer.innerHTML = `
+                    <button onclick="window.location.href='../exam-room/index.html'" style="padding: 1rem 2rem; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: #16a34a; color: white; font-size: 1rem; box-shadow: 0 10px 20px rgba(22, 163, 74, 0.3); transition: transform 0.2s;">
+                        Start Premium Exam →
+                    </button>
                 `;
-                document.querySelector('.sidebar-nav').style.display = 'none';
-                document.querySelector('.mobile-menu-btn').style.display = 'none';
-                return; 
-            }
-
-            // 🚀 4. TIME WINDOW LOGIC
-            if (currentTime < betaStart) {
-                // Too Early
-                statusText.innerText = 'Beta Scheduled';
-                actionBtn.innerText = 'Opens at 6:00 PM 🕒';
-                actionBtn.style.background = '#94a3b8'; // Gray out the button
-                actionBtn.style.cursor = 'not-allowed';
-                actionBtn.onclick = () => alert("The Beta Test has not started yet. Please return at 6:00 PM.");
-                
-            } else if (currentTime > betaEnd) {
-                // Too Late
-                statusText.innerText = 'Beta Closed';
-                actionBtn.innerText = 'Beta Window Closed 🔒';
-                actionBtn.style.background = '#ef4444'; // Red button
-                actionBtn.style.cursor = 'not-allowed';
-                actionBtn.onclick = () => alert("The Beta Test window has officially closed. Thank you for your interest!");
-                
             } else {
-                // Inside the window! (Between 6pm and 10pm)
-                statusText.innerText = 'Beta Tester';
-                actionBtn.innerText = 'Start Beta Test →'; 
-                actionBtn.style.background = '#16a34a'; // Green go button
-                actionBtn.style.cursor = 'pointer';
-                actionBtn.onclick = () => window.location.href = '../exam-room/'; 
+                if (actualTestsTaken >= 1) {
+                    statusText.innerText = 'Free Limit Reached';
+                    statusText.style.color = '#ea580c';
+                    actionContainer.innerHTML = `
+                        <button onclick="initiatePayment('${session.user.email}', '${session.user.id}')" style="padding: 1rem 2rem; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: #ea580c; color: white; font-size: 1rem; box-shadow: 0 10px 20px rgba(234, 88, 12, 0.3); transition: transform 0.2s;">
+                            👑 Unlock Full Access (₦1,050)
+                        </button>
+                    `;
+                } else {
+                    statusText.innerText = `Free Tier (1 Left)`;
+                    actionContainer.innerHTML = `
+                        <button onclick="window.location.href='../exam-room/index.html'" style="padding: 1rem 2rem; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: #2563eb; color: white; font-size: 1rem; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); transition: transform 0.2s;">
+                            Start Free Test →
+                        </button>
+                        <button onclick="initiatePayment('${session.user.email}', '${session.user.id}')" style="padding: 1rem 2rem; border-radius: 12px; font-weight: 700; border: 2px solid #ea580c; cursor: pointer; background: white; color: #ea580c; font-size: 1rem; transition: background 0.3s;">
+                            👑 Upgrade Now
+                        </button>
+                    `;
+                }
             }
 
             fetchLeaderboard();
             fetchUserHistory(session.user.id);
+        }
+
+        // PAYSTACK INLINE POPUP FUNCTION
+        function initiatePayment(email, userId) {
+            let handler = PaystackPop.setup({
+                key: 'pk_live_f1ca0bad0d6913267fb525e6c58cd2c447a1ae29',
+                email: email,
+                amount: 1050 * 100, // 1050 Naira in kobo
+                currency: 'NGN',
+                ref: 'AFIT_' + Math.floor((Math.random() * 1000000000) + 1),
+                metadata: {
+                    custom_fields: [
+                        {
+                            display_name: "Student ID",
+                            variable_name: "student_id",
+                            value: userId 
+                        }
+                    ]
+                },
+                callback: function(response) {
+                    alert('Payment successful! Verifying your account upgrade. The page will refresh momentarily.');
+                    setTimeout(() => {
+                        window.location.reload(); 
+                    }, 3000);
+                },
+                onClose: function() {
+                    alert('Payment process was cancelled.');
+                }
+            });
+            handler.openIframe();
         }
 
         async function fetchUserHistory(userId) {
@@ -280,7 +292,6 @@
                 totalSum += row.total_score;
                 const formattedDate = new Date(row.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 
-                // 🚀 DYNAMIC SUBJECT GENERATOR FOR HISTORY TABLE
                 const allScores = [
                     { name: 'ENG', val: row.english_score },
                     { name: 'GNS', val: row.gns_score },

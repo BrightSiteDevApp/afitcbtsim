@@ -256,6 +256,17 @@
             const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
             userProfile = profile;
 
+            // 🚀 URL BYPASS PROTECTION (Limit reduced to 1)
+            const { data: resultsData } = await supabaseClient.from('results').select('id').eq('student_id', session.user.id);
+            const actualTestsTaken = resultsData ? resultsData.length : 0;
+
+            if (!profile.has_paid && actualTestsTaken >= 1) {
+                alert("SECURITY LOCK: You have exhausted your 1 free test. Please upgrade to Premium to continue.");
+                window.location.href = '../dashboard/index.html';
+                return; // Stop the exam room from loading
+            }
+
+            // 🚀 BROWSER HISTORY TRAP
             history.pushState(null, null, location.href);
             window.onpopstate = function () {
                 if (examActive) {
@@ -289,6 +300,7 @@
             }, 2000);
         }
 
+        // 🚀 BROWSER REFRESH/CLOSE WARNING
         window.addEventListener('beforeunload', function (e) {
             if (examActive && !isDeliberateSubmit) {
                 e.preventDefault();
@@ -296,6 +308,7 @@
             }
         });
 
+        // 🚀 ABANDONMENT PENALTY
         if (localStorage.getItem('cbt_active_exam_trap') === 'TRUE') {
             localStorage.removeItem('cbt_active_exam_trap');
             alert("SYSTEM ALERT: You abandoned an ongoing exam session. Your previous paper was submitted automatically and marked as 0.");
@@ -344,27 +357,11 @@
 
         // 🚀 THE ULTIMATE UNIVERSAL MOJIBAKE DECODER
         const MOJIBAKE_MAP = {
-            // Documented PDF Corruptions
-            "a\u0161": "\\sqrt{", // "aš " -> \sqrt
-            "â€²â€²": "-",      // â′′ -> -
-            "âr′": "-",        // âr′ -> -
-            "\\l_s": "\\theta",// \l_s -> \theta
-            "\\l,": "\\theta", // \l, -> \theta
-            "i\\in": "\\pi",   // i\in -> \pi
-            "Î\\_s": "\\theta", // Î_s -> \theta
-            "kgmal": "kgm^{-3}",
-            "Nma 2": "Nm^{-2}",
-            "msâˆ’1": "ms^{-1}",
-            "msâˆ’2": "ms^{-2}",
-            
-            // Quotes & Punctuation
+            "a\u0161": "\\sqrt{", "â€²â€²": "-", "âr′": "-", "\\l_s": "\\theta", "\\l,": "\\theta", "i\\in": "\\pi", "Î\\_s": "\\theta",
+            "kgmal": "kgm^{-3}", "Nma 2": "Nm^{-2}", "msâˆ’1": "ms^{-1}", "msâˆ’2": "ms^{-2}",
             "â€™": "'", "â€˜": "'", "â€œ": '"', "â€": '"', "â€": '"', 
             "â€š": "‚", "â€ž": "„", "â€“": "-", "â€”": "-", "â€¦": "...", "â€¢": "•",
-            
-            // Currencies
             "â‚¬": "€", "Â£": "£", "â‚¦": "₦",
-            
-            // Math, Science, and Chemistry Operators
             "âˆ’": "−", "â‰¡": "≡", "â‰ˆ": "≈", "âˆ¼": "∼", "âˆ": "∝",
             "âˆ«": "∫", "âˆ‘": "∑", "âˆЏ": "∏", "âˆ†": "Δ", "âˆ‡": "∇",
             "âˆˆ": "∈", "âˆ‰": "∉", "âˆ©": "∩", "âˆª": "∪", "âˆ´": "∴", "âˆµ": "∵",
@@ -374,18 +371,12 @@
             "â‰¤": "≤", "â‰¥": "≥", "âˆž": "∞", "âˆš": "√",
             "Â²": "^2", "Â³": "^3", "Â¹": "^1",
             "Â¼": "¼", "Â½": "½", "Â¾": "¾",
-            
-            // Arrows and Reactions
             "â†’": "→", "â‡Œ": "⇌", "â†": "←", "â†‘": "↑", "â†“": "↓", "â†”": "↔",
             "â‡’": "⇒", "â‡": "⇐", "â‡‘": "⇑", "â‡“": "⇓", "â‡”": "⇔",
-            
-            // Greek Alphabet
             "Î±": "α", "Î²": "β", "Î³": "γ", "Î´": "δ", "Îµ": "ε", "Î¶": "ζ", 
             "Î·": "η", "Î¸": "θ", "Î¹": "ι", "Îº": "κ", "Î»": "λ", "Î¼": "μ", "Âµ": "μ",
             "Î½": "ν", "Î¾": "ξ", "Î¿": "ο", "Ï€": "π", "Ï": "ρ", "Ï‚": "ς", 
             "Ïƒ": "σ", "Ï„": "τ", "Ï…": "υ", "Ï†": "φ", "Ï‡": "χ", "Ïˆ": "ψ", "Ï‰": "ω",
-            
-            // Lingering garbage
             "Â": " " 
         };
 
@@ -433,10 +424,22 @@
                 }
 
                 const fetchPromises = subjectsToFetch.map((subj, idx) => {
-                    return supabaseClient.rpc('get_random_questions', { 
-                        subj_param: subj, 
-                        lim_param: limits[idx] 
-                    });
+                    if (userProfile.has_paid) {
+                        // PREMIUM TIER: True Randomization
+                        return supabaseClient.rpc('get_random_questions', { 
+                            subj_param: subj, 
+                            lim_param: limits[idx] 
+                        });
+                    } else {
+                        // 🚀 FREE TIER ANTI-ABUSE ALGORITHM
+                        // Always grabs the first exact X questions ordered by ID. 
+                        // It will NEVER randomize, so free users always get the exact same test.
+                        return supabaseClient.from('questions')
+                            .select('*')
+                            .ilike('subject', `%${subj}%`)
+                            .order('id', { ascending: true })
+                            .limit(limits[idx]);
+                    }
                 });
 
                 const results = await Promise.all(fetchPromises);
@@ -452,9 +455,13 @@
                     return;
                 }
                 
-                for (let i = allQuestions.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [allQuestions[i], allQuestions[j]] = [allQuestions[j], allQuestions[i]];
+                // Only shuffle questions if they are a premium user
+                // Free users will see the exact same layout order every time.
+                if (userProfile.has_paid) {
+                    for (let i = allQuestions.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [allQuestions[i], allQuestions[j]] = [allQuestions[j], allQuestions[i]];
+                    }
                 }
                 
                 questions = allQuestions;
@@ -516,7 +523,6 @@
                 activeDot.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
             }
 
-            // Command MathJax to render the raw text into beautiful equations!
             if (window.MathJax) MathJax.typesetPromise();
         }
 

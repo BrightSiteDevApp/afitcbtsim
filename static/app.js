@@ -8,7 +8,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 let userEmailForVerification = '';
 
 async function requestOTP(event) {
-    event.preventDefault(); 
+    event.preventDefault();
     
     const emailInput = document.getElementById('email').value;
     const messageEl = document.getElementById('auth-message');
