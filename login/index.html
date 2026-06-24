@@ -92,7 +92,7 @@
                     <span style="font-weight: 800; color: #1e293b; margin-left: 12px; font-size: 1.2rem; letter-spacing: -0.5px;">AFIT CBT SIM</span>
                 </div>
                 
-                <div id="coming-soon-block" style="text-align: center; padding: 1rem 0;">
+                <div id="coming-soon-block" style="text-align: center; padding: 1rem 0; display: none;">
                     <h2 style="font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 10px;">Launching Soon</h2>
                     <p style="color: #64748b; line-height: 1.6;">The ultimate AFIT Simulator goes live in:</p>
                     
@@ -151,40 +151,46 @@
     <script src="../static/app.js"></script>
     <script>
 
-        // --- 🚀 LAUNCH COUNTDOWN ENGINE ---
+        // --- 🚀 SMARTER LAUNCH COUNTDOWN ENGINE ---
         // Target: June 26, 2026 at 18:00:00 WAT (WAT is UTC+1)
         const launchDate = new Date("2026-06-26T18:00:00+01:00").getTime();
         
-        // Check for Admin Bypass URL (?mode=admin)
-        const urlParams = new URLSearchParams(window.location.search);
-        let isAdminBypass = urlParams.get('mode') === 'admin';
+        // Smart Admin Bypass Check (Will catch ?mode=admin, ?admin=true, or just ?admin)
+        const isAdminBypass = window.location.search.toLowerCase().includes('admin');
 
-        const timerInterval = setInterval(function() {
-            const now = new Date().getTime();
-            const distance = launchDate - now;
+        function revealLoginForm() {
+            document.getElementById('coming-soon-block').style.display = 'none';
+            document.getElementById('secret-login-block').style.display = 'block';
+        }
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        // Instant Check before interval starts to prevent flashing
+        if (isAdminBypass || new Date().getTime() >= launchDate) {
+            revealLoginForm();
+        } else {
+            document.getElementById('coming-soon-block').style.display = 'block';
+            
+            const timerInterval = setInterval(function() {
+                const now = new Date().getTime();
+                const distance = launchDate - now;
 
-            // If time remains AND no admin bypass
-            if (distance > 0 && !isAdminBypass) {
-                document.getElementById("cd-days").innerText = days < 10 ? '0' + days : days;
-                document.getElementById("cd-hours").innerText = hours < 10 ? '0' + hours : hours;
-                document.getElementById("cd-mins").innerText = minutes < 10 ? '0' + minutes : minutes;
-                document.getElementById("cd-secs").innerText = seconds < 10 ? '0' + seconds : seconds;
-            } else {
-                // IT IS LAUNCH TIME! (Or Admin bypassed) 🚀
-                clearInterval(timerInterval);
-                
-                // Hide Countdown, Show Login
-                document.getElementById('coming-soon-block').style.display = 'none';
-                document.getElementById('secret-login-block').style.display = 'block';
-            }
-        }, 1000);
+                if (distance > 0) {
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        // 🚀 REQUEST OTP (Beta restrictions removed)
+                    document.getElementById("cd-days").innerText = days < 10 ? '0' + days : days;
+                    document.getElementById("cd-hours").innerText = hours < 10 ? '0' + hours : hours;
+                    document.getElementById("cd-mins").innerText = minutes < 10 ? '0' + minutes : minutes;
+                    document.getElementById("cd-secs").innerText = seconds < 10 ? '0' + seconds : seconds;
+                } else {
+                    clearInterval(timerInterval);
+                    revealLoginForm();
+                }
+            }, 1000);
+        }
+
+        // 🚀 REQUEST OTP (Beta restrictions permanently removed)
         window.requestOTP = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('request-btn');
@@ -196,7 +202,6 @@
             const messageDiv = document.getElementById('auth-message');
 
             try {
-                // Anyone can now request an OTP
                 const { error: otpError } = await supabaseClient.auth.signInWithOtp({
                     email: emailInput,
                     options: {
@@ -211,6 +216,7 @@
                 messageDiv.innerHTML = `<p style="color: #10b981; font-weight: 600; margin-top: 15px; text-align: center;">Verification code sent to your email!</p>`;
 
             } catch (error) {
+                console.error("Auth Error:", error);
                 messageDiv.innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${error.message}</p>`;
                 btn.innerText = originalText;
                 btn.disabled = false;
