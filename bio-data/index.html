@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-<link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
-<link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
-<link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
-<link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
-<link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
+    <link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
+    <link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete Profile - AFIT CBT Simulator</title>
     
@@ -140,7 +140,6 @@
                             <input type="text" id="state" placeholder="e.g. Kaduna" required>
                         </div>
 
-                        <!-- 🚀 UPDATE: JAMB Score is now strictly required with max bounds -->
                         <div class="input-group">
                             <label for="jamb-score">JAMB Score</label>
                             <input type="number" id="jamb-score" placeholder="e.g. 250" required min="0" max="400">
@@ -148,7 +147,7 @@
                     </div>
 
                     <button type="submit" id="save-btn" class="auth-btn">Save Profile & Continue</button>
-                    <div id="bio-message" style="margin-top: 10px; font-size: 0.875rem; text-align: center;"></div>
+                    <div id="bio-message" style="margin-top: 10px; font-size: 0.875rem; text-align: center; font-weight: bold;"></div>
                 </form>
             </div>
         </div>
@@ -206,13 +205,11 @@
             const courseSelect = document.getElementById('course');
             const electiveContainer = document.getElementById('elective-container');
             
-            // Reset Course dropdown & Hide Elective
             courseSelect.innerHTML = '<option value="" disabled selected>Select Course...</option>';
             courseSelect.disabled = false;
             electiveContainer.style.display = 'none';
             document.getElementById('elective').removeAttribute('required');
 
-            // Build new options
             if (courseData[program]) {
                 courseData[program].forEach(category => {
                     const optgroup = document.createElement('optgroup');
@@ -235,7 +232,6 @@
             const course = document.getElementById('course').value || "";
             const electiveContainer = document.getElementById('elective-container');
             
-            // Check if course includes words associated with management
             if (course.includes('Accounting') || course.includes('Business') || course.includes('Economics')) {
                 electiveContainer.style.display = 'block';
                 document.getElementById('elective').setAttribute('required', 'true');
@@ -252,53 +248,83 @@
             const msg = document.getElementById('bio-message');
             btn.innerText = 'Saving...';
             btn.disabled = true;
+            msg.innerText = ""; 
 
-            const fullName = document.getElementById('full-name').value;
-            const phone = document.getElementById('phone').value;
+            const fullName = document.getElementById('full-name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
             const program = document.getElementById('program').value;
             let course = document.getElementById('course').value;
-            const state = document.getElementById('state').value;
-            
-            // Changed to enforce the required number value instead of falling back to null
+            const state = document.getElementById('state').value.trim();
             const jambScore = parseInt(document.getElementById('jamb-score').value, 10);
 
-            // SMART MERGE: Append elective choice to the course name if applicable!
             const electiveContainer = document.getElementById('elective-container');
             if (electiveContainer.style.display === 'block') {
                 const elective = document.getElementById('elective').value;
-                course = `${course} [${elective}]`; // e.g., "Business Administration [Government]"
+                course = `${course} [${elective}]`; 
             }
 
             const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
             if (authError || !user) {
                 msg.innerText = "Authentication error. Please log in again.";
-                msg.className = "error";
+                msg.style.color = "red";
+                btn.innerText = 'Save Profile & Continue';
+                btn.disabled = false;
                 return;
             }
 
-            const { error: dbError } = await supabaseClient
-                .from('profiles')
-                .update({
-                    full_name: fullName,
-                    phone_number: phone,
-                    program_type: program,
-                    course_applied: course, 
-                    state_of_origin: state,
-                    jamb_score: jambScore
-                })
-                .eq('id', user.id);
+            try {
+                // 🚀 STEP 1: Attempt to UPDATE the profile and FORCE Supabase to return the row using .select()
+                const { data: updatedData, error: dbError } = await supabaseClient
+                    .from('profiles')
+                    .update({
+                        full_name: fullName,
+                        phone_number: phone,
+                        program_type: program,
+                        course_applied: course, 
+                        state_of_origin: state,
+                        jamb_score: jambScore
+                    })
+                    .eq('id', user.id)
+                    .select(); // <--- This forces Supabase to prove the row was updated!
 
-            if (dbError) {
-                console.error(dbError);
-                msg.innerText = "Error saving profile. Please try again.";
-                msg.className = "error";
+                if (dbError) throw dbError;
+
+                // 🚀 STEP 2: The "Silent Fail" check. If Supabase returns nothing, the row was missing!
+                if (!updatedData || updatedData.length === 0) {
+                    
+                    // The row didn't exist, so we FORCEFULLY INSERT IT from scratch!
+                    const { error: insertError } = await supabaseClient.from('profiles').insert([{
+                        id: user.id,
+                        email: user.email,
+                        full_name: fullName,
+                        phone_number: phone,
+                        program_type: program,
+                        course_applied: course, 
+                        state_of_origin: state,
+                        jamb_score: jambScore,
+                        role: 'student',
+                        has_paid: false,
+                        tests_taken: 0
+                    }]);
+
+                    if (insertError) throw insertError;
+                }
+
+                // If we get here, it absolutely, 100% saved properly.
+                msg.innerText = "Profile securely saved! Redirecting...";
+                msg.style.color = "#10b981";
+                
+                setTimeout(() => {
+                    window.location.href = '../dashboard/index.html';
+                }, 1000);
+
+            } catch (err) {
+                console.error("Database Error:", err);
+                msg.innerText = "Error: " + (err.message || "Failed to save profile.");
+                msg.style.color = "red";
                 btn.innerText = 'Save Profile & Continue';
                 btn.disabled = false;
-            } else {
-                msg.innerText = "Profile saved! Redirecting...";
-                msg.className = "success";
-                window.location.href = '../dashboard/index.html';
             }
         }
     </script>

@@ -317,14 +317,15 @@
 
         function forceZeroSubmission() {
             const examData = {
-                totalQuestions: 50,
+                totalQuestions: questions.length || 50,
                 correctCount: 0,
-                breakdown: { english: 0, mathematics: 0, physics: 0, chemistry: 0, gns: 0, economics: 0, literature: 0, government: 0, commerce: 0 }
+                breakdown: { english: 0, mathematics: 0, physics: 0, chemistry: 0, gns: 0, economics: 0, literature: 0, government: 0, commerce: 0 },
+                questions: questions, // 🚀 Saves the questions
+                userAnswers: userAnswers // 🚀 Saves the answers
             };
             localStorage.setItem('cbt_recent_exam', JSON.stringify(examData));
             window.location.href = '../result/index.html';
         }
-
         document.addEventListener("visibilitychange", () => {
             if (document.hidden && examActive && !isDeliberateSubmit) {
                 issueStrike("You switched tabs or minimized the browser.");
@@ -534,7 +535,7 @@
             }
         }
 
-        function submitExam(isAutoSubmit = false) {
+       function submitExam(isAutoSubmit = false) {
             if (!isAutoSubmit) {
                 let answeredCount = Object.keys(userAnswers).length;
                 let totalCount = questions.length;
@@ -566,10 +567,13 @@
                 }
             });
 
+            // 🚀 UPDATE: Now we are saving the questions and userAnswers too!
             const examData = {
                 totalQuestions: questions.length,
                 correctCount: correctCount,
-                breakdown: breakdown
+                breakdown: breakdown,
+                questions: questions,
+                userAnswers: userAnswers
             };
 
             localStorage.setItem('cbt_recent_exam', JSON.stringify(examData));
@@ -577,7 +581,6 @@
             alert("Exam Submitted! Grading paper and routing to Results...");
             window.location.href = '../result/index.html';
         }
-
         function startTimer(duration) {
             let timer = duration, minutes, seconds;
             let display = document.getElementById('exam-timer');

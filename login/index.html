@@ -155,7 +155,6 @@
         // Target: June 26, 2026 at 18:00:00 WAT (WAT is UTC+1)
         const launchDate = new Date("2026-06-26T18:00:00+01:00").getTime();
         
-        // Smart Admin Bypass Check (Will catch ?mode=admin, ?admin=true, or just ?admin)
         const isAdminBypass = window.location.search.toLowerCase().includes('admin');
 
         function revealLoginForm() {
@@ -163,7 +162,7 @@
             document.getElementById('secret-login-block').style.display = 'block';
         }
 
-        // Instant Check before interval starts to prevent flashing
+        // Instant Check before interval starts
         if (isAdminBypass || new Date().getTime() >= launchDate) {
             revealLoginForm();
         } else {
@@ -190,7 +189,7 @@
             }, 1000);
         }
 
-        // 🚀 REQUEST OTP (Beta restrictions permanently removed)
+        // 🚀 REQUEST OTP
         window.requestOTP = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('request-btn');
@@ -202,11 +201,10 @@
             const messageDiv = document.getElementById('auth-message');
 
             try {
+                // If it fails here, it is because of Supabase Email Rate Limits!
                 const { error: otpError } = await supabaseClient.auth.signInWithOtp({
                     email: emailInput,
-                    options: {
-                        shouldCreateUser: true
-                    }
+                    options: { shouldCreateUser: true }
                 });
 
                 if (otpError) throw otpError;
@@ -223,7 +221,7 @@
             }
         };
 
-        // 🚀 CUSTOM LOGIN ROUTER
+        // 🚀 CUSTOM LOGIN ROUTER (FRONTEND PROFILE CREATION)
         window.verifyOTP = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('verify-btn');
@@ -244,22 +242,40 @@
 
                 if (error) throw error;
 
-                // 2. Fetch the user's profile to see if they are new
-                const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', data.session.user.id).single();
+                // 2. Fetch the user's profile SECURELY (without crashing if it doesn't exist)
+                const { data: profile, error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .select('full_name')
+                    .eq('id', data.session.user.id)
+                    .maybeSingle();
 
-                // 3. Set session token for security
                 const sessionToken = Math.random().toString(36).substr(2);
                 localStorage.setItem('cbt_session_token', sessionToken);
-                await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', data.session.user.id);
 
-                // 4. THE ROUTING LOGIC
-                if (!profile || !profile.full_name || profile.full_name.trim() === "") {
+                // 3. IF NO PROFILE EXISTS, JAVASCRIPT CREATES IT!
+                if (!profile) {
+                    await supabaseClient.from('profiles').insert([{ 
+                        id: data.session.user.id, 
+                        email: email,
+                        current_session_token: sessionToken,
+                        role: 'student',
+                        has_paid: false,
+                        tests_taken: 0
+                    }]);
                     window.location.href = '../bio-data/index.html';
                 } else {
-                    window.location.href = '../dashboard/index.html';
+                    // Profile exists, just update the token
+                    await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', data.session.user.id);
+                    
+                    if (!profile.full_name || profile.full_name.trim() === "") {
+                        window.location.href = '../bio-data/index.html';
+                    } else {
+                        window.location.href = '../dashboard/index.html';
+                    }
                 }
 
             } catch (error) {
+                console.error("Verification Error:", error);
                 document.getElementById('auth-message').innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">${error.message}</p>`;
                 btn.innerText = originalText;
                 btn.disabled = false;
@@ -267,7 +283,6 @@
         };
 
         window.addEventListener('DOMContentLoaded', async () => {
-            // Smart Redirect Logic for already logged-in users
             const { data: { session } } = await supabaseClient.auth.getSession();
             
             if (session) {

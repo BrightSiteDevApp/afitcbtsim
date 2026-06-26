@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Answers - AFIT CBT Simulator</title>
+    
+    <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/main.css">
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body { background-color: #f1f5f9; color: #0f172a; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+        
+        .review-nav {
+            height: 70px; background: #0f172a; color: white; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 5%; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .review-container { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
+        
+        .question-card {
+            background: white; padding: 2.5rem; border-radius: 20px; border: 1px solid #e2e8f0; 
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+        }
+
+        .q-meta { color: #64748b; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem; }
+        .q-text { font-size: 1.15rem; line-height: 1.7; font-weight: 500; margin-bottom: 2rem; color: #1e293b; }
+
+        .option-box { display: flex; align-items: center; padding: 1rem 1.5rem; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 1rem; }
+        
+        .opt-letter { width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; flex-shrink: 0; display: flex; justify-content: center; align-items: center; font-weight: 800; margin-right: 15px; color: #475569; }
+        .opt-text { font-size: 1rem; color: #334155; }
+
+        /* 🚀 HIGHLIGHT STYLES */
+        .option-box.correct { background: #dcfce7; border-color: #16a34a; }
+        .option-box.correct .opt-letter { background: #16a34a; color: white; }
+        
+        .option-box.wrong { background: #fef2f2; border-color: #dc2626; }
+        .option-box.wrong .opt-letter { background: #dc2626; color: white; }
+
+        .status-badge { padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.8rem; font-weight: 800; }
+        .badge-correct { background: #dcfce7; color: #16a34a; }
+        .badge-wrong { background: #fef2f2; color: #dc2626; }
+        .badge-unanswered { background: #f1f5f9; color: #64748b; }
+
+        @media (max-width: 600px) {
+            .question-card { padding: 1.5rem; }
+            .q-meta { flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="review-nav">
+        <div style="font-weight: 800; font-size: 1.2rem;">AFIT CBT | Paper Review</div>
+        <button onclick="window.location.href='../dashboard/index.html'" style="background: #2563eb; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer;">Exit Review</button>
+    </nav>
+
+    <div class="review-container" id="review-canvas">
+        <div style="text-align: center; margin-top: 3rem; color: #64748b; font-size: 1.2rem;">Generating paper review...</div>
+    </div>
+
+    <script>
+        const MOJIBAKE_MAP = {
+            "a\u0161": "\\sqrt{", "â€²â€²": "-", "âr′": "-", "\\l_s": "\\theta", "\\l,": "\\theta", "i\\in": "\\pi", "Î\\_s": "\\theta",
+            "kgmal": "kgm^{-3}", "Nma 2": "Nm^{-2}", "msâˆ’1": "ms^{-1}", "msâˆ’2": "ms^{-2}",
+            "â€™": "'", "â€˜": "'", "â€œ": '"', "â€": '"', "â€": '"', "â€š": "‚", "â€ž": "„", "â€“": "-", "â€”": "-", "â€¦": "...", "â€¢": "•",
+            "â‚¬": "€", "Â£": "£", "â‚¦": "₦", "âˆ’": "−", "â‰¡": "≡", "â‰ˆ": "≈", "âˆ¼": "∼", "âˆ": "∝", "âˆ«": "∫", "âˆ‘": "∑", "âˆЏ": "∏", "âˆ†": "Δ", "âˆ‡": "∇",
+            "âˆˆ": "∈", "âˆ‰": "∉", "âˆ©": "∩", "âˆª": "∪", "âˆ´": "∴", "âˆµ": "∵", "âˆ—": "∗", "âˆ˜": "∘", "âŠ‚": "⊂", "âŠƒ": "⊃", "âŠ†": "⊆", "âŠ‡": "⊇",
+            "âŠ•": "⊕", "âŠ—": "⊗", "âŠ¥": "⊥", "â‹…": "⋅", "Ã—": "×", "Ã·": "÷", "Â°": "°", "Â±": "±", "â‰ ": "≠", "â‰¤": "≤", "â‰¥": "≥", "âˆž": "∞", "âˆš": "√",
+            "Â²": "^2", "Â³": "^3", "Â¹": "^1", "Â¼": "¼", "Â½": "½", "Â¾": "¾", "â†’": "→", "â‡Œ": "⇌", "â†": "←", "â†‘": "↑", "â†“": "↓", "â†”": "↔",
+            "â‡’": "⇒", "â‡": "⇐", "â‡‘": "⇑", "â‡“": "⇓", "â‡”": "⇔",
+            "Î±": "α", "Î²": "β", "Î³": "γ", "Î´": "δ", "Îµ": "ε", "Î¶": "ζ", "Î·": "η", "Î¸": "θ", "Î¹": "ι", "Îº": "κ", "Î»": "λ", "Î¼": "μ", "Âµ": "μ",
+            "Î½": "ν", "Î¾": "ξ", "Î¿": "ο", "Ï€": "π", "Ï": "ρ", "Ï‚": "ς", "Ïƒ": "σ", "Ï„": "τ", "Ï…": "υ", "Ï†": "φ", "Ï‡": "χ", "Ïˆ": "ψ", "Ï‰": "ω", "Â": " " 
+        };
+        const MOJIBAKE_KEYS = Object.keys(MOJIBAKE_MAP).sort((a, b) => b.length - a.length);
+
+        function prepText(txt) {
+            if (!txt) return "";
+            let c = txt;
+            for (let i = 0; i < MOJIBAKE_KEYS.length; i++) {
+                c = c.split(MOJIBAKE_KEYS[i]).join(MOJIBAKE_MAP[MOJIBAKE_KEYS[i]]);
+            }
+            const mathCommands = ['\\frac', '\\theta', '\\pi', '\\sqrt', '\\alpha', '\\beta', '\\int', '\\sum', '\\sin', '\\cos', '\\tan', '^'];
+            const hasMath = mathCommands.some(cmd => c.includes(cmd));
+            const hasDelimiters = c.includes('$') || c.includes('\\(') || c.includes('\\[');
+            if (hasMath && !hasDelimiters) c = '\\( ' + c + ' \\)';
+            return c;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const examDataStr = localStorage.getItem('cbt_recent_exam');
+            if (!examDataStr) {
+                alert("No recent exam data found. Redirecting to dashboard.");
+                window.location.href = '../dashboard/index.html';
+                return;
+            }
+
+            const examData = JSON.parse(examDataStr);
+            const questions = examData.questions;
+            const userAnswers = examData.userAnswers;
+            const canvas = document.getElementById('review-canvas');
+            
+            canvas.innerHTML = ''; // Clear loading text
+
+            questions.forEach((q, index) => {
+                const userAns = (userAnswers[index] || "").toUpperCase().trim();
+                const actualAns = (q.correct_answer || q.answer || "").toUpperCase().trim();
+                
+                let statusHtml = '';
+                if (!userAns) {
+                    statusHtml = `<span class="status-badge badge-unanswered">Unanswered</span>`;
+                } else if (userAns === actualAns) {
+                    statusHtml = `<span class="status-badge badge-correct">Correct ✓</span>`;
+                } else {
+                    statusHtml = `<span class="status-badge badge-wrong">Incorrect ✕</span>`;
+                }
+
+                // Determine option classes
+                const getClass = (letter) => {
+                    if (letter === actualAns) return 'correct';
+                    if (letter === userAns && userAns !== actualAns) return 'wrong';
+                    return '';
+                };
+
+                const cardHtml = `
+                    <div class="question-card">
+                        <div class="q-meta">
+                            <span style="color: #2563eb;">${(q.subject || "Subject").toUpperCase()} • Q${index + 1}</span>
+                            ${statusHtml}
+                        </div>
+                        <div class="q-text">${prepText(q.question_text)}</div>
+                        
+                        <div class="option-box ${getClass('A')}">
+                            <div class="opt-letter">A</div> <span class="opt-text">${prepText(q.option_a)}</span>
+                        </div>
+                        <div class="option-box ${getClass('B')}">
+                            <div class="opt-letter">B</div> <span class="opt-text">${prepText(q.option_b)}</span>
+                        </div>
+                        <div class="option-box ${getClass('C')}">
+                            <div class="opt-letter">C</div> <span class="opt-text">${prepText(q.option_c)}</span>
+                        </div>
+                        <div class="option-box ${getClass('D')}">
+                            <div class="opt-letter">D</div> <span class="opt-text">${prepText(q.option_d || q.option_D)}</span>
+                        </div>
+                    </div>
+                `;
+                canvas.innerHTML += cardHtml;
+            });
+
+            // Trigger MathJax to render equations
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        });
+    </script>
+</body>
+</html>
