@@ -16,32 +16,19 @@
     <link rel="stylesheet" href="../static/main.css">
     
     <style>
-        body { background-color: #f0f4f8; color: #0f172a; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f8fafc; color: #0f172a; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
         
         /* Custom Scrollbar for Premium Feel */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* ADMIN LOGIN OVERLAY */
-        #admin-auth-gate {
-            position: fixed; inset: 0; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            z-index: 9999; display: flex; justify-content: center; align-items: center; padding: 20px;
+        /* FULL PAGE LOADER */
+        #auth-loader {
+            position: fixed; inset: 0; background: #0f172a; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; color: white;
         }
-        .admin-login-card {
-            background: white; padding: 3rem; border-radius: 24px; width: 100%; max-width: 450px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center;
-        }
-        .admin-input {
-            width: 100%; padding: 1rem; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 1.5rem;
-            font-family: 'Poppins', sans-serif; font-size: 1rem; box-sizing: border-box; text-align: center;
-        }
-        .admin-btn {
-            background: #2563eb; color: white; width: 100%; padding: 1rem; border: none; border-radius: 12px;
-            font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: background 0.3s;
-        }
-        .admin-btn:hover { background: #1d4ed8; }
 
         /* DASHBOARD LAYOUT */
         #admin-dashboard { display: none; }
@@ -49,88 +36,81 @@
         .admin-nav {
             height: 70px; background: white; display: flex; justify-content: space-between; align-items: center;
             padding: 0 5%; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
         
-        .admin-wrapper { max-width: 1300px; margin: 2rem auto; padding: 0 2rem; }
+        .admin-wrapper { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
 
         /* KPI CARDS */
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
         .kpi-card {
             background: white; padding: 2rem; border-radius: 20px; border: 1px solid #e2e8f0;
             box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); display: flex; flex-direction: column;
+            position: relative; overflow: hidden;
         }
-        .kpi-title { color: #64748b; font-size: 0.9rem; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; }
-        .kpi-value { font-size: 2.5rem; font-weight: 800; color: #0f172a; line-height: 1; }
-        .kpi-value.blue { color: #2563eb; }
-        .kpi-value.green { color: #10b981; }
+        .kpi-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%;
+            background: #cbd5e1;
+        }
+        .kpi-card.blue::before { background: #2563eb; }
+        .kpi-card.green::before { background: #10b981; }
+        .kpi-card.gold::before { background: #f59e0b; }
+        .kpi-card.purple::before { background: #8b5cf6; }
 
-        /* DATA SECTIONS */
-        .data-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
-        
+        .kpi-title { color: #64748b; font-size: 0.85rem; text-transform: uppercase; font-weight: 700; margin-bottom: 5px; }
+        .kpi-value { font-size: 2.8rem; font-weight: 800; color: #0f172a; line-height: 1; }
+
+        /* TABS INTERFACE */
+        .tabs-container { margin-bottom: 1.5rem; display: flex; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;}
+        .tab-btn {
+            background: transparent; border: none; padding: 0.8rem 1.5rem; font-family: 'Poppins'; font-weight: 700;
+            font-size: 1rem; color: #64748b; cursor: pointer; border-radius: 8px; transition: all 0.2s;
+        }
+        .tab-btn:hover { background: #f1f5f9; color: #0f172a; }
+        .tab-btn.active { background: #2563eb; color: white; }
+
+        /* DATA PANELS */
         .data-panel {
-            background: white; padding: 2.5rem; border-radius: 24px; border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); display: flex; flex-direction: column;
+            background: white; padding: 1.5rem; border-radius: 24px; border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); display: none;
         }
+        .data-panel.active { display: block; }
         
-        .panel-heading { 
-            font-size: 1.2rem; font-weight: 800; color: #1e293b; margin: 0 0 1.5rem 0; 
-            border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem; 
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        
-        .badge { background: #eff6ff; color: #2563eb; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
-
-        /* SCROLLABLE CONTAINERS */
-        .scroll-container {
-            flex-grow: 1;
-            max-height: 600px;
-            overflow-y: auto;
-            padding-right: 10px;
+        .table-container {
+            width: 100%; overflow-x: auto; max-height: 600px; overflow-y: auto;
         }
 
         /* TABLES */
-        .admin-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .admin-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 1000px; }
         .admin-table th { 
-            color: #64748b; font-size: 0.8rem; text-transform: uppercase; padding: 1rem 0; 
-            border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; background: white; z-index: 10;
+            color: #64748b; font-size: 0.8rem; text-transform: uppercase; padding: 1.2rem 1rem; 
+            border-bottom: 2px solid #e2e8f0; position: sticky; top: 0; background: #f8fafc; z-index: 10;
+            font-weight: 700; white-space: nowrap;
         }
-        .admin-table td { padding: 1.2rem 0; border-bottom: 1px solid #f1f5f9; font-weight: 500; color: #334155; }
+        .admin-table td { padding: 1.2rem 1rem; border-bottom: 1px solid #f1f5f9; font-weight: 500; color: #334155; font-size: 0.9rem; white-space: nowrap;}
         .admin-table tr:hover td { background-color: #f8fafc; }
         .admin-table tr:last-child td { border-bottom: none; }
 
-        /* COURSE DISTRIBUTION PILLS */
-        .course-list { display: flex; flex-direction: column; gap: 1rem; }
-        .course-item { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 1rem; border-radius: 12px; }
-        .course-name { font-weight: 600; color: #1e293b; font-size: 0.9rem;}
-        .course-count { background: #dbeafe; color: #1e40af; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 800; font-size: 0.85rem;}
+        /* BADGES */
+        .badge { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;}
+        .badge-premium { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0;}
+        .badge-free { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0;}
+        .badge-score { background: #eff6ff; color: #2563eb; font-weight: 800; font-size: 0.9rem;}
 
         @media (max-width: 900px) {
-            .data-grid { grid-template-columns: 1fr; }
             .admin-wrapper { padding: 0 1rem; }
-            .data-panel { padding: 1.5rem; }
-            .admin-table th, .admin-table td { padding: 0.8rem 0; font-size: 0.85rem; }
-            .scroll-container { max-height: 400px; }
+            .kpi-value { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
 
-    <div id="admin-auth-gate">
-        <div class="admin-login-card">
-            <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 16px; margin-bottom: 1rem; box-shadow: 0 10px 20px rgba(37,99,235,0.3);">
-                <rect width="100" height="100" rx="22" fill="#2563eb"/>
-                <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
-            </svg>
-            <h2 style="margin: 0 0 5px 0; font-size: 1.8rem; color: #0f172a;">Command Center</h2>
-            <p style="color: #64748b; margin-bottom: 2rem;">Authorized Personnel Only</p>
-            
-            <form id="admin-login-form" onsubmit="handleAdminLogin(event)">
-                <input type="email" id="admin-email" class="admin-input" placeholder="Admin Email" required>
-                <input type="password" id="admin-password" class="admin-input" placeholder="Secure Password" required>
-                <button type="submit" id="admin-login-btn" class="admin-btn">Access Dashboard</button>
-            </form>
-            <p id="admin-error" style="color: #ef4444; font-weight: 600; margin-top: 1rem; display: none;"></p>
-        </div>
+    <div id="auth-loader">
+        <svg class="animate-spin" style="width: 50px; height: 50px; color: #38bdf8; margin-bottom: 20px;" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <h2 style="margin:0;">Verifying Admin Clearance...</h2>
     </div>
 
     <div id="admin-dashboard">
@@ -140,71 +120,92 @@
                     <rect width="100" height="100" rx="22" fill="#2563eb"/>
                     <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
                 </svg>
-                AFIT CBT Simulator <span style="color: #94a3b8; font-weight: 500;">| Admin</span>
+                AFIT Simulator <span style="color: #94a3b8; font-weight: 500;">| Command Center</span>
             </div>
-            <button onclick="adminLogout()" style="background: none; border: none; color: #ef4444; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif;">Disconnect</button>
+            <button onclick="adminLogout()" style="background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 0.5rem 1.2rem; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Poppins', sans-serif;">Disconnect</button>
         </nav>
 
         <div class="admin-wrapper">
             
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 15px;">
                 <div>
-                    <h1 style="margin: 0; font-size: 2rem; color: #0f172a;">System Overview</h1>
-                    <p style="margin: 5px 0 0 0; color: #64748b;">Live telemetry from the CBT engine.</p>
+                    <h1 style="margin: 0; font-size: 2rem; color: #0f172a;">Live Telemetry</h1>
+                    <p style="margin: 5px 0 0 0; color: #64748b;">Complete database overview and analytics.</p>
                 </div>
-                <button onclick="fetchAdminData()" style="background: white; border: 1px solid #e2e8f0; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; color: #475569; transition: all 0.2s;">Refresh Data 🔄</button>
+                <button onclick="fetchAdminData()" style="background: white; border: 1px solid #cbd5e1; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; color: #1e293b; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">Refresh Data 🔄</button>
             </div>
 
             <div class="kpi-grid">
-                <div class="kpi-card">
+                <div class="kpi-card blue">
                     <span class="kpi-title">Total Registered Users</span>
-                    <span class="kpi-value blue" id="kpi-users">--</span>
+                    <span class="kpi-value" id="kpi-users">0</span>
                 </div>
-                <div class="kpi-card">
-                    <span class="kpi-title">Total Exams Submitted</span>
-                    <span class="kpi-value" id="kpi-exams">--</span>
+                <div class="kpi-card gold">
+                    <span class="kpi-title">Premium (Paid) Users</span>
+                    <span class="kpi-value" id="kpi-premium">0</span>
                 </div>
-                <div class="kpi-card">
-                    <span class="kpi-title">Global Avg. Aggregate</span>
-                    <span class="kpi-value green" id="kpi-avg">--%</span>
+                <div class="kpi-card purple">
+                    <span class="kpi-title">Total Exams Taken</span>
+                    <span class="kpi-value" id="kpi-exams">0</span>
+                </div>
+                <div class="kpi-card green">
+                    <span class="kpi-title">Global Average Score</span>
+                    <span class="kpi-value" id="kpi-avg">0<span style="font-size: 1.5rem; color:#94a3b8;">/50</span></span>
                 </div>
             </div>
 
-            <div class="data-grid">
-                
-                <div class="data-panel">
-                    <h2 class="panel-heading">
-                        All Examination Records
-                        <span class="badge" id="badge-exams">0 Total</span>
-                    </h2>
-                    <div class="scroll-container">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Aspirant Name</th>
-                                    <th>Post-UTME Score</th>
-                                    <th>Time Submitted</th>
-                                </tr>
-                            </thead>
-                            <tbody id="activity-body">
-                                <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">Fetching live data...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('profiles')">Aspirant Profiles</button>
+                <button class="tab-btn" onclick="switchTab('results')">Exam Results Engine</button>
+            </div>
 
-                <div class="data-panel">
-                    <h2 class="panel-heading">
-                        All Demographics
-                        <span class="badge" id="badge-courses">0 Courses</span>
-                    </h2>
-                    <div class="scroll-container">
-                        <div class="course-list" id="course-body">
-                            <div style="text-align: center; color: #94a3b8; padding: 2rem;">Analyzing profiles...</div>
-                        </div>
-                    </div>
+            <div id="tab-profiles" class="data-panel active">
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>JAMB</th>
+                                <th>Program</th>
+                                <th>Course Applied</th>
+                                <th>State</th>
+                                <th>Exams Taken</th>
+                            </tr>
+                        </thead>
+                        <tbody id="profiles-body">
+                            <tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading data...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
+            <div id="tab-results" class="data-panel">
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Aspirant</th>
+                                <th>Total Score</th>
+                                <th>ENG</th>
+                                <th>MTH</th>
+                                <th>PHY</th>
+                                <th>CHM</th>
+                                <th>GNS</th>
+                                <th>ECO</th>
+                                <th>LIT</th>
+                                <th>GOV</th>
+                                <th>COM</th>
+                                <th>Time Submitted</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body">
+                            <tr><td colspan="12" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
         </div>
@@ -214,7 +215,7 @@
     <script src="../static/app.js"></script>
 
     <script>
-        // 🚀 ADMIN FAILSAFE: Initializes Supabase even if app.js crashes
+        // 🚀 ADMIN FAILSAFE
         if (typeof supabaseClient === 'undefined') {
             const supabaseUrl = 'PASTE_YOUR_SUPABASE_URL_HERE';
             const supabaseKey = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
@@ -222,119 +223,134 @@
         }
 
         document.addEventListener("DOMContentLoaded", async () => {
+            // 1. Verify User is Logged In
             const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
-                if (profile && profile.role === 'admin') {
-                    openDashboard();
-                } else {
-                    await supabaseClient.auth.signOut();
-                }
+            
+            if (!session) {
+                // If not logged in, route them to the login portal with the admin bypass flag
+                window.location.href = '../login/index.html?mode=admin';
+                return;
             }
+
+            // 2. Verify User has 'admin' role
+            const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
+            
+            if (!profile || profile.role !== 'admin') {
+                alert("SECURITY LOCKOUT: Your account does not have administrative privileges.");
+                window.location.href = '../dashboard/index.html';
+                return;
+            }
+
+            // 3. User is an admin, show the dashboard and fetch data
+            document.getElementById('auth-loader').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'block';
+            
+            fetchAdminData();
         });
 
-        async function handleAdminLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('admin-login-btn');
-            const errorTxt = document.getElementById('admin-error');
+        // Tab Switcher Logic
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.data-panel').forEach(panel => panel.classList.remove('active'));
             
-            btn.innerText = "Authenticating...";
-            btn.disabled = true;
-            errorTxt.style.display = 'none';
-
-            const email = document.getElementById('admin-email').value.trim();
-            const password = document.getElementById('admin-password').value;
-
-            try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                });
-
-                if (error) throw error;
-
-                const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', data.session.user.id).single();
-                
-                if (!profile || profile.role !== 'admin') {
-                    await supabaseClient.auth.signOut();
-                    throw new Error("Access Denied: Account lacks administrative clearance.");
-                }
-
-                openDashboard();
-
-            } catch (err) {
-                errorTxt.innerText = err.message;
-                errorTxt.style.display = 'block';
-                btn.innerText = "Access Dashboard";
-                btn.disabled = false;
-            }
-        }
-
-        function openDashboard() {
-            document.getElementById('admin-auth-gate').style.display = 'none';
-            document.getElementById('admin-dashboard').style.display = 'block';
-            fetchAdminData();
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
         }
 
         async function fetchAdminData() {
             try {
-                const { data, error } = await supabaseClient.rpc('get_admin_stats');
-                if (error) throw error;
+                // 🚀 FETCH ALL RAW DATA DIRECTLY FROM DATABASE
+                const { data: profiles, error: pErr } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+                const { data: results, error: rErr } = await supabaseClient.from('results').select('*, profiles(full_name)').order('submitted_at', { ascending: false });
 
-                // Update KPIs
-                document.getElementById('kpi-users').innerText = data.total_users;
-                document.getElementById('kpi-exams').innerText = data.total_exams;
-                document.getElementById('kpi-avg').innerText = data.avg_score + '%';
+                if (pErr) throw pErr;
+                if (rErr) throw rErr;
 
-                // Update Activity Table (ALL ROWS)
-                const actBody = document.getElementById('activity-body');
-                document.getElementById('badge-exams').innerText = data.recent_activity.length + ' Total';
-                actBody.innerHTML = '';
+                // --- 1. CALCULATE KPIs ---
+                const totalUsers = profiles.length;
+                const premiumUsers = profiles.filter(p => p.has_paid).length;
+                const totalExams = results.length;
                 
-                if (data.recent_activity.length === 0) {
-                    actBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">No results found.</td></tr>';
+                let totalScoreSum = 0;
+                results.forEach(r => totalScoreSum += (r.total_score || 0));
+                const avgScore = totalExams > 0 ? (totalScoreSum / totalExams).toFixed(1) : 0;
+
+                document.getElementById('kpi-users').innerText = totalUsers;
+                document.getElementById('kpi-premium').innerText = premiumUsers;
+                document.getElementById('kpi-exams').innerText = totalExams;
+                document.getElementById('kpi-avg').innerHTML = `${avgScore}<span style="font-size: 1.5rem; color:#94a3b8;">/50</span>`;
+
+                // --- 2. POPULATE PROFILES TABLE ---
+                const pBody = document.getElementById('profiles-body');
+                pBody.innerHTML = '';
+                
+                if (profiles.length === 0) {
+                    pBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #94a3b8; padding: 2rem;">No users registered yet.</td></tr>';
                 } else {
-                    data.recent_activity.forEach(act => {
-                        const dateObj = new Date(act.submitted_at);
-                        const timeStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' at ' + dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                        
-                        actBody.innerHTML += `
+                    profiles.forEach(p => {
+                        const statusBadge = p.has_paid 
+                            ? `<span class="badge badge-premium">Premium</span>` 
+                            : `<span class="badge badge-free">Free</span>`;
+
+                        pBody.innerHTML += `
                             <tr>
-                                <td style="padding-left: 10px;"><strong>${act.full_name || 'Unknown Aspirant'}</strong></td>
-                                <td style="color: #10b981; font-weight: 800;">${act.total_score} / 50</td>
-                                <td style="color: #64748b; font-size: 0.85rem;">${timeStr}</td>
+                                <td>${statusBadge}</td>
+                                <td style="font-weight: 700; color: #0f172a;">${p.full_name || 'N/A'}</td>
+                                <td style="color: #2563eb;">${p.email || 'N/A'}</td>
+                                <td>${p.phone_number || 'N/A'}</td>
+                                <td style="font-weight: 800;">${p.jamb_score || '0'}</td>
+                                <td>${p.program_type || 'N/A'}</td>
+                                <td>${p.course_applied || 'N/A'}</td>
+                                <td>${p.state_of_origin || 'N/A'}</td>
+                                <td>${p.tests_taken || 0} Tests</td>
                             </tr>
                         `;
                     });
                 }
 
-                // Update Course Demographics (ALL COURSES)
-                const courseBody = document.getElementById('course-body');
-                document.getElementById('badge-courses').innerText = data.course_stats.length + ' Courses';
-                courseBody.innerHTML = '';
+                // --- 3. POPULATE RESULTS TABLE ---
+                const rBody = document.getElementById('results-body');
+                rBody.innerHTML = '';
                 
-                if (data.course_stats.length === 0) {
-                    courseBody.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 2rem;">No demographic data available.</div>';
+                if (results.length === 0) {
+                    rBody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: #94a3b8; padding: 2rem;">No exams taken yet.</td></tr>';
                 } else {
-                    data.course_stats.forEach(course => {
-                        courseBody.innerHTML += `
-                            <div class="course-item">
-                                <span class="course-name">${course.name.replace(/\[.*?\]/g, '').trim()}</span>
-                                <span class="course-count">${course.count}</span>
-                            </div>
+                    results.forEach(r => {
+                        const dateObj = new Date(r.submitted_at);
+                        const timeStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' - ' + dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                        
+                        const aspirantName = r.profiles ? r.profiles.full_name : 'Unknown';
+
+                        const f = (score) => score > 0 ? `<span style="color:#0f172a; font-weight:700;">${score}</span>` : `<span style="color:#cbd5e1;">-</span>`;
+
+                        rBody.innerHTML += `
+                            <tr>
+                                <td style="font-weight: 700; color: #0f172a;">${aspirantName}</td>
+                                <td><span class="badge badge-score">${r.total_score} / 50</span></td>
+                                <td>${f(r.english_score)}</td>
+                                <td>${f(r.math_score)}</td>
+                                <td>${f(r.physics_score)}</td>
+                                <td>${f(r.chemistry_score)}</td>
+                                <td>${f(r.gns_score)}</td>
+                                <td>${f(r.economics_score)}</td>
+                                <td>${f(r.literature_score)}</td>
+                                <td>${f(r.government_score)}</td>
+                                <td>${f(r.commerce_score)}</td>
+                                <td style="color: #64748b; font-size: 0.8rem;">${timeStr}</td>
+                            </tr>
                         `;
                     });
                 }
 
             } catch (err) {
                 console.error("Dashboard Error:", err);
-                alert("Failed to load telemetry. Please ensure your session is active.");
+                alert("Failed to load telemetry. Check console.");
             }
         }
 
         async function adminLogout() {
             await supabaseClient.auth.signOut();
-            window.location.reload();
+            window.location.href = '../index.html';
         }
     </script>
 </body>
