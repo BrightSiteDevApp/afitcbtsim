@@ -151,13 +151,35 @@
     <script src="../static/app.js" defer></script>
     <script>
 
-        // --- 🚀 ROBUST OPERA MINI FAILSAFE ---
-        // This function forces the browser to wait until app.js is fully loaded before executing any Supabase logic
+        // --- 🚀 ROBUST OPERA MINI FAILSAFE (WITH TIMEOUT DETECTOR) ---
+        let loadAttempts = 0;
         function runWhenReady(callback) {
             if (typeof supabaseClient !== 'undefined') {
+                loadAttempts = 0; // Reset
                 callback();
             } else {
-                console.log("Waiting for Supabase to load...");
+                loadAttempts++;
+                // If it takes more than 5 seconds (100 loops * 50ms), Opera Mini has blocked it.
+                if (loadAttempts > 100) {
+                    document.getElementById('auth-message').innerHTML = `
+                        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 15px; margin-top: 15px; text-align: left;">
+                            <p style="color: #ef4444; font-weight: 800; margin: 0 0 5px 0;">⚠️ Browser Connection Blocked</p>
+                            <p style="color: #b91c1c; font-size: 0.85rem; margin: 0; line-height: 1.5;">
+                                Your browser is aggressively blocking our secure login server to save data. <br><br>
+                                Please turn off <strong>Extreme Data Savings</strong> in your Opera Mini settings, or switch to <strong>Google Chrome</strong> to continue.
+                            </p>
+                        </div>
+                    `;
+                    
+                    const reqBtn = document.getElementById('request-btn');
+                    if (reqBtn) { reqBtn.innerText = "Continue with Email"; reqBtn.disabled = false; }
+                    
+                    const verBtn = document.getElementById('verify-btn');
+                    if (verBtn) { verBtn.innerText = "Verify & Secure Login"; verBtn.disabled = false; }
+                    
+                    return; // Break the infinite loop!
+                }
+                
                 setTimeout(() => runWhenReady(callback), 50);
             }
         }
