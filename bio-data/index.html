@@ -236,13 +236,6 @@
                 return;
             }
 
-            // 🚀 CRITICAL FIX: GRAB THE TOKEN LOCALLY BEFORE SAVING TO THE DATABASE
-            let sessionToken = localStorage.getItem('cbt_session_token');
-            if (!sessionToken) {
-                sessionToken = Math.random().toString(36).substr(2);
-                localStorage.setItem('cbt_session_token', sessionToken);
-            }
-
             try {
                 // Attempt to update existing row
                 const { data: updatedData, error: dbError } = await supabaseClient
@@ -253,8 +246,7 @@
                         program_type: program,
                         course_applied: course, 
                         state_of_origin: state,
-                        jamb_score: jambScore,
-                        current_session_token: sessionToken // Locks token in!
+                        jamb_score: jambScore
                     })
                     .eq('id', user.id)
                     .select();
@@ -272,7 +264,6 @@
                         course_applied: course, 
                         state_of_origin: state,
                         jamb_score: jambScore,
-                        current_session_token: sessionToken, // Locks token in!
                         role: 'student',
                         has_paid: false,
                         tests_taken: 0

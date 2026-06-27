@@ -212,7 +212,7 @@
             });
         };
 
-        // 🚀 CUSTOM LOGIN ROUTER (OPERA MINI SAFE SYNTAX)
+        // 🚀 CUSTOM LOGIN ROUTER (PURIFIED & FAST)
         window.verifyOTP = function(e) {
             e.preventDefault();
             const btn = document.getElementById('verify-btn');
@@ -233,7 +233,7 @@
 
                     if (error) throw error;
 
-                    // STRICT NON-OPTIONAL CHAINING (For Opera Mini compatibility)
+                    // Extracted Safely for Opera Mini
                     let userId = null;
                     if (data && data.user && data.user.id) {
                         userId = data.user.id;
@@ -243,45 +243,19 @@
 
                     if (!userId) throw new Error("Invalid verification response. Please try again.");
 
-                    btn.innerText = "Synchronizing Account...";
+                    btn.innerText = "Routing...";
 
-                    // Generate Security Token Globally
-                    const sessionToken = Math.random().toString(36).substr(2);
-                    localStorage.setItem('cbt_session_token', sessionToken);
-
-                    const { data: profile, error: profileError } = await supabaseClient
+                    // ONLY READ DATA. NO INSERTS/UPDATES TO CRASH THE APP.
+                    const { data: profile } = await supabaseClient
                         .from('profiles')
                         .select('full_name')
                         .eq('id', userId)
                         .maybeSingle();
 
-                    if (!profile) {
-                        // Profile doesn't exist, build it
-                        const { error: insertError } = await supabaseClient.from('profiles').insert([{ 
-                            id: userId, 
-                            email: email,
-                            current_session_token: sessionToken,
-                            role: 'student',
-                            has_paid: false,
-                            tests_taken: 0
-                        }]);
-                        
-                        // Fallback safely just in case
-                        if (insertError) {
-                            await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', userId);
-                        }
-                        
-                        btn.innerText = "Success! Routing...";
+                    if (!profile || !profile.full_name || profile.full_name.trim() === "") {
                         window.location.href = '../bio-data/index.html';
                     } else {
-                        await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', userId);
-                        btn.innerText = "Success! Routing...";
-                        
-                        if (!profile.full_name || profile.full_name.trim() === "") {
-                            window.location.href = '../bio-data/index.html';
-                        } else {
-                            window.location.href = '../dashboard/index.html';
-                        }
+                        window.location.href = '../dashboard/index.html';
                     }
 
                 } catch (error) {
@@ -294,40 +268,19 @@
             });
         };
 
+        // SMART REDIRECT LOGIC
         window.addEventListener('DOMContentLoaded', () => {
             runWhenReady(async () => {
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 
                 if (session && session.user) {
                     const userId = session.user.id;
-                    
-                    // 🚀 CRITICAL: We MUST generate and sync the token here to fix the Desync Bug!
-                    let sessionToken = localStorage.getItem('cbt_session_token');
-                    if (!sessionToken) {
-                        sessionToken = Math.random().toString(36).substr(2);
-                        localStorage.setItem('cbt_session_token', sessionToken);
-                    }
-
                     const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', userId).maybeSingle();
                     
-                    if (!profile) {
-                        await supabaseClient.from('profiles').insert([{ 
-                            id: userId, 
-                            email: session.user.email,
-                            current_session_token: sessionToken,
-                            role: 'student',
-                            has_paid: false,
-                            tests_taken: 0
-                        }]);
+                    if (!profile || !profile.full_name || profile.full_name.trim() === "") {
                         window.location.href = '../bio-data/index.html';
                     } else {
-                        await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', userId);
-
-                        if (!profile.full_name || profile.full_name.trim() === "") {
-                            window.location.href = '../bio-data/index.html';
-                        } else {
-                            window.location.href = '../dashboard/index.html';
-                        }
+                        window.location.href = '../dashboard/index.html';
                     }
                 }
             });
