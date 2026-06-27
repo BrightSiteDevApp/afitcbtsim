@@ -29,7 +29,7 @@
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-    <style>
+   <style>
         /* CORE EXAM STYLES - STRICTLY NO COPYING */
         body.exam-mode {
             background-color: #f8fafc; 
@@ -68,19 +68,28 @@
             border-radius: 8px; font-weight: 800; font-size: 1.1rem; border: 1px solid #bfdbfe;
         }
 
-        /* LAYOUT GRID */
-        .exam-main { display: grid; grid-template-columns: 320px 1fr; flex-grow: 1; overflow: hidden; }
+        /* 🚀 LAYOUT GRID (FIXED FOR LAPTOP SCROLLING) */
+        .exam-main { 
+            display: grid; grid-template-columns: 320px 1fr; 
+            flex-grow: 1; overflow: hidden; height: calc(100vh - 70px); 
+        }
 
-        /* SIDEBAR (NAV DOTS) */
+        /* 🚀 SIDEBAR (NAV DOTS INDEPENDENT SCROLL) */
         .nav-sidebar {
             background: #f1f5f9; border-right: 1px solid #e2e8f0;
             display: flex; flex-direction: column; padding: 1.5rem;
+            height: 100%; box-sizing: border-box;
         }
 
         .grid-status {
             display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
             overflow-y: auto; margin-bottom: 1.5rem; padding-right: 5px;
+            flex-grow: 1; align-content: start;
         }
+        
+        /* Custom Scrollbar for Dots */
+        .grid-status::-webkit-scrollbar { width: 6px; }
+        .grid-status::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         .q-dot {
             aspect-ratio: 1; border-radius: 8px; background: white; color: #64748b;
@@ -90,14 +99,20 @@
         .q-dot.active { border: 2px solid #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
         .q-dot.answered { background: #10b981; color: white; border-color: #10b981; }
 
-        /* QUESTION CANVAS */
+        /* 🚀 QUESTION CANVAS (INDEPENDENT SCROLL) */
         .question-canvas {
-            padding: 3rem 5%; overflow-y: auto; display: flex; flex-direction: column; align-items: center; background: #f8fafc;
+            padding: 2rem 5% 0 5%; overflow-y: auto; display: flex; flex-direction: column; 
+            align-items: center; background: #f8fafc; height: 100%; box-sizing: border-box;
+            position: relative;
         }
+        
+        .question-canvas::-webkit-scrollbar { width: 8px; }
+        .question-canvas::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         .question-card {
             background: white; padding: 3rem; border-radius: 20px; width: 100%; max-width: 900px;
             border: 1px solid #e2e8f0; box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem; flex-shrink: 0;
         }
 
         .q-meta { 
@@ -129,7 +144,18 @@
         .option-box.selected .opt-letter { background: #2563eb; color: white; }
         .opt-text { font-size: 1.05rem; color: #334155; }
 
-        .controls { display: flex; gap: 15px; width: 100%; max-width: 900px; margin-top: 2rem; justify-content: space-between;}
+        /* 🚀 STICKY CONTROLS (ALWAYS VISIBLE AT BOTTOM) */
+        .controls { 
+            display: flex; gap: 15px; width: 100%; max-width: 900px; justify-content: space-between;
+            position: sticky; bottom: 0; background: #f8fafc; padding: 1rem 0 2rem 0; z-index: 100;
+            margin-top: auto;
+        }
+        /* Gradient fade to hide scroll clipping under buttons */
+        .controls::before {
+            content: ''; position: absolute; top: -20px; left: 0; width: 100%; height: 20px;
+            background: linear-gradient(to top, #f8fafc, transparent); pointer-events: none;
+        }
+
         .btn-exam { padding: 1rem 2rem; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-size: 1rem; transition: background 0.2s;}
         .btn-prev { background: #e2e8f0; color: #475569; }
         .btn-prev:hover { background: #cbd5e1; }
@@ -152,16 +178,17 @@
         @media (max-width: 900px) {
             body.exam-mode { overflow-y: auto; }
             .exam-layout { height: auto; min-height: 100vh; }
-            .exam-main { display: flex; flex-direction: column; }
-            .nav-sidebar { padding: 1rem; border-right: none; border-bottom: 1px solid #e2e8f0; }
-            .grid-status { display: flex; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; gap: 8px; }
+            .exam-main { display: flex; flex-direction: column; height: auto; overflow: visible;}
+            .nav-sidebar { padding: 1rem; border-right: none; border-bottom: 1px solid #e2e8f0; height: auto; }
+            .grid-status { display: flex; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; gap: 8px; flex-grow: 0; }
             .q-dot { flex-shrink: 0; width: 40px; height: 40px; }
             .btn-submit { margin-top: 0; width: 100%; }
-            .question-canvas { padding: 1.5rem 1rem; }
-            .question-card { padding: 1.5rem; border-radius: 16px; }
+            .question-canvas { padding: 1.5rem 1rem; height: auto; overflow: visible; display: block;}
+            .question-card { padding: 1.5rem; border-radius: 16px; margin-bottom: 1.5rem;}
             .q-meta { flex-direction: column; align-items: flex-start; gap: 10px; }
             .db-id-badge { align-self: flex-start; }
-            .controls { flex-direction: column; width: 100%;}
+            .controls { flex-direction: column; width: 100%; position: relative; padding: 0; }
+            .controls::before { display: none; }
             .btn-exam { width: 100%; }
         }
     </style>
