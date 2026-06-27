@@ -136,7 +136,7 @@
                 <div class="dash-card">
                     <h3>
                         <svg style="width: 20px; color: #ea580c;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        Top 5 Achievers
+                        Top 15 Achievers
                     </h3>
                     <div style="overflow-x: auto;">
                         <table class="data-table">
@@ -144,11 +144,12 @@
                                 <tr>
                                     <th>Rank</th>
                                     <th>Aspirant</th>
+                                    <th>Course</th>
                                     <th>Score</th>
                                 </tr>
                             </thead>
                             <tbody id="leaderboard-body">
-                                <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading results...</td></tr>
+                                <tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading results...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -208,7 +209,7 @@
             const statusText = document.getElementById('account-status');
             const actionContainer = document.getElementById('action-buttons-container');
 
-            // 🚀 LAUNCH/MONETIZATION LOGIC (1 Free Test Max)
+            // LAUNCH/MONETIZATION LOGIC (1 Free Test Max)
             actionContainer.innerHTML = '';
 
             if (profile.has_paid) {
@@ -325,19 +326,34 @@
             avgDisplay.innerHTML = `${average} <span style="font-size: 1rem; color: #94a3b8;">/ 50</span>`;
         }
 
+        // 🚀 UPDATED LEADERBOARD FUNCTION
         async function fetchLeaderboard() {
-            const { data, error } = await supabaseClient.from('results').select(`total_score, profiles (full_name)`).order('total_score', { ascending: false }).limit(5); 
+            // Fetch top 15 results, joining with profile to get name AND course
+            const { data, error } = await supabaseClient
+                .from('results')
+                .select(`total_score, profiles (full_name, course_applied)`)
+                .order('total_score', { ascending: false })
+                .limit(15); 
+
             const tbody = document.getElementById('leaderboard-body');
             
+            if (error) {
+                console.error("Leaderboard Error:", error);
+            }
+
             if (error || !data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">No results yet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">No results yet.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = ''; 
             
             data.forEach((row, index) => {
-                const nameParts = row.profiles.full_name.trim().split(/\s+/);
+                // Safely handle potential missing profile data
+                const fullName = row.profiles?.full_name || 'Unknown Aspirant';
+                const courseApplied = row.profiles?.course_applied || 'General';
+
+                const nameParts = fullName.trim().split(/\s+/);
                 let initials = nameParts[0].charAt(0).toUpperCase();
                 if(nameParts.length > 1) initials += nameParts[1].charAt(0).toUpperCase();
 
@@ -352,9 +368,10 @@
                     <td>
                         <div style="display: flex; align-items: center;">
                             <div class="mini-avatar">${initials}</div>
-                            <span style="font-weight: 600; color: #1e293b;">${row.profiles.full_name}</span>
+                            <span style="font-weight: 600; color: #1e293b;">${fullName}</span>
                         </div>
                     </td>
+                    <td style="color: #64748b; font-size: 0.85rem; font-weight: 500;">${courseApplied}</td>
                     <td><span class="score-badge badge-blue">${row.total_score}</span></td>
                 `;
                 tbody.appendChild(tr);
