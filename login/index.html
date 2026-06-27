@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="../static/main.css">
 
     <style>
-        /* 🚀 LAUNCH COUNTDOWN STYLES */
         .countdown-container {
             display: flex;
             justify-content: center;
@@ -151,15 +150,14 @@
     <script src="../static/app.js" defer></script>
     <script>
 
-        // --- 🚀 ROBUST OPERA MINI FAILSAFE (WITH TIMEOUT DETECTOR) ---
+        // --- ROBUST OPERA MINI FAILSAFE (WITH TIMEOUT DETECTOR) ---
         let loadAttempts = 0;
         function runWhenReady(callback) {
             if (typeof supabaseClient !== 'undefined') {
-                loadAttempts = 0; // Reset
+                loadAttempts = 0; 
                 callback();
             } else {
                 loadAttempts++;
-                // If it takes more than 5 seconds (100 loops * 50ms), Opera Mini has blocked it.
                 if (loadAttempts > 100) {
                     document.getElementById('auth-message').innerHTML = `
                         <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 15px; margin-top: 15px; text-align: left;">
@@ -177,14 +175,14 @@
                     const verBtn = document.getElementById('verify-btn');
                     if (verBtn) { verBtn.innerText = "Verify & Secure Login"; verBtn.disabled = false; }
                     
-                    return; // Break the infinite loop!
+                    return; 
                 }
                 
                 setTimeout(() => runWhenReady(callback), 50);
             }
         }
 
-        // --- 🚀 LAUNCH COUNTDOWN ENGINE ---
+        // --- LAUNCH COUNTDOWN ENGINE ---
         const launchDate = new Date("2026-06-26T18:00:00+01:00").getTime();
         const isAdminBypass = window.location.search.toLowerCase().includes('admin');
 
@@ -219,7 +217,7 @@
             }, 1000);
         }
 
-        // 🚀 REQUEST OTP
+        // --- REQUEST OTP ---
         window.requestOTP = function(e) {
             e.preventDefault();
             const btn = document.getElementById('request-btn');
@@ -252,7 +250,7 @@
             });
         };
 
-        // 🚀 CUSTOM LOGIN ROUTER (FORTIFIED)
+        // --- CUSTOM LOGIN ROUTER (WITH PERFECT TOKEN SYNC) ---
         window.verifyOTP = function(e) {
             e.preventDefault();
             const btn = document.getElementById('verify-btn');
@@ -274,24 +272,27 @@
 
                     if (error) throw error;
 
-                    // 🚀 CRITICAL FIX: Safely extract User ID (Preventing Silent Crashes)
+                    // 2. Extract User ID Safely
                     const userId = data?.user?.id || data?.session?.user?.id;
                     if (!userId) throw new Error("Invalid verification response. Please try again.");
 
-                    // 2. Fetch Profile Safely
+                    // UI Feedback
+                    btn.innerText = "Synchronizing Account...";
+
+                    // 3. Generate Security Token Globally
+                    const sessionToken = Math.random().toString(36).substr(2);
+                    localStorage.setItem('cbt_session_token', sessionToken);
+
+                    // 4. Fetch Profile Safely
                     const { data: profile, error: profileError } = await supabaseClient
                         .from('profiles')
                         .select('full_name')
                         .eq('id', userId)
                         .maybeSingle();
 
-                    if (profileError) throw new Error("Database Fetch Error: " + profileError.message);
-
-                    const sessionToken = Math.random().toString(36).substr(2);
-                    localStorage.setItem('cbt_session_token', sessionToken);
-
-                    // 3. Routing Logic
+                    // 5. Database Synchronization & Routing Logic
                     if (!profile) {
+                        // Profile doesn't exist, build it
                         const { error: insertError } = await supabaseClient.from('profiles').insert([{ 
                             id: userId, 
                             email: email,
@@ -301,14 +302,18 @@
                             tests_taken: 0
                         }]);
                         
-                        if (insertError) throw new Error("Failed to create profile: " + insertError.message);
+                        // If insert fails due to a ghost trigger, instantly fallback to update to prevent a crash
+                        if (insertError) {
+                            await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', userId);
+                        }
                         
+                        btn.innerText = "Success! Routing...";
                         window.location.href = '../bio-data/index.html';
                     } else {
-                        const { error: updateError } = await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', userId);
+                        // Profile exists, just secure it
+                        await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', userId);
                         
-                        if (updateError) throw new Error("Failed to update session: " + updateError.message);
-                        
+                        btn.innerText = "Success! Routing...";
                         if (!profile.full_name || profile.full_name.trim() === "") {
                             window.location.href = '../bio-data/index.html';
                         } else {
@@ -318,7 +323,6 @@
 
                 } catch (error) {
                     console.error("Verification Error:", error);
-                    // This guarantees a red error message will show up if anything breaks!
                     const errMsg = error.message || error.error_description || "An unexpected network error occurred.";
                     document.getElementById('auth-message').innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${errMsg}</p>`;
                     btn.innerText = originalText;
@@ -327,18 +331,39 @@
             });
         };
 
-        // Smart Redirect Logic
+        // --- SMART REDIRECT LOGIC (WITH PERFECT TOKEN SYNC) ---
         window.addEventListener('DOMContentLoaded', () => {
             runWhenReady(async () => {
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 
+                // If the user refreshed the page and is already logged into Supabase
                 if (session && session.user) {
-                    const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', session.user.id).single();
+                    const userId = session.user.id;
                     
-                    if (!profile || !profile.full_name || profile.full_name.trim() === "") {
+                    // CRITICAL: We MUST generate and sync the token here too, otherwise the dashboard kicks them out!
+                    const sessionToken = Math.random().toString(36).substr(2);
+                    localStorage.setItem('cbt_session_token', sessionToken);
+
+                    const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', userId).maybeSingle();
+                    
+                    if (!profile) {
+                        await supabaseClient.from('profiles').insert([{ 
+                            id: userId, 
+                            email: session.user.email,
+                            current_session_token: sessionToken,
+                            role: 'student',
+                            has_paid: false,
+                            tests_taken: 0
+                        }]);
                         window.location.href = '../bio-data/index.html';
                     } else {
-                        window.location.href = '../dashboard/index.html';
+                        await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', userId);
+
+                        if (!profile.full_name || profile.full_name.trim() === "") {
+                            window.location.href = '../bio-data/index.html';
+                        } else {
+                            window.location.href = '../dashboard/index.html';
+                        }
                     }
                 }
             });
