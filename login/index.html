@@ -40,6 +40,16 @@
 </head>
 <body class="auth-page">
 
+    <!-- 🚀 GHOST ELEMENTS TO TRAP THE BROKEN APP.JS SCRIPT -->
+    <div style="display: none;" aria-hidden="true">
+        <form id="email-form"></form>
+        <form id="otp-form"></form>
+        <button id="request-btn"></button>
+        <button id="verify-btn"></button>
+        <input type="text" id="email">
+        <input type="text" id="otp">
+    </div>
+
     <div class="auth-split-layout">
         
         <div class="auth-banner">
@@ -82,22 +92,24 @@
                     <h2 class="auth-title">Welcome Back</h2>
                     <p class="auth-subtitle">Enter your email to receive a secure, passwordless login code.</p>
 
-                    <form id="email-form" onsubmit="sendLoginCode(event)">
+                    <!-- 🚀 RENAMED FORMS AND INPUTS TO PREVENT HIJACKING -->
+                    <form id="secure-email-form" onsubmit="handleEmailSubmit(event)">
                         <div class="input-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" placeholder="name@example.com" maxlength="60" required>
+                            <label for="secure-email">Email Address</label>
+                            <input type="email" id="secure-email" placeholder="name@example.com" maxlength="60" required>
                         </div>
-                        <button type="submit" id="request-btn" class="auth-btn">Continue with Email</button>
+                        <button type="submit" id="secure-request-btn" class="auth-btn">Continue with Email</button>
                     </form>
 
-                    <form id="otp-form" class="hidden" onsubmit="processLoginOTP(event)">
+                    <form id="secure-otp-form" class="hidden" onsubmit="handleOtpSubmit(event)">
                         <div class="input-group">
-                            <label for="otp">Enter 8-Digit Code</label>
-                            <input type="text" id="otp" placeholder="123456" pattern="[0-9]*" maxlength="8" required style="letter-spacing: 5px; font-size: 1.2rem; text-align: center; font-weight: 600;">
+                            <label for="secure-otp">Enter 8-Digit Code</label>
+                            <input type="text" id="secure-otp" placeholder="123456" pattern="[0-9]*" maxlength="8" required style="letter-spacing: 5px; font-size: 1.2rem; text-align: center; font-weight: 600;">
                         </div>
-                        <button type="submit" id="verify-btn" class="auth-btn">Verify & Secure Login</button>
+                        <button type="submit" id="secure-verify-btn" class="auth-btn">Verify & Secure Login</button>
                     </form>
 
+                    <!-- WHATSAPP SUPPORT SECTION -->
                     <div style="margin-top: 2rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; text-align: center;">
                         <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 10px; font-weight: 500;">Having issues logging in?</p>
                         <a href="https://wa.me/2349153375488?text=Hello%20Admin,%20I%20am%20having%20issues%20logging%20into%20my%20AFIT%20CBT%20Simulator%20account..." target="_blank" class="whatsapp-support-btn">
@@ -117,36 +129,12 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    <script src="../static/app.js" defer></script>
+    <!-- 🚀 REMOVED DEFER TAGS SO SUPABASE LOADS INSTANTLY BEFORE APP.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../static/app.js"></script>
     <script>
 
-        let loadAttempts = 0;
-        function runWhenReady(callback) {
-            if (typeof supabaseClient !== 'undefined') {
-                loadAttempts = 0; 
-                callback();
-            } else {
-                loadAttempts++;
-                if (loadAttempts > 100) {
-                    document.getElementById('auth-message').innerHTML = `
-                        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 15px; margin-top: 15px; text-align: left;">
-                            <p style="color: #ef4444; font-weight: 800; margin: 0 0 5px 0;">⚠️ Browser Connection Blocked</p>
-                            <p style="color: #b91c1c; font-size: 0.85rem; margin: 0; line-height: 1.5;">
-                                Your browser is aggressively blocking our secure login server. Please turn off <strong>Extreme Data Savings</strong> in your Opera Mini settings, or switch to <strong>Google Chrome</strong>.
-                            </p>
-                        </div>
-                    `;
-                    const reqBtn = document.getElementById('request-btn');
-                    if (reqBtn) { reqBtn.innerText = "Continue with Email"; reqBtn.disabled = false; }
-                    const verBtn = document.getElementById('verify-btn');
-                    if (verBtn) { verBtn.innerText = "Verify & Secure Login"; verBtn.disabled = false; }
-                    return; 
-                }
-                setTimeout(() => runWhenReady(callback), 50);
-            }
-        }
-
+        // --- COUNTDOWN LOGIC ---
         const launchDate = new Date("2026-06-26T18:00:00+01:00").getTime();
         const isAdminBypass = window.location.search.toLowerCase().includes('admin');
 
@@ -180,111 +168,119 @@
             }, 1000);
         }
 
-        // 🚀 RENAMED TO AVOID APP.JS HIJACKING
-        window.sendLoginCode = function(e) {
+        // --- PURE JAVASCRIPT AUTHENTICATION ---
+        window.handleEmailSubmit = async function(e) {
             e.preventDefault();
-            const btn = document.getElementById('request-btn');
+            const btn = document.getElementById('secure-request-btn');
             const originalText = btn.innerText;
             btn.innerText = "Sending Code...";
             btn.disabled = true;
 
-            const emailInput = document.getElementById('email').value.toLowerCase().trim();
+            const emailInput = document.getElementById('secure-email').value.toLowerCase().trim();
             const messageDiv = document.getElementById('auth-message');
 
-            runWhenReady(async () => {
-                try {
-                    const { error: otpError } = await supabaseClient.auth.signInWithOtp({
-                        email: emailInput,
-                        options: { shouldCreateUser: true }
-                    });
-
-                    if (otpError) throw otpError;
-
-                    document.getElementById('email-form').classList.add('hidden');
-                    document.getElementById('otp-form').classList.remove('hidden');
-                    messageDiv.innerHTML = `<p style="color: #10b981; font-weight: 600; margin-top: 15px; text-align: center;">Verification code sent to your email!</p>`;
-
-                } catch (error) {
-                    console.error("Auth Error:", error);
-                    messageDiv.innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${error.message}</p>`;
-                    btn.innerText = originalText;
-                    btn.disabled = false;
+            try {
+                if (typeof supabaseClient === 'undefined') {
+                    throw new Error("Unable to connect to the server. Please check your internet and refresh the page.");
                 }
-            });
+
+                const { error: otpError } = await supabaseClient.auth.signInWithOtp({
+                    email: emailInput,
+                    options: { shouldCreateUser: true }
+                });
+
+                if (otpError) throw otpError;
+
+                document.getElementById('secure-email-form').classList.add('hidden');
+                document.getElementById('secure-otp-form').classList.remove('hidden');
+                messageDiv.innerHTML = `<p style="color: #10b981; font-weight: 600; margin-top: 15px; text-align: center;">Verification code sent to your email!</p>`;
+
+            } catch (error) {
+                console.error("Auth Error:", error);
+                messageDiv.innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${error.message}</p>`;
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         };
 
-        // 🚀 RENAMED TO AVOID APP.JS HIJACKING
-        window.processLoginOTP = function(e) {
+        window.handleOtpSubmit = async function(e) {
             e.preventDefault();
-            const btn = document.getElementById('verify-btn');
+            const btn = document.getElementById('secure-verify-btn');
             const originalText = btn.innerText;
             btn.innerText = "Verifying...";
             btn.disabled = true;
 
-            const email = document.getElementById('email').value.toLowerCase().trim();
-            const otp = document.getElementById('otp').value.trim();
+            const email = document.getElementById('secure-email').value.toLowerCase().trim();
+            const otp = document.getElementById('secure-otp').value.trim();
+            const messageDiv = document.getElementById('auth-message');
 
-            runWhenReady(async () => {
-                try {
-                    const { data, error } = await supabaseClient.auth.verifyOtp({
-                        email: email,
-                        token: otp,
-                        type: 'email'
-                    });
-
-                    if (error) throw error;
-
-                    // Extracted Safely
-                    let userId = null;
-                    if (data && data.user && data.user.id) {
-                        userId = data.user.id;
-                    } else if (data && data.session && data.session.user && data.session.user.id) {
-                        userId = data.session.user.id;
-                    }
-
-                    if (!userId) throw new Error("Invalid verification response. Please try again.");
-
-                    btn.innerText = "Routing...";
-
-                    // ONLY READ DATA. NO INSERTS/UPDATES TO CRASH THE APP.
-                    const { data: profile } = await supabaseClient
-                        .from('profiles')
-                        .select('full_name')
-                        .eq('id', userId)
-                        .maybeSingle();
-
-                    if (!profile || !profile.full_name || profile.full_name.trim() === "") {
-                        window.location.href = '../bio-data/index.html';
-                    } else {
-                        window.location.href = '../dashboard/index.html';
-                    }
-
-                } catch (error) {
-                    console.error("Verification Error:", error);
-                    const errMsg = error.message || error.error_description || "An unexpected network error occurred.";
-                    document.getElementById('auth-message').innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${errMsg}</p>`;
-                    btn.innerText = originalText;
-                    btn.disabled = false;
+            try {
+                if (typeof supabaseClient === 'undefined') {
+                    throw new Error("Lost connection to the server. Please refresh.");
                 }
-            });
+
+                // 1. Verify Code
+                const { data, error } = await supabaseClient.auth.verifyOtp({
+                    email: email,
+                    token: otp,
+                    type: 'email'
+                });
+
+                if (error) throw error;
+
+                // 2. Extract User ID (Safely written for older browsers)
+                let userId = null;
+                if (data && data.user && data.user.id) {
+                    userId = data.user.id;
+                } else if (data && data.session && data.session.user && data.session.user.id) {
+                    userId = data.session.user.id;
+                }
+
+                if (!userId) throw new Error("Invalid verification response. Please try again.");
+
+                btn.innerText = "Routing...";
+
+                // 3. Simple Read Operation (No crashing inserts or complex tokens!)
+                const { data: profile } = await supabaseClient
+                    .from('profiles')
+                    .select('full_name')
+                    .eq('id', userId)
+                    .maybeSingle();
+
+                if (!profile || !profile.full_name || profile.full_name.trim() === "") {
+                    window.location.replace('../bio-data/index.html');
+                } else {
+                    window.location.replace('../dashboard/index.html');
+                }
+
+            } catch (error) {
+                console.error("Verification Error:", error);
+                const errMsg = error.message || error.error_description || "An unexpected network error occurred.";
+                messageDiv.innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${errMsg}</p>`;
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         };
 
-        // SMART REDIRECT LOGIC
+        // AUTO-LOGIN LISTENER
         window.addEventListener('DOMContentLoaded', () => {
-            runWhenReady(async () => {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                
-                if (session && session.user) {
-                    const userId = session.user.id;
-                    const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', userId).maybeSingle();
-                    
-                    if (!profile || !profile.full_name || profile.full_name.trim() === "") {
-                        window.location.href = '../bio-data/index.html';
-                    } else {
-                        window.location.href = '../dashboard/index.html';
+            const checkSession = async () => {
+                if (typeof supabaseClient !== 'undefined') {
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (session && session.user) {
+                        const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', session.user.id).maybeSingle();
+                        if (!profile || !profile.full_name || profile.full_name.trim() === "") {
+                            window.location.replace('../bio-data/index.html');
+                        } else {
+                            window.location.replace('../dashboard/index.html');
+                        }
                     }
+                } else {
+                    // Try again in 100ms if script hasn't loaded yet
+                    setTimeout(checkSession, 100);
                 }
-            });
+            };
+            checkSession();
         });
     </script>
 </body>
