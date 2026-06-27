@@ -219,7 +219,7 @@
             }, 1000);
         }
 
-        // 🚀 REQUEST OTP (Wrapped in Opera Mini Failsafe)
+        // 🚀 REQUEST OTP
         window.requestOTP = function(e) {
             e.preventDefault();
             const btn = document.getElementById('request-btn');
@@ -252,7 +252,7 @@
             });
         };
 
-        // 🚀 CUSTOM LOGIN ROUTER (Wrapped in Opera Mini Failsafe)
+        // 🚀 CUSTOM LOGIN ROUTER (FORTIFIED)
         window.verifyOTP = function(e) {
             e.preventDefault();
             const btn = document.getElementById('verify-btn');
@@ -261,10 +261,11 @@
             btn.disabled = true;
 
             const email = document.getElementById('email').value.toLowerCase().trim();
-            const otp = document.getElementById('otp').value;
+            const otp = document.getElementById('otp').value.trim();
 
             runWhenReady(async () => {
                 try {
+                    // 1. Verify Code
                     const { data, error } = await supabaseClient.auth.verifyOtp({
                         email: email,
                         token: otp,
@@ -273,27 +274,40 @@
 
                     if (error) throw error;
 
+                    // 🚀 CRITICAL FIX: Safely extract User ID (Preventing Silent Crashes)
+                    const userId = data?.user?.id || data?.session?.user?.id;
+                    if (!userId) throw new Error("Invalid verification response. Please try again.");
+
+                    // 2. Fetch Profile Safely
                     const { data: profile, error: profileError } = await supabaseClient
                         .from('profiles')
                         .select('full_name')
-                        .eq('id', data.session.user.id)
+                        .eq('id', userId)
                         .maybeSingle();
+
+                    if (profileError) throw new Error("Database Fetch Error: " + profileError.message);
 
                     const sessionToken = Math.random().toString(36).substr(2);
                     localStorage.setItem('cbt_session_token', sessionToken);
 
+                    // 3. Routing Logic
                     if (!profile) {
-                        await supabaseClient.from('profiles').insert([{ 
-                            id: data.session.user.id, 
+                        const { error: insertError } = await supabaseClient.from('profiles').insert([{ 
+                            id: userId, 
                             email: email,
                             current_session_token: sessionToken,
                             role: 'student',
                             has_paid: false,
                             tests_taken: 0
                         }]);
+                        
+                        if (insertError) throw new Error("Failed to create profile: " + insertError.message);
+                        
                         window.location.href = '../bio-data/index.html';
                     } else {
-                        await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', data.session.user.id);
+                        const { error: updateError } = await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', userId);
+                        
+                        if (updateError) throw new Error("Failed to update session: " + updateError.message);
                         
                         if (!profile.full_name || profile.full_name.trim() === "") {
                             window.location.href = '../bio-data/index.html';
@@ -304,19 +318,21 @@
 
                 } catch (error) {
                     console.error("Verification Error:", error);
-                    document.getElementById('auth-message').innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">${error.message}</p>`;
+                    // This guarantees a red error message will show up if anything breaks!
+                    const errMsg = error.message || error.error_description || "An unexpected network error occurred.";
+                    document.getElementById('auth-message').innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${errMsg}</p>`;
                     btn.innerText = originalText;
                     btn.disabled = false;
                 }
             });
         };
 
-        // Smart Redirect Logic (Wrapped in Opera Mini Failsafe)
+        // Smart Redirect Logic
         window.addEventListener('DOMContentLoaded', () => {
             runWhenReady(async () => {
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 
-                if (session) {
+                if (session && session.user) {
                     const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', session.user.id).single();
                     
                     if (!profile || !profile.full_name || profile.full_name.trim() === "") {
