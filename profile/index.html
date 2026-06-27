@@ -274,12 +274,7 @@
                 .eq('id', session.user.id)
                 .single();
 
-            // Security Check
-            const localSessionToken = localStorage.getItem('cbt_session_token');
-            if (profile.current_session_token !== localSessionToken) {
-                alert("Security Alert: Logged in from another device.");
-                return logout();
-            }
+
 
             // Populate the UI
             if (profile.full_name) {

@@ -221,11 +221,7 @@
             if (!session || authError) return window.location.href = '../login/index.html';
 
             const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
-            const localSessionToken = localStorage.getItem('cbt_session_token');
-            if (profile.current_session_token !== localSessionToken) {
-                alert("Security Alert: Logged in from another device.");
-                return logout();
-            }
+
 
             // Fetch true test count from results table to prevent bypasses
             const { data: resultsData } = await supabaseClient.from('results').select('id').eq('student_id', session.user.id);
