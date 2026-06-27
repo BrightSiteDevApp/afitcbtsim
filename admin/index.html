@@ -15,6 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/main.css">
     
+    <!-- REQUIRED FOR IMAGE GENERATION -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
@@ -119,7 +120,8 @@
         }
         .report-header { border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
         .report-title { margin: 0; font-size: 1.8rem; font-weight: 800; }
-        .report-date { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 0.9rem;}
+        .report-date { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; display: inline-block;}
+        .report-total { margin-top: 8px; font-size: 0.85rem; color: #bae6fd; font-weight: 600; text-align: right;}
         
         .report-row { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); }
         .r-rank { font-size: 1.2rem; font-weight: 800; color: #93c5fd; width: 30px;}
@@ -144,20 +146,25 @@
         <h3 style="margin:0; font-size: 1.1rem;">Verifying Clearance...</h3>
     </div>
 
+    <!-- HIDDEN CAPTURE AREA -->
     <div id="capture-area">
         <div class="report-header">
             <div>
                 <h2 class="report-title">Daily Top Scorers</h2>
                 <p style="margin: 0; color: #93c5fd; font-size: 0.95rem;">AFIT CBT Simulator</p>
             </div>
-            <div class="report-date" id="img-date">--</div>
+            <div style="text-align: right;">
+                <div class="report-date" id="img-date">--</div>
+                <div class="report-total" id="img-total-exams">0 Exams Taken Today</div>
+            </div>
         </div>
         
         <div id="img-list">
-            </div>
+            <!-- Populated by JS -->
+        </div>
         
-        <div style="text-align: center; margin-top: 30px; font-size: 0.85rem; color: #94a3b8; font-weight: 500;">
-            Secured by Brightsitedev
+        <div style="text-align: center; margin-top: 30px; font-size: 0.85rem; color: #94a3b8; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">
+            Powered by brightsitedev
         </div>
     </div>
 
@@ -185,6 +192,7 @@
                 </div>
             </div>
 
+            <!-- KPI CARDS -->
             <div class="kpi-grid">
                 <div class="kpi-card blue">
                     <span class="kpi-title">Total Users</span>
@@ -204,17 +212,20 @@
                 </div>
             </div>
 
+            <!-- TABS -->
             <div class="tabs-container">
                 <button class="tab-btn active" onclick="switchTab('demographics')">Aspirant Demographics</button>
                 <button class="tab-btn" onclick="switchTab('results')">Exam Results Log</button>
             </div>
 
+            <!-- DEMOGRAPHICS PANEL -->
             <div id="tab-demographics" class="data-panel active">
                 <div class="demo-grid" id="course-body">
                     <div style="grid-column: 1 / -1; text-align: center; color: #94a3b8; padding: 2rem;">Loading data...</div>
                 </div>
             </div>
 
+            <!-- RESULTS PANEL -->
             <div id="tab-results" class="data-panel">
                 <div class="table-container">
                     <table class="admin-table">
@@ -314,6 +325,9 @@
                 document.getElementById('kpi-premium').innerText = premiumUsers;
                 document.getElementById('kpi-exams').innerText = totalExams;
                 document.getElementById('kpi-today').innerText = examsToday;
+                
+                // NEW: Update Image Capture Area with Total Exams Today
+                document.getElementById('img-total-exams').innerText = `${examsToday} Exams Taken Today`;
 
                 // Prepare Top 5 Scorers for Image Generation (from today's results)
                 const sortedToday = [...todayResults].sort((a, b) => b.total_score - a.total_score);
