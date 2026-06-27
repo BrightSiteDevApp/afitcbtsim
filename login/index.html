@@ -147,14 +147,23 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../static/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="../static/app.js" defer></script>
     <script>
 
-        // --- 🚀 SMARTER LAUNCH COUNTDOWN ENGINE ---
-        // Target: June 26, 2026 at 18:00:00 WAT (WAT is UTC+1)
+        // --- 🚀 ROBUST OPERA MINI FAILSAFE ---
+        // This function forces the browser to wait until app.js is fully loaded before executing any Supabase logic
+        function runWhenReady(callback) {
+            if (typeof supabaseClient !== 'undefined') {
+                callback();
+            } else {
+                console.log("Waiting for Supabase to load...");
+                setTimeout(() => runWhenReady(callback), 50);
+            }
+        }
+
+        // --- 🚀 LAUNCH COUNTDOWN ENGINE ---
         const launchDate = new Date("2026-06-26T18:00:00+01:00").getTime();
-        
         const isAdminBypass = window.location.search.toLowerCase().includes('admin');
 
         function revealLoginForm() {
@@ -162,7 +171,6 @@
             document.getElementById('secret-login-block').style.display = 'block';
         }
 
-        // Instant Check before interval starts
         if (isAdminBypass || new Date().getTime() >= launchDate) {
             revealLoginForm();
         } else {
@@ -189,8 +197,8 @@
             }, 1000);
         }
 
-        // 🚀 REQUEST OTP
-        window.requestOTP = async function(e) {
+        // 🚀 REQUEST OTP (Wrapped in Opera Mini Failsafe)
+        window.requestOTP = function(e) {
             e.preventDefault();
             const btn = document.getElementById('request-btn');
             const originalText = btn.innerText;
@@ -200,29 +208,30 @@
             const emailInput = document.getElementById('email').value.toLowerCase().trim();
             const messageDiv = document.getElementById('auth-message');
 
-            try {
-                // If it fails here, it is because of Supabase Email Rate Limits!
-                const { error: otpError } = await supabaseClient.auth.signInWithOtp({
-                    email: emailInput,
-                    options: { shouldCreateUser: true }
-                });
+            runWhenReady(async () => {
+                try {
+                    const { error: otpError } = await supabaseClient.auth.signInWithOtp({
+                        email: emailInput,
+                        options: { shouldCreateUser: true }
+                    });
 
-                if (otpError) throw otpError;
+                    if (otpError) throw otpError;
 
-                document.getElementById('email-form').classList.add('hidden');
-                document.getElementById('otp-form').classList.remove('hidden');
-                messageDiv.innerHTML = `<p style="color: #10b981; font-weight: 600; margin-top: 15px; text-align: center;">Verification code sent to your email!</p>`;
+                    document.getElementById('email-form').classList.add('hidden');
+                    document.getElementById('otp-form').classList.remove('hidden');
+                    messageDiv.innerHTML = `<p style="color: #10b981; font-weight: 600; margin-top: 15px; text-align: center;">Verification code sent to your email!</p>`;
 
-            } catch (error) {
-                console.error("Auth Error:", error);
-                messageDiv.innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${error.message}</p>`;
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
+                } catch (error) {
+                    console.error("Auth Error:", error);
+                    messageDiv.innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${error.message}</p>`;
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            });
         };
 
-        // 🚀 CUSTOM LOGIN ROUTER (FRONTEND PROFILE CREATION)
-        window.verifyOTP = async function(e) {
+        // 🚀 CUSTOM LOGIN ROUTER (Wrapped in Opera Mini Failsafe)
+        window.verifyOTP = function(e) {
             e.preventDefault();
             const btn = document.getElementById('verify-btn');
             const originalText = btn.innerText;
@@ -232,68 +241,69 @@
             const email = document.getElementById('email').value.toLowerCase().trim();
             const otp = document.getElementById('otp').value;
 
-            try {
-                // 1. Verify the code with Supabase
-                const { data, error } = await supabaseClient.auth.verifyOtp({
-                    email: email,
-                    token: otp,
-                    type: 'email'
-                });
-
-                if (error) throw error;
-
-                // 2. Fetch the user's profile SECURELY (without crashing if it doesn't exist)
-                const { data: profile, error: profileError } = await supabaseClient
-                    .from('profiles')
-                    .select('full_name')
-                    .eq('id', data.session.user.id)
-                    .maybeSingle();
-
-                const sessionToken = Math.random().toString(36).substr(2);
-                localStorage.setItem('cbt_session_token', sessionToken);
-
-                // 3. IF NO PROFILE EXISTS, JAVASCRIPT CREATES IT!
-                if (!profile) {
-                    await supabaseClient.from('profiles').insert([{ 
-                        id: data.session.user.id, 
+            runWhenReady(async () => {
+                try {
+                    const { data, error } = await supabaseClient.auth.verifyOtp({
                         email: email,
-                        current_session_token: sessionToken,
-                        role: 'student',
-                        has_paid: false,
-                        tests_taken: 0
-                    }]);
-                    window.location.href = '../bio-data/index.html';
-                } else {
-                    // Profile exists, just update the token
-                    await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', data.session.user.id);
+                        token: otp,
+                        type: 'email'
+                    });
+
+                    if (error) throw error;
+
+                    const { data: profile, error: profileError } = await supabaseClient
+                        .from('profiles')
+                        .select('full_name')
+                        .eq('id', data.session.user.id)
+                        .maybeSingle();
+
+                    const sessionToken = Math.random().toString(36).substr(2);
+                    localStorage.setItem('cbt_session_token', sessionToken);
+
+                    if (!profile) {
+                        await supabaseClient.from('profiles').insert([{ 
+                            id: data.session.user.id, 
+                            email: email,
+                            current_session_token: sessionToken,
+                            role: 'student',
+                            has_paid: false,
+                            tests_taken: 0
+                        }]);
+                        window.location.href = '../bio-data/index.html';
+                    } else {
+                        await supabaseClient.from('profiles').update({ current_session_token: sessionToken }).eq('id', data.session.user.id);
+                        
+                        if (!profile.full_name || profile.full_name.trim() === "") {
+                            window.location.href = '../bio-data/index.html';
+                        } else {
+                            window.location.href = '../dashboard/index.html';
+                        }
+                    }
+
+                } catch (error) {
+                    console.error("Verification Error:", error);
+                    document.getElementById('auth-message').innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">${error.message}</p>`;
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            });
+        };
+
+        // Smart Redirect Logic (Wrapped in Opera Mini Failsafe)
+        window.addEventListener('DOMContentLoaded', () => {
+            runWhenReady(async () => {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                if (session) {
+                    const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', session.user.id).single();
                     
-                    if (!profile.full_name || profile.full_name.trim() === "") {
+                    if (!profile || !profile.full_name || profile.full_name.trim() === "") {
                         window.location.href = '../bio-data/index.html';
                     } else {
                         window.location.href = '../dashboard/index.html';
                     }
                 }
-
-            } catch (error) {
-                console.error("Verification Error:", error);
-                document.getElementById('auth-message').innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">${error.message}</p>`;
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
-        };
-
-        window.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            
-            if (session) {
-                const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', session.user.id).single();
-                
-                if (!profile || !profile.full_name || profile.full_name.trim() === "") {
-                    window.location.href = '../bio-data/index.html';
-                } else {
-                    window.location.href = '../dashboard/index.html';
-                }
-            }
+            });
         });
     </script>
 </body>
