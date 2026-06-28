@@ -154,7 +154,8 @@
                         <svg style="width: 20px; color: var(--brand-blue);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                         Performance History
                     </h3>
-                    <div style="overflow-x: hidden;"> <table class="data-table history-table">
+                    <div style="overflow-x: hidden;">
+                        <table class="data-table history-table">
                             <thead>
                                 <tr>
                                     <th>Date</th>
@@ -169,12 +170,37 @@
                     </div>
                 </div>
 
+                <!-- 🚀 TODAY'S LEADERBOARD (DYNAMIC TITLE) -->
+                <div class="dash-card">
+                    <h3>
+                        <svg style="width: 20px; color: #10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span id="today-leaderboard-title">Top 10 Achievers Today</span>
+                    </h3>
+                    <div style="overflow-x: hidden;">
+                        <table class="data-table leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center;">Rank</th>
+                                    <th>Aspirant</th>
+                                    <th>Course</th>
+                                    <th style="text-align: right;">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="today-leaderboard-body">
+                                <tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading today's results...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ALL TIME ACHIEVERS -->
                 <div class="dash-card">
                     <h3>
                         <svg style="width: 20px; color: #ea580c;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        Top 15 Achievers
+                        Top 15 Achievers (All Time)
                     </h3>
-                    <div style="overflow-x: hidden;"> <table class="data-table leaderboard-table">
+                    <div style="overflow-x: hidden;">
+                        <table class="data-table leaderboard-table">
                             <thead>
                                 <tr>
                                     <th style="text-align: center;">Rank</th>
@@ -221,7 +247,6 @@
             if (!session || authError) return window.location.href = '../login/index.html';
 
             const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
-
 
             // Fetch true test count from results table to prevent bypasses
             const { data: resultsData } = await supabaseClient.from('results').select('id').eq('student_id', session.user.id);
@@ -273,8 +298,9 @@
                 }
             }
 
-            fetchLeaderboard();
             fetchUserHistory(session.user.id);
+            fetchTodayLeaderboard(); 
+            fetchLeaderboard();      
         }
 
         // PAYSTACK INLINE POPUP FUNCTION
@@ -357,8 +383,68 @@
             avgDisplay.innerHTML = `${average} <span style="font-size: 1rem; color: #94a3b8;">/ 50</span>`;
         }
 
+        // 🚀 FETCH TODAY'S LEADERBOARD & UPDATE TITLE
+        async function fetchTodayLeaderboard() {
+            // Update Title with Dynamic Date
+            const todayDate = new Date();
+            const monthStr = todayDate.toLocaleDateString('en-US', { month: 'long' });
+            const dayNum = todayDate.getDate();
+            
+            let suffix = 'th';
+            if (dayNum % 10 === 1 && dayNum !== 11) suffix = 'st';
+            else if (dayNum % 10 === 2 && dayNum !== 12) suffix = 'nd';
+            else if (dayNum % 10 === 3 && dayNum !== 13) suffix = 'rd';
+            
+            document.getElementById('today-leaderboard-title').innerText = `Top 10 Achievers Today, ${monthStr} ${dayNum}${suffix}`;
+
+            // Calculate 00:00:00 and 23:59:59 for today
+            const startOfDay = new Date();
+            startOfDay.setHours(0, 0, 0, 0);
+            
+            const endOfDay = new Date();
+            endOfDay.setHours(23, 59, 59, 999);
+
+            const { data, error } = await supabaseClient
+                .from('results')
+                .select(`total_score, profiles (full_name, course_applied)`)
+                .gte('submitted_at', startOfDay.toISOString())
+                .lte('submitted_at', endOfDay.toISOString())
+                .order('total_score', { ascending: false })
+                .limit(10); 
+
+            const tbody = document.getElementById('today-leaderboard-body');
+            
+            if (error) console.error("Today's Leaderboard Error:", error);
+
+            if (error || !data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">No exams have been completed today.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = ''; 
+            
+            data.forEach((row, index) => {
+                const fullName = row.profiles?.full_name || 'Unknown Aspirant';
+                const courseApplied = row.profiles?.course_applied || 'General';
+
+                let rankDisplay = `<span style="color: #64748b; font-weight: 700;">#${index + 1}</span>`;
+                if (index === 0) rankDisplay = '🥇';
+                if (index === 1) rankDisplay = '🥈';
+                if (index === 2) rankDisplay = '🥉';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-size: 1.1rem; text-align: center;">${rankDisplay}</td>
+                    <td><span style="font-weight: 600; color: #1e293b; line-height: 1.3; display: block;">${fullName}</span></td>
+                    <td style="color: #64748b; font-weight: 500; line-height: 1.3; font-size: 0.85rem;">${courseApplied}</td>
+                    <td style="text-align: right;"><span class="score-badge badge-blue" style="white-space: nowrap;">${row.total_score}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // FETCH ALL-TIME LEADERBOARD
         async function fetchLeaderboard() {
-            // Fetch top 15 results, joining with profile to get name AND course
             const { data, error } = await supabaseClient
                 .from('results')
                 .select(`total_score, profiles (full_name, course_applied)`)
@@ -367,9 +453,7 @@
 
             const tbody = document.getElementById('leaderboard-body');
             
-            if (error) {
-                console.error("Leaderboard Error:", error);
-            }
+            if (error) console.error("Leaderboard Error:", error);
 
             if (error || !data || data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">No results yet.</td></tr>';
@@ -388,7 +472,6 @@
                 if (index === 2) rankDisplay = '🥉';
 
                 const tr = document.createElement('tr');
-                // Removed the avatar initial logic entirely per your instruction
                 tr.innerHTML = `
                     <td style="font-size: 1.1rem; text-align: center;">${rankDisplay}</td>
                     <td><span style="font-weight: 600; color: #1e293b; line-height: 1.3; display: block;">${fullName}</span></td>
