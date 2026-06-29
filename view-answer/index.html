@@ -121,6 +121,7 @@
             questions.forEach((q, index) => {
                 const userAns = (userAnswers[index] || "").toUpperCase().trim();
                 const actualAns = (q.correct_answer || q.answer || "").toUpperCase().trim();
+                const shortId = q.short_id || q.id || 'N/A'; // 🚀 Added short_id logic
                 
                 let statusHtml = '';
                 if (!userAns) {
@@ -141,7 +142,10 @@
                 const cardHtml = `
                     <div class="question-card">
                         <div class="q-meta">
-                            <span style="color: #2563eb;">${(q.subject || "Subject").toUpperCase()} • Q${index + 1}</span>
+                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <span style="color: #2563eb;">${(q.subject || "Subject").toUpperCase()} • Q${index + 1}</span>
+                                <span style="background: #f1f5f9; color: #64748b; padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">ID: ${shortId}</span>
+                            </div>
                             ${statusHtml}
                         </div>
                         <div class="q-text">${prepText(q.question_text)}</div>
