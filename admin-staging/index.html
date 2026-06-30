@@ -103,7 +103,7 @@
 
     <nav class="admin-nav">
         <div style="font-weight: 800; font-size: 1.2rem;">AFIT Admin | Question Bank Manager</div>
-        <button onclick="window.location.href='../admin/index.html'" style="background: #334155; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer;">Back to Command Center</button>
+        <button onclick="window.location.href='../profile/index.html'" style="background: #334155; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer;">Back to Profile</button>
     </nav>
 
     <div class="global-stats-bar" id="stats-bar">
@@ -275,22 +275,38 @@
             }
         }
 
-        // 🚀 ENGINE 1: GLOBAL STATS
+        // 🚀 ENGINE 1: GLOBAL STATS (FIXED FOR 1000+ QUESTIONS)
         async function loadGlobalStats() {
-            const { data, error } = await supabaseClient.from('questions').select('subject');
-            if (error || !data) return;
+            // We use specific subject counts to completely bypass Supabase's 1000 row download limit
+            const subjectsToCount = [
+                'english', 'mathematics', 'physics', 'chemistry', 
+                'biology', 'economics', 'commerce', 'government', 'literature', 'gns'
+            ];
 
-            const counts = data.reduce((acc, curr) => {
-                let subj = curr.subject.toUpperCase();
-                acc[subj] = (acc[subj] || 0) + 1;
-                return acc;
-            }, {});
+            try {
+                const countPromises = subjectsToCount.map(async (subj) => {
+                    const { count, error } = await supabaseClient
+                        .from('questions')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('subject', subj);
+                    
+                    return { subject: subj, count: error ? 0 : (count || 0) };
+                });
 
-            let html = '';
-            for (const [subj, count] of Object.entries(counts)) {
-                html += `<div class="stat-box"><span>${subj}</span><strong>${count}</strong></div>`;
+                const results = await Promise.all(countPromises);
+                
+                let html = '';
+                results.forEach(res => {
+                    if (res.count > 0) {
+                        html += `<div class="stat-box"><span>${res.subject.toUpperCase()}</span><strong>${res.count}</strong></div>`;
+                    }
+                });
+
+                document.getElementById('stats-bar').innerHTML = html || '<div class="stat-box"><span>Bank Empty</span><strong>0</strong></div>';
+            } catch (err) {
+                console.error("Stats Error:", err);
+                document.getElementById('stats-bar').innerHTML = '<div class="stat-box"><span>Error Loading</span><strong>!</strong></div>';
             }
-            document.getElementById('stats-bar').innerHTML = html || '<div class="stat-box"><span>Bank Empty</span><strong>0</strong></div>';
         }
 
         // 🚀 ENGINE 2: ALOC FETCH (WITH DUPLICATE TRAP & INSTR. INJECTION)
@@ -353,7 +369,7 @@
                             option_c: q.option.c || "N/A",
                             option_d: q.option.d || "N/A",
                             correct_answer: (q.answer || "").toUpperCase(),
-                            short_id: Math.random().toString(36).substr(2, 4).toUpperCase(),
+                            short_id: Math.random().toString(36).substr(2, 4).toUpperCase(), 
                             year: q.examyear || "2026"
                         });
                         allExisting.add(qTextLower);
@@ -441,7 +457,7 @@
 
                 stagingQueue.splice(currentIndex, 1);
                 updateUI();
-                loadGlobalStats(); 
+                loadGlobalStats(); // Refresh stats!
             } catch (err) { alert("Move Error: " + err.message); } 
             finally { btn.innerHTML = "✅ Approve & Move"; btn.disabled = false; }
         }
@@ -470,7 +486,7 @@
             }
         }
 
-        // 🚀 ENGINE 3: EDITOR (WITH RLS FALLBACKS)
+        // 🚀 ENGINE 3: EDITOR (MAIN DB INTERACTION)
         async function searchMainDatabase() {
             const shortId = document.getElementById('search-id').value.toUpperCase().trim();
             const btn = document.getElementById('search-btn');
@@ -530,7 +546,6 @@
             btn.innerText = "Saving..."; btn.disabled = true;
 
             try {
-                // 🚀 USING .select() TO FORCE SUPABASE TO REPORT IF RLS BLOCKED IT
                 const { data, error } = await supabaseClient.from('questions')
                     .update({ correct_answer: newAns })
                     .eq('id', activeEditorQuestion.id)
@@ -556,7 +571,6 @@
             btn.innerText = "Deleting..."; btn.disabled = true;
 
             try {
-                // 🚀 USING .select() TO VERIFY DELETION WORKED
                 const { data, error } = await supabaseClient.from('questions')
                     .delete()
                     .eq('id', activeEditorQuestion.id)
@@ -572,7 +586,7 @@
                 document.getElementById('search-id').value = '';
                 document.getElementById('search-status').innerText = '';
                 activeEditorQuestion = null;
-                loadGlobalStats(); 
+                loadGlobalStats(); // Refresh stats!
             } catch (err) { alert("Delete Error: " + err.message); } 
             finally { btn.innerHTML = "🗑️ Delete Permanently"; btn.disabled = false; }
         }
