@@ -33,7 +33,7 @@
             padding: 0 5%; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%;
         }
         
-        /* 🚀 GLOBAL STATS BAR (HORIZONTALLY SCROLLABLE) */
+        /* 🚀 GLOBAL STATS BAR */
         .global-stats-bar {
             display: flex; gap: 15px; overflow-x: auto; padding: 1.5rem 5%; background: white; 
             border-bottom: 1px solid #e2e8f0; width: 100%;
@@ -86,7 +86,6 @@
         .opt-letter { width: 30px; height: 30px; border-radius: 50%; background: #e2e8f0; display: flex; justify-content: center; align-items: center; font-weight: 800; margin-right: 15px; color: #475569; flex-shrink: 0;}
         .option-box.correct-ans .opt-letter { background: #16a34a; color: white; }
 
-        /* 🚀 MOBILE OVERRIDES FOR SMALL PHONES (SAMSUNG S10e) */
         @media (max-width: 900px) {
             .admin-nav { flex-direction: column; height: auto; padding: 1rem; gap: 10px; text-align: center; }
             .staging-layout { grid-template-columns: 1fr; padding: 0 1rem; gap: 1rem; }
@@ -107,23 +106,17 @@
         <button onclick="window.location.href='../admin/index.html'" style="background: #334155; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer;">Back to Command Center</button>
     </nav>
 
-    <!-- GLOBAL STATS BAR -->
     <div class="global-stats-bar" id="stats-bar">
         <div class="stat-box"><span>Loading Stats</span><strong>...</strong></div>
     </div>
 
-    <!-- TABS -->
     <div class="tab-wrapper">
         <button class="tab-btn active" id="tab-btn-staging" onclick="switchTab('staging')">📥 ALOC Staging Area</button>
         <button class="tab-btn" id="tab-btn-editor" onclick="switchTab('editor')">✏️ Edit Main Bank</button>
     </div>
 
-    <!-- ========================================== -->
-    <!-- TAB 1: ALOC STAGING AREA                   -->
-    <!-- ========================================== -->
     <div class="staging-layout" id="section-staging">
         
-        <!-- LEFT PANEL: FETCH ENGINE -->
         <div class="panel-card">
             <h3 style="margin-top:0; color: #0f172a; font-size: 1.3rem;">1. Pull from ALOC</h3>
             <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.5rem;">Fetch 40 new questions to the holding queue.</p>
@@ -152,7 +145,6 @@
             <div id="fetch-status" style="font-size: 0.85rem; text-align: center; font-weight: 700; margin-top: 10px;"></div>
         </div>
 
-        <!-- RIGHT PANEL: REVIEW QUEUE -->
         <div class="panel-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px;">
                 <h3 style="margin:0; color: #0f172a; font-size: 1.3rem;">2. Review & Approve</h3>
@@ -176,9 +168,6 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- TAB 2: QUESTION EDITOR (MAIN DB)           -->
-    <!-- ========================================== -->
     <div class="editor-layout" id="section-editor">
         <div class="panel-card">
             <h3 style="margin-top:0; color: #0f172a; font-size: 1.3rem;">Search & Edit Main Question Bank</h3>
@@ -281,7 +270,6 @@
             document.getElementById(`tab-btn-${tab}`).classList.add('active');
             document.getElementById(`section-${tab}`).style.display = tab === 'staging' ? 'grid' : 'block';
             
-            // Adjust mobile display specifically for staging grid
             if(window.innerWidth <= 900 && tab === 'staging') {
                 document.getElementById('section-staging').style.display = 'block';
             }
@@ -319,10 +307,8 @@
             status.style.color = "#2563eb"; status.innerText = "Scanning database for existing questions...";
 
             try {
-                // Strict mathematics fix
                 const dbSubject = (subject === 'mathematic' || subject === 'mathematics') ? 'mathematics' : subject;
 
-                // Grab existing for duplicate checking
                 const [{data: mainQs}, {data: stageQs}] = await Promise.all([
                     supabaseClient.from('questions').select('question_text').eq('subject', dbSubject),
                     supabaseClient.from('staging_questions').select('question_text').eq('subject', dbSubject)
@@ -335,7 +321,6 @@
 
                 status.innerText = "Pulling from ALOC API...";
 
-                // Smart Retry Loop
                 let json = null, fetchSuccess = false;
                 for(let attempt = 1; attempt <= 3; attempt++) {
                     try {
@@ -354,7 +339,6 @@
                 const newQuestions = [];
                 json.data.forEach(q => {
                     let finalQuestionText = q.question;
-                    // English Instructions Fix
                     if (dbSubject === 'english' && q.section) {
                         finalQuestionText = `<strong>Instruction:</strong> <em>${q.section}</em><br><br>${q.question}`;
                     }
@@ -369,7 +353,7 @@
                             option_c: q.option.c || "N/A",
                             option_d: q.option.d || "N/A",
                             correct_answer: (q.answer || "").toUpperCase(),
-                            short_id: Math.random().toString(36).substr(2, 4).toUpperCase(), // 4 CHAR ID 
+                            short_id: Math.random().toString(36).substr(2, 4).toUpperCase(),
                             year: q.examyear || "2026"
                         });
                         allExisting.add(qTextLower);
@@ -436,7 +420,6 @@
             btn.innerText = "Checking..."; btn.disabled = true;
 
             try {
-                // Double check main DB for duplicate before move
                 const { data: dupCheck } = await supabaseClient.from('questions').select('id').eq('question_text', q.question_text).maybeSingle();
                 if (dupCheck) {
                     alert("⚠️ Duplicate Prevented! This exact question is already in the Main Bank. Deleting from staging...");
@@ -458,7 +441,7 @@
 
                 stagingQueue.splice(currentIndex, 1);
                 updateUI();
-                loadGlobalStats(); // Refresh stats!
+                loadGlobalStats(); 
             } catch (err) { alert("Move Error: " + err.message); } 
             finally { btn.innerHTML = "✅ Approve & Move"; btn.disabled = false; }
         }
@@ -487,7 +470,7 @@
             }
         }
 
-        // 🚀 ENGINE 3: EDITOR (MAIN DB INTERACTION)
+        // 🚀 ENGINE 3: EDITOR (WITH RLS FALLBACKS)
         async function searchMainDatabase() {
             const shortId = document.getElementById('search-id').value.toUpperCase().trim();
             const btn = document.getElementById('search-btn');
@@ -547,12 +530,20 @@
             btn.innerText = "Saving..."; btn.disabled = true;
 
             try {
-                const { error } = await supabaseClient.from('questions').update({ correct_answer: newAns }).eq('id', activeEditorQuestion.id);
+                // 🚀 USING .select() TO FORCE SUPABASE TO REPORT IF RLS BLOCKED IT
+                const { data, error } = await supabaseClient.from('questions')
+                    .update({ correct_answer: newAns })
+                    .eq('id', activeEditorQuestion.id)
+                    .select();
+
                 if (error) throw error;
+                if (!data || data.length === 0) {
+                    throw new Error("Update blocked by Database Security. Please run the SQL command provided to unlock UPDATE permissions.");
+                }
                 
                 alert(`Success! Correct answer updated to Option ${newAns}`);
                 activeEditorQuestion.correct_answer = newAns;
-                renderEditorCard(); // Re-render to show updated green highlight
+                renderEditorCard(); 
             } catch (err) { alert("Update Error: " + err.message); } 
             finally { btn.innerHTML = "💾 Save New Answer"; btn.disabled = false; }
         }
@@ -565,15 +556,23 @@
             btn.innerText = "Deleting..."; btn.disabled = true;
 
             try {
-                const { error } = await supabaseClient.from('questions').delete().eq('id', activeEditorQuestion.id);
+                // 🚀 USING .select() TO VERIFY DELETION WORKED
+                const { data, error } = await supabaseClient.from('questions')
+                    .delete()
+                    .eq('id', activeEditorQuestion.id)
+                    .select();
+
                 if (error) throw error;
+                if (!data || data.length === 0) {
+                    throw new Error("Delete blocked by Database Security. Please run the SQL command provided to unlock DELETE permissions.");
+                }
                 
                 alert("Question permanently deleted from Main Bank.");
                 document.getElementById('editor-canvas').style.display = 'none';
                 document.getElementById('search-id').value = '';
                 document.getElementById('search-status').innerText = '';
                 activeEditorQuestion = null;
-                loadGlobalStats(); // Refresh stats!
+                loadGlobalStats(); 
             } catch (err) { alert("Delete Error: " + err.message); } 
             finally { btn.innerHTML = "🗑️ Delete Permanently"; btn.disabled = false; }
         }
