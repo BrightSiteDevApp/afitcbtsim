@@ -20,69 +20,105 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        body { background-color: #f1f5f9; color: #0f172a; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+        /* 🚀 GLOBAL RESPONSIVENESS FIXES */
+        * { box-sizing: border-box; }
+        body { 
+            background-color: #f1f5f9; color: #0f172a; 
+            font-family: 'Poppins', sans-serif; margin: 0; padding: 0; 
+            overflow-x: hidden; /* Absolutely prevents side-swiping the whole page */
+            width: 100vw;
+        }
         
         .admin-nav {
-            height: 60px; background: #0f172a; color: white; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 1.5rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            height: 70px; background: #0f172a; color: white; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 5%; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
         }
         
-        .manager-wrapper { max-width: 1200px; margin: 1.5rem auto; padding: 0 1rem; }
-
-        .stats-scroll-container {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 1.5rem;
+        /* 🚀 HORIZONTAL SCROLLING FOR STATS BAR */
+        .global-stats-bar {
+            display: flex; gap: 15px; overflow-x: auto; padding: 1.5rem 5%; background: white; 
+            border-bottom: 1px solid #e2e8f0; width: 100%;
+            -ms-overflow-style: none; scrollbar-width: none; /* Hide scrollbar for clean look */
         }
-        .stats-scroll-container::-webkit-scrollbar { height: 6px; }
-        .stats-scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .global-stats-bar::-webkit-scrollbar { display: none; }
         
-        .stat-pill {
-            background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 15px;
-            display: flex; flex-direction: column; align-items: center; min-width: 100px; flex-shrink: 0;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-top: 3px solid #2563eb;
+        .stat-box {
+            background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 10px 20px; 
+            text-align: center; min-width: 110px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); flex-shrink: 0;
         }
-        .stat-pill span { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 2px;}
-        .stat-pill strong { font-size: 1.3rem; font-weight: 800; color: #0f172a; }
+        .stat-box span { display: block; font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-box strong { font-size: 1.5rem; color: #0f172a; }
 
-        .tabs-container { display: flex; gap: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 1.5rem; overflow-x: auto;}
+        /* 🚀 MAIN LAYOUT CONSTRAINTS */
+        .staging-layout { 
+            display: grid; grid-template-columns: 350px 1fr; max-width: 1400px; 
+            margin: 2rem auto; gap: 2rem; padding: 0 2rem; align-items: start; width: 100%; 
+        }
+        
+        .panel-card { 
+            background: white; padding: 2rem; border-radius: 20px; border: 1px solid #e2e8f0; 
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); width: 100%; overflow: hidden; 
+        }
+        
+        /* 🚀 TABS WRAPPING FIX */
+        .tab-container { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; width: 100%; }
         .tab-btn {
-            background: transparent; border: none; padding: 0.6rem 1rem; font-family: 'Poppins'; font-weight: 700;
-            font-size: 0.95rem; color: #64748b; cursor: pointer; border-radius: 8px; transition: all 0.2s; white-space: nowrap;
+            padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; 
+            background: #f1f5f9; color: #64748b; transition: all 0.2s; flex-grow: 1; text-align: center;
         }
-        .tab-btn:hover { background: #f1f5f9; color: #0f172a; }
-        .tab-btn.active { background: #2563eb; color: white; }
+        .tab-btn.active { background: #2563eb; color: white; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
 
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        .staging-layout { display: grid; grid-template-columns: 350px 1fr; gap: 1.5rem; align-items: start; }
+        /* INPUTS & BUTTONS */
+        .input-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
+        .input-group select, .input-group input { 
+            width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 2px solid #e2e8f0; 
+            font-family: 'Poppins'; margin-bottom: 1rem; font-size: 1rem; box-sizing: border-box; 
+        }
         
-        .panel-card { background: white; padding: 1.5rem; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); }
-        
-        .input-group label { display: block; font-size: 0.8rem; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; }
-        .input-group select, .input-group input { width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 2px solid #e2e8f0; font-family: 'Poppins'; margin-bottom: 1.5rem; font-size: 0.95rem; box-sizing: border-box; }
-        .input-group input:focus, .input-group select:focus { outline: none; border-color: #2563eb; }
+        /* 🚀 SEARCH INPUT & BUTTON FLEX FIX */
+        .search-flex { display: flex; gap: 10px; width: 100%; align-items: stretch; }
+        .search-flex input { margin-bottom: 0; flex-grow: 1; min-width: 0; /* min-width 0 prevents input from pushing flex boundary */ }
+        .search-flex button { flex-shrink: 0; margin-bottom: 0; }
 
-        .btn { width: 100%; padding: 0.9rem; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; font-size: 0.95rem; transition: transform 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn { width: 100%; padding: 1rem; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; font-size: 1rem; transition: transform 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .btn:hover { transform: translateY(-2px); }
         .btn-blue { background: #2563eb; color: white; }
         .btn-green { background: #16a34a; color: white; }
         .btn-red { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-        .btn-orange { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
-
-        .question-card { border: 2px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; background: #f8fafc; }
-        .q-meta { display: flex; justify-content: space-between; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem; text-transform: uppercase; font-size: 0.85rem;}
-        .q-text { font-size: 1.1rem; font-weight: 500; margin-bottom: 1.5rem; line-height: 1.6;}
         
-        .option-box { display: flex; align-items: center; padding: 0.8rem 1.2rem; background: white; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 0.8rem; font-size: 0.9rem;}
+        /* QUESTION PREVIEW */
+        .question-card { border: 2px solid #e2e8f0; border-radius: 16px; padding: 2rem; background: #f8fafc; width: 100%; overflow-x: auto;}
+        .q-meta { display: flex; justify-content: space-between; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem; text-transform: uppercase; flex-wrap: wrap; gap: 10px;}
+        .q-text { font-size: 1.2rem; font-weight: 500; margin-bottom: 2rem; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;}
+        
+        .option-box { display: flex; align-items: center; padding: 1rem 1.5rem; background: white; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 1rem; word-wrap: break-word; }
         .option-box.correct-ans { background: #dcfce7; border-color: #16a34a; }
-        .opt-letter { width: 28px; height: 28px; border-radius: 50%; background: #e2e8f0; display: flex; justify-content: center; align-items: center; font-weight: 800; margin-right: 12px; color: #475569; flex-shrink: 0;}
+        .opt-letter { width: 30px; height: 30px; border-radius: 50%; background: #e2e8f0; display: flex; justify-content: center; align-items: center; font-weight: 800; margin-right: 15px; color: #475569; flex-shrink: 0;}
         .option-box.correct-ans .opt-letter { background: #16a34a; color: white; }
 
+        /* 🚀 MOBILE OVERRIDES FOR SAMSUNG S10e / SMALL PHONES */
         @media (max-width: 900px) {
-            .staging-layout { grid-template-columns: 1fr; }
-            .q-meta { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .admin-nav { padding: 0 1rem; }
+            .staging-layout { grid-template-columns: 1fr; padding: 1rem; margin: 1rem auto; gap: 1rem; }
+            .panel-card { padding: 1.2rem; }
+            .admin-nav { flex-direction: column; height: auto; padding: 1rem; gap: 10px; text-align: center; }
+            
+            /* Stack search input and button on mobile so it never overflows */
+            .search-flex { flex-direction: column; }
+            .search-flex button { width: 100%; }
+            
+            .global-stats-bar { padding: 1rem; }
+            .stat-box { padding: 8px 15px; min-width: 90px; }
+            .stat-box strong { font-size: 1.2rem; }
+            
+            .question-card { padding: 1.2rem; }
+            .q-text { font-size: 1.05rem; }
+            .option-box { padding: 0.8rem 1rem; }
+            
+            /* Ensure bottom action buttons stack neatly */
+            #edit-actions { flex-direction: column; }
+            #edit-actions button { width: 100%; }
+            #review-canvas > div:last-child { display: flex; flex-direction: column; }
         }
     </style>
 </head>
