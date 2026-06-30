@@ -387,10 +387,10 @@
         const MOJIBAKE_MAP = {
             "a\u0161": "\\sqrt{", "â€²â€²": "-", "âr′": "-", "\\l_s": "\\theta", "\\l,": "\\theta", "i\\in": "\\pi", "Î\\_s": "\\theta",
             "kgmal": "kgm^{-3}", "Nma 2": "Nm^{-2}", "msâˆ’1": "ms^{-1}", "msâˆ’2": "ms^{-2}",
-            "â€™": "'", "â€˜": "'", "â€œ": '"', "â€": '"', "â€": '"', 
+            "â€™": "'", "â€˜": "'", "â€œ": '"', "â€ ": '"', "â€": '"', 
             "â€š": "‚", "â€ž": "„", "â€“": "-", "â€”": "-", "â€¦": "...", "â€¢": "•",
             "â‚¬": "€", "Â£": "£", "â‚¦": "₦",
-            "âˆ’": "−", "â‰¡": "≡", "â‰ˆ": "≈", "âˆ¼": "∼", "âˆ": "∝",
+            "âˆ’": "−", "â‰¡": "≡", "â‰ˆ": "≈", "âˆ¼": "∼", "âˆ ": "∝",
             "âˆ«": "∫", "âˆ‘": "∑", "âˆЏ": "∏", "âˆ†": "Δ", "âˆ‡": "∇",
             "âˆˆ": "∈", "âˆ‰": "∉", "âˆ©": "∩", "âˆª": "∪", "âˆ´": "∴", "âˆµ": "∵",
             "âˆ—": "∗", "âˆ˜": "∘", "âŠ‚": "⊂", "âŠƒ": "⊃", "âŠ†": "⊆", "âŠ‡": "⊇",
@@ -399,11 +399,11 @@
             "â‰¤": "≤", "â‰¥": "≥", "âˆž": "∞", "âˆš": "√",
             "Â²": "^2", "Â³": "^3", "Â¹": "^1",
             "Â¼": "¼", "Â½": "½", "Â¾": "¾",
-            "â†’": "→", "â‡Œ": "⇌", "â†": "←", "â†‘": "↑", "â†“": "↓", "â†”": "↔",
-            "â‡’": "⇒", "â‡": "⇐", "â‡‘": "⇑", "â‡“": "⇓", "â‡”": "⇔",
+            "â†’": "→", "â‡Œ": "⇌", "â† ": "←", "â†‘": "↑", "â†“": "↓", "â†”": "↔",
+            "â‡’": "⇒", "â‡ ": "⇐", "â‡‘": "⇑", "â‡“": "⇓", "â‡”": "⇔",
             "Î±": "α", "Î²": "β", "Î³": "γ", "Î´": "δ", "Îµ": "ε", "Î¶": "ζ", 
             "Î·": "η", "Î¸": "θ", "Î¹": "ι", "Îº": "κ", "Î»": "λ", "Î¼": "μ", "Âµ": "μ",
-            "Î½": "ν", "Î¾": "ξ", "Î¿": "ο", "Ï€": "π", "Ï": "ρ", "Ï‚": "ς", 
+            "Î½": "ν", "Î¾": "ξ", "Î¿": "ο", "Ï€": "π", "Ï ": "ρ", "Ï‚": "ς", 
             "Ïƒ": "σ", "Ï„": "τ", "Ï…": "υ", "Ï†": "φ", "Ï‡": "χ", "Ïˆ": "ψ", "Ï‰": "ω",
             "Â": " " 
         };
@@ -530,12 +530,12 @@
             document.getElementById('q-subject-text').innerText = `${(q.subject || "Subject").toUpperCase()} • Q${index + 1} of ${questions.length}`;
             document.getElementById('q-db-id').innerText = `Report ID: ${q.short_id || q.id}`;
             
-            // Note: We MUST use innerText here so HTML brackets (< and >) in Math equations don't break the layout!
-            document.getElementById('q-body').innerText = prepText(q.question_text);
-            document.getElementById('text-A').innerText = prepText(q.option_a);
-            document.getElementById('text-B').innerText = prepText(q.option_b);
-            document.getElementById('text-C').innerText = prepText(q.option_c);
-            document.getElementById('text-D').innerText = prepText(q.option_d || q.option_D);
+            // 🚀 FIXED: Switched from innerText to innerHTML so formatting tags (<i>, <b>, <u>) work properly!
+            document.getElementById('q-body').innerHTML = prepText(q.question_text);
+            document.getElementById('text-A').innerHTML = prepText(q.option_a);
+            document.getElementById('text-B').innerHTML = prepText(q.option_b);
+            document.getElementById('text-C').innerHTML = prepText(q.option_c);
+            document.getElementById('text-D').innerHTML = prepText(q.option_d || q.option_D);
             
             ['A', 'B', 'C', 'D'].forEach(opt => document.getElementById(`box-${opt}`).classList.remove('selected'));
             
