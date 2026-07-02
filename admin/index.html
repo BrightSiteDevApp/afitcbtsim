@@ -15,7 +15,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/main.css">
     
-    <!-- REQUIRED FOR IMAGE GENERATION -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
@@ -146,7 +145,6 @@
         <h3 style="margin:0; font-size: 1.1rem;">Verifying Clearance...</h3>
     </div>
 
-    <!-- HIDDEN CAPTURE AREA -->
     <div id="capture-area">
         <div class="report-header">
             <div>
@@ -160,8 +158,7 @@
         </div>
         
         <div id="img-list">
-            <!-- Populated by JS -->
-        </div>
+            </div>
         
         <div style="text-align: center; margin-top: 30px; font-size: 0.85rem; color: #94a3b8; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">
             Powered by brightsitedev
@@ -192,7 +189,6 @@
                 </div>
             </div>
 
-            <!-- KPI CARDS -->
             <div class="kpi-grid">
                 <div class="kpi-card blue">
                     <span class="kpi-title">Total Users</span>
@@ -212,20 +208,17 @@
                 </div>
             </div>
 
-            <!-- TABS -->
             <div class="tabs-container">
                 <button class="tab-btn active" onclick="switchTab('demographics')">Aspirant Demographics</button>
                 <button class="tab-btn" onclick="switchTab('results')">Exam Results Log</button>
             </div>
 
-            <!-- DEMOGRAPHICS PANEL -->
             <div id="tab-demographics" class="data-panel active">
                 <div class="demo-grid" id="course-body">
                     <div style="grid-column: 1 / -1; text-align: center; color: #94a3b8; padding: 2rem;">Loading data...</div>
                 </div>
             </div>
 
-            <!-- RESULTS PANEL -->
             <div id="tab-results" class="data-panel">
                 <div class="table-container">
                     <table class="admin-table">
@@ -304,50 +297,69 @@
 
         async function fetchAdminData() {
             try {
-                // Fetch profiles and results
-                const { data: profiles, error: pErr } = await supabaseClient.from('profiles').select('*');
-                const { data: results, error: rErr } = await supabaseClient.from('results').select('*, profiles(full_name, course_applied)').order('submitted_at', { ascending: false });
+                // --- 1. CALCULATE EXACT KPIs (Bypassing 1000 Limit) ---
+                const pTotalUsers = supabaseClient.from('profiles').select('*', { count: 'exact', head: true });
+                const pPremiumUsers = supabaseClient.from('profiles').select('*', { count: 'exact', head: true }).eq('has_paid', true);
+                const pTotalExams = supabaseClient.from('results').select('*', { count: 'exact', head: true });
 
-                if (pErr) throw pErr;
-                if (rErr) throw rErr;
+                const startOfDay = new Date();
+                startOfDay.setHours(0, 0, 0, 0);
+                const pTodayExams = supabaseClient.from('results')
+                    .select('*, profiles(full_name, course_applied)')
+                    .gte('submitted_at', startOfDay.toISOString());
 
-                // --- 1. CALCULATE KPIs ---
-                const totalUsers = profiles.length;
-                const premiumUsers = profiles.filter(p => p.has_paid).length;
-                const totalExams = results.length;
+                // 🚀 FIX: Fetching ONLY the 100 most recent results to keep table fast!
+                const pRecentResults = supabaseClient.from('results')
+                    .select('*, profiles(full_name, course_applied)')
+                    .order('submitted_at', { ascending: false })
+                    .limit(100); 
 
-                // Calculate Exams Today (Resetting at midnight)
-                const todayStr = new Date().toDateString();
-                const todayResults = results.filter(r => new Date(r.submitted_at).toDateString() === todayStr);
-                const examsToday = todayResults.length;
+                // Note: Fetching course applied for demographics calculation
+                const pDemographics = supabaseClient.from('profiles').select('course_applied');
 
-                document.getElementById('kpi-users').innerText = totalUsers;
-                document.getElementById('kpi-premium').innerText = premiumUsers;
-                document.getElementById('kpi-exams').innerText = totalExams;
+                // Run all queries simultaneously for extreme speed
+                const [
+                    { count: totalUsers }, 
+                    { count: premiumUsers }, 
+                    { count: totalExams }, 
+                    { data: todayResults },
+                    { data: recentResults },
+                    { data: profiles }
+                ] = await Promise.all([pTotalUsers, pPremiumUsers, pTotalExams, pTodayExams, pRecentResults, pDemographics]);
+
+                const examsToday = todayResults ? todayResults.length : 0;
+
+                // Inject KPI Values
+                document.getElementById('kpi-users').innerText = totalUsers || 0;
+                document.getElementById('kpi-premium').innerText = premiumUsers || 0;
+                document.getElementById('kpi-exams').innerText = totalExams || 0;
                 document.getElementById('kpi-today').innerText = examsToday;
                 
-                // NEW: Update Image Capture Area with Total Exams Today
                 document.getElementById('img-total-exams').innerText = `${examsToday} Exams Taken Today`;
 
                 // Prepare Top 5 Scorers for Image Generation (from today's results)
-                const sortedToday = [...todayResults].sort((a, b) => b.total_score - a.total_score);
-                todayTopScorers = sortedToday.slice(0, 5);
+                todayTopScorers = [];
+                if (todayResults && todayResults.length > 0) {
+                    const sortedToday = [...todayResults].sort((a, b) => b.total_score - a.total_score);
+                    todayTopScorers = sortedToday.slice(0, 5);
+                }
 
                 // --- 2. POPULATE DEMOGRAPHICS (Course Grouping) ---
                 const courseCounts = {};
-                profiles.forEach(p => {
-                    if (p.course_applied) {
-                        // Clean up the name (remove brackets if any)
-                        const cleanName = p.course_applied.replace(/\[.*?\]/g, '').trim();
-                        courseCounts[cleanName] = (courseCounts[cleanName] || 0) + 1;
-                    }
-                });
+                if (profiles) {
+                    profiles.forEach(p => {
+                        if (p.course_applied) {
+                            // Clean up the name (remove brackets if any)
+                            const cleanName = p.course_applied.replace(/\[.*?\]/g, '').trim();
+                            courseCounts[cleanName] = (courseCounts[cleanName] || 0) + 1;
+                        }
+                    });
+                }
 
                 const courseBody = document.getElementById('course-body');
                 courseBody.innerHTML = '';
                 
                 const courseArray = Object.keys(courseCounts).map(key => ({ name: key, count: courseCounts[key] }));
-                // Sort highest count first
                 courseArray.sort((a, b) => b.count - a.count);
 
                 if (courseArray.length === 0) {
@@ -363,14 +375,14 @@
                     });
                 }
 
-                // --- 3. POPULATE RESULTS TABLE ---
+                // --- 3. POPULATE RESULTS TABLE (Capped at 100) ---
                 const rBody = document.getElementById('results-body');
                 rBody.innerHTML = '';
                 
-                if (results.length === 0) {
+                if (!recentResults || recentResults.length === 0) {
                     rBody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: #94a3b8; padding: 2rem;">No exams taken yet.</td></tr>';
                 } else {
-                    results.forEach(r => {
+                    recentResults.forEach(r => {
                         const dateObj = new Date(r.submitted_at);
                         const timeStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
                         
