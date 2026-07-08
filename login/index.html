@@ -40,7 +40,6 @@
 </head>
 <body class="auth-page">
 
-    <!-- 🚀 GHOST ELEMENTS TO TRAP THE BROKEN APP.JS SCRIPT -->
     <div style="display: none;" aria-hidden="true">
         <form id="email-form"></form>
         <form id="otp-form"></form>
@@ -92,7 +91,6 @@
                     <h2 class="auth-title">Welcome Back</h2>
                     <p class="auth-subtitle">Enter your email to receive a secure, passwordless login code.</p>
 
-                    <!-- 🚀 RENAMED FORMS AND INPUTS TO PREVENT HIJACKING -->
                     <form id="secure-email-form" onsubmit="handleEmailSubmit(event)">
                         <div class="input-group">
                             <label for="secure-email">Email Address</label>
@@ -109,7 +107,6 @@
                         <button type="submit" id="secure-verify-btn" class="auth-btn">Verify & Secure Login</button>
                     </form>
 
-                    <!-- WHATSAPP SUPPORT SECTION -->
                     <div style="margin-top: 2rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; text-align: center;">
                         <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 10px; font-weight: 500;">Having issues logging in?</p>
                         <a href="https://wa.me/2349153375488?text=Hello%20Admin,%20I%20am%20having%20issues%20logging%20into%20my%20AFIT%20CBT%20Simulator%20account..." target="_blank" class="whatsapp-support-btn">
@@ -129,7 +126,6 @@
         </div>
     </div>
 
-    <!-- 🚀 REMOVED DEFER TAGS SO SUPABASE LOADS INSTANTLY BEFORE APP.JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../static/app.js"></script>
     <script>
@@ -180,8 +176,9 @@
             const messageDiv = document.getElementById('auth-message');
 
             try {
+                // 🚀 FIXED: Specific Error telling them to use Firefox
                 if (typeof supabaseClient === 'undefined') {
-                    throw new Error("Unable to connect to the server. Please check your internet and refresh the page.");
+                    throw new Error("Your browser is blocking the secure connection. Please try using a different browser like Firefox (which works perfectly).");
                 }
 
                 const { error: otpError } = await supabaseClient.auth.signInWithOtp({
@@ -197,7 +194,14 @@
 
             } catch (error) {
                 console.error("Auth Error:", error);
-                messageDiv.innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${error.message}</p>`;
+                const errMsg = error.message || "An unexpected network error occurred.";
+                // 🚀 FIXED: Added helpful tip to all errors
+                messageDiv.innerHTML = `
+                    <p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center; line-height: 1.5;">
+                        ${errMsg}
+                        <br><br>
+                        <span style="font-size: 0.85rem; color: #64748b;">(Tip: If this continues, try using <strong>Firefox</strong>, which works perfectly)</span>
+                    </p>`;
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
@@ -215,8 +219,9 @@
             const messageDiv = document.getElementById('auth-message');
 
             try {
+                // 🚀 FIXED: Specific Error telling them to use Firefox
                 if (typeof supabaseClient === 'undefined') {
-                    throw new Error("Lost connection to the server. Please refresh.");
+                    throw new Error("Your browser is blocking the secure connection. Please try using a different browser like Firefox (which works perfectly).");
                 }
 
                 // 1. Verify Code
@@ -240,7 +245,7 @@
 
                 btn.innerText = "Routing...";
 
-                // 3. Simple Read Operation (No crashing inserts or complex tokens!)
+                // 3. Simple Read Operation
                 const { data: profile } = await supabaseClient
                     .from('profiles')
                     .select('full_name')
@@ -256,7 +261,13 @@
             } catch (error) {
                 console.error("Verification Error:", error);
                 const errMsg = error.message || error.error_description || "An unexpected network error occurred.";
-                messageDiv.innerHTML = `<p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center;">Error: ${errMsg}</p>`;
+                // 🚀 FIXED: Added helpful tip to all errors
+                messageDiv.innerHTML = `
+                    <p style="color: #ef4444; font-weight: 600; margin-top: 15px; text-align: center; line-height: 1.5;">
+                        ${errMsg}
+                        <br><br>
+                        <span style="font-size: 0.85rem; color: #64748b;">(Tip: If this continues, try using <strong>Firefox</strong>, which works perfectly)</span>
+                    </p>`;
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
