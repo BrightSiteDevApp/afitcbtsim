@@ -22,18 +22,17 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* This is the magic rule that prevents horizontal scrolling! */
+            table-layout: fixed; 
         }
         
         .data-table th, .data-table td {
             padding: 1rem 0.5rem;
-            white-space: normal; /* Forces text to wrap instead of stretching */
+            white-space: normal; 
             word-wrap: break-word;
             overflow-wrap: break-word;
             vertical-align: middle;
         }
 
-        /* Set specific column percentages so they scale down perfectly on small screens */
         .history-table th:nth-child(1) { width: 25%; }
         .history-table th:nth-child(2) { width: 55%; }
         .history-table th:nth-child(3) { width: 20%; text-align: right; }
@@ -43,18 +42,82 @@
         .leaderboard-table th:nth-child(3) { width: 32%; }
         .leaderboard-table th:nth-child(4) { width: 18%; text-align: right; }
 
+        /* 🚀 WHATSAPP BUTTON STYLES */
+        .btn-whatsapp-join {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #25D366; color: white; padding: 0.8rem 1.5rem;
+            border-radius: 12px; font-weight: 700; text-decoration: none;
+            font-size: 0.95rem; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+            transition: transform 0.2s; border: none; cursor: pointer;
+            margin-top: 1rem;
+        }
+        .btn-whatsapp-join:hover { transform: translateY(-2px); background: #128C7E; }
+
+        /* 🚀 PREMIUM MODAL STYLES */
+        .premium-modal-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85);
+            z-index: 10000; display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(8px); padding: 1rem;
+        }
+        .premium-modal {
+            background: white; border-radius: 24px; padding: 2.5rem;
+            max-width: 450px; width: 100%; position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center;
+        }
+        .close-modal-btn {
+            position: absolute; top: 15px; right: 15px; background: #f1f5f9;
+            border: none; width: 35px; height: 35px; border-radius: 50%;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            color: #64748b; font-weight: bold; transition: 0.2s; font-size: 1.2rem;
+        }
+        .close-modal-btn:hover { background: #e2e8f0; color: #0f172a; }
+        .premium-features { text-align: left; margin: 1.5rem 0; background: #f8fafc; padding: 1.5rem; border-radius: 16px; border: 1px solid #e2e8f0; }
+        .premium-feature-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; color: #334155; font-weight: 500; font-size: 0.95rem; line-height: 1.4;}
+        .premium-feature-item svg { width: 20px; height: 20px; color: #16a34a; flex-shrink: 0; margin-top: 2px;}
+
         @media (max-width: 768px) {
             .data-table th, .data-table td {
-                font-size: 0.75rem; /* Scaled down for devices like the Samsung S10e */
+                font-size: 0.75rem; 
                 padding: 0.7rem 0.2rem;
             }
-            .dash-card {
-                padding: 1.2rem 1rem; /* Less padding around the card to maximize screen space */
-            }
+            .dash-card { padding: 1.2rem 1rem; }
+            .premium-modal { padding: 2rem 1.5rem; }
         }
     </style>
 </head>
 <body class="dashboard-body">
+
+    <div class="premium-modal-overlay" id="premium-modal-overlay">
+        <div class="premium-modal">
+            <button class="close-modal-btn" onclick="closePremiumModal()">✕</button>
+            
+            <div style="width: 60px; height: 60px; background: #fff7ed; color: #ea580c; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px auto; font-size: 2rem;">
+                👑
+            </div>
+            
+            <h2 style="font-size: 1.6rem; font-weight: 800; color: #0f172a; margin-bottom: 10px;">Unlock Premium Access</h2>
+            <p style="color: #64748b; font-size: 0.95rem;">Give yourself the ultimate edge. Upgrade to premium to unlock all CBT simulator features.</p>
+            
+            <div class="premium-features">
+                <div class="premium-feature-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span><strong>Unlimited Test Sessions:</strong> Practice as many times as you want without restrictions.</span>
+                </div>
+                <div class="premium-feature-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span><strong>Full Question Bank:</strong> Gain access to thousands of updated, verified Post-UTME questions.</span>
+                </div>
+                <div class="premium-feature-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span><strong>Real-time Analytics:</strong> Track your performance and study past answers with in-depth reviews.</span>
+                </div>
+            </div>
+
+            <button id="modal-proceed-btn" style="width: 100%; padding: 1.2rem; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; background: #ea580c; color: white; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(234, 88, 12, 0.3); transition: transform 0.2s;">
+                Proceed to Payment (₦1,050)
+            </button>
+        </div>
+    </div>
 
     <div class="sidebar-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
 
@@ -111,7 +174,15 @@
                 <div class="welcome-text">
                     <h1><span id="time-greeting">Welcome</span>, <span id="welcome-name">Aspirant</span>.</h1>
                     <p>Track your progress, challenge the leaderboard, and master the AFIT CBT exam.</p>
+                    
                     <div id="action-buttons-container" style="display: flex; gap: 15px; margin-top: 1.5rem; flex-wrap: wrap;"></div>
+                    
+                    <div style="margin-top: 15px;">
+                        <a href="https://chat.whatsapp.com/GVXHCJOEIpZKILyWLXe7kt?s=cl&p=a&mlu=0&ilr=0" target="_blank" class="btn-whatsapp-join">
+                            <svg style="width: 20px; height: 20px;" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                            Join Aspirant Support Group
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -170,7 +241,6 @@
                     </div>
                 </div>
 
-                <!-- 🚀 TODAY'S LEADERBOARD (DYNAMIC TITLE) -->
                 <div class="dash-card">
                     <h3>
                         <svg style="width: 20px; color: #10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -193,7 +263,6 @@
                     </div>
                 </div>
 
-                <!-- ALL TIME ACHIEVERS -->
                 <div class="dash-card">
                     <h3>
                         <svg style="width: 20px; color: #ea580c;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
@@ -227,6 +296,22 @@
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('mobile-overlay').classList.toggle('active');
+        }
+
+        // 🚀 MODAL LOGIC
+        function showPremiumModal(email, userId) {
+            document.getElementById('premium-modal-overlay').style.display = 'flex';
+            
+            // Bind the Paystack function dynamically to the Proceed button
+            const proceedBtn = document.getElementById('modal-proceed-btn');
+            proceedBtn.onclick = function() {
+                closePremiumModal();
+                initiatePayment(email, userId);
+            };
+        }
+
+        function closePremiumModal() {
+            document.getElementById('premium-modal-overlay').style.display = 'none';
         }
 
         function setTimeGreeting() {
@@ -265,7 +350,6 @@
             const statusText = document.getElementById('account-status');
             const actionContainer = document.getElementById('action-buttons-container');
 
-            // LAUNCH/MONETIZATION LOGIC (1 Free Test Max)
             actionContainer.innerHTML = '';
 
             if (profile.has_paid) {
@@ -281,7 +365,7 @@
                     statusText.innerText = 'Free Limit Reached';
                     statusText.style.color = '#ea580c';
                     actionContainer.innerHTML = `
-                        <button onclick="initiatePayment('${session.user.email}', '${session.user.id}')" style="padding: 1rem 2rem; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: #ea580c; color: white; font-size: 1rem; box-shadow: 0 10px 20px rgba(234, 88, 12, 0.3); transition: transform 0.2s;">
+                        <button onclick="showPremiumModal('${session.user.email}', '${session.user.id}')" style="padding: 1rem 2rem; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: #ea580c; color: white; font-size: 1rem; box-shadow: 0 10px 20px rgba(234, 88, 12, 0.3); transition: transform 0.2s;">
                             👑 Unlock Full Access (₦1,050)
                         </button>
                     `;
@@ -291,7 +375,7 @@
                         <button onclick="window.location.href='../exam-room/index.html'" style="padding: 1rem 2rem; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; background: #2563eb; color: white; font-size: 1rem; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); transition: transform 0.2s;">
                             Start Free Test →
                         </button>
-                        <button onclick="initiatePayment('${session.user.email}', '${session.user.id}')" style="padding: 1rem 2rem; border-radius: 12px; font-weight: 700; border: 2px solid #ea580c; cursor: pointer; background: white; color: #ea580c; font-size: 1rem; transition: background 0.3s;">
+                        <button onclick="showPremiumModal('${session.user.email}', '${session.user.id}')" style="padding: 1rem 2rem; border-radius: 12px; font-weight: 700; border: 2px solid #ea580c; cursor: pointer; background: white; color: #ea580c; font-size: 1rem; transition: background 0.3s;">
                             👑 Upgrade Now
                         </button>
                     `;
@@ -383,9 +467,7 @@
             avgDisplay.innerHTML = `${average} <span style="font-size: 1rem; color: #94a3b8;">/ 50</span>`;
         }
 
-        // 🚀 FETCH TODAY'S LEADERBOARD & UPDATE TITLE
         async function fetchTodayLeaderboard() {
-            // Update Title with Dynamic Date
             const todayDate = new Date();
             const monthStr = todayDate.toLocaleDateString('en-US', { month: 'long' });
             const dayNum = todayDate.getDate();
@@ -397,7 +479,6 @@
             
             document.getElementById('today-leaderboard-title').innerText = `Top 10 Achievers Today, ${monthStr} ${dayNum}${suffix}`;
 
-            // Calculate 00:00:00 and 23:59:59 for today
             const startOfDay = new Date();
             startOfDay.setHours(0, 0, 0, 0);
             
@@ -443,7 +524,6 @@
             });
         }
 
-        // FETCH ALL-TIME LEADERBOARD
         async function fetchLeaderboard() {
             const { data, error } = await supabaseClient
                 .from('results')
