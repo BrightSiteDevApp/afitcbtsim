@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Enterprise Bank Manager - AFIT CBT</title>
+    <title>Question Bank Manager - AFIT CBT</title>
     
     <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/main.css">
     
     <script>
         window.MathJax = {
@@ -19,158 +20,86 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        /* 🚀 HIGH-END ENTERPRISE DARK THEME */
-        :root {
-            --bg-base: #020617; /* Slate 950 */
-            --bg-panel: rgba(15, 23, 42, 0.6); /* Slate 900 translucent */
-            --bg-card: rgba(30, 41, 59, 0.4); /* Slate 800 translucent */
-            --border-glow: rgba(56, 189, 248, 0.15);
-            --border-subtle: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-blue: #3b82f6;
-            --accent-blue-hover: #2563eb;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --glass-blur: blur(16px);
-        }
-
+        /* 🚀 CLEAN & SIMPLE RESPONSIVENESS */
         *, *::before, *::after { box-sizing: border-box; }
-        
         body { 
-            background-color: var(--bg-base);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
-            background-attachment: fixed;
-            color: var(--text-main); 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; padding: 0; 
-            overflow-x: hidden; width: 100%;
-            min-height: 100vh;
+            background-color: #f8fafc; color: #0f172a; 
+            font-family: 'Poppins', sans-serif; margin: 0; padding: 0; 
+            overflow-x: hidden; width: 100%; min-height: 100vh;
         }
-
-        /* TYPOGRAPHY */
-        h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; letter-spacing: -0.5px; margin: 0; }
         
-        /* NAVBAR */
         .admin-nav {
-            height: 70px; background: rgba(2, 6, 23, 0.8); backdrop-filter: var(--glass-blur);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 5%; position: sticky; top: 0; z-index: 100; 
-            border-bottom: 1px solid var(--border-subtle);
+            height: 70px; background: #0f172a; color: white; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 5%; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%;
         }
         
-        /* GLOBAL STATS BAR */
+        /* 🚀 GLOBAL STATS BAR */
         .global-stats-bar {
-            display: flex; gap: 15px; overflow-x: auto; padding: 1.5rem 5%; 
-            background: rgba(15, 23, 42, 0.3); border-bottom: 1px solid var(--border-subtle); width: 100%;
+            display: flex; gap: 15px; overflow-x: auto; padding: 1.5rem 5%; background: white; 
+            border-bottom: 1px solid #e2e8f0; width: 100%;
             -ms-overflow-style: none; scrollbar-width: none;
         }
         .global-stats-bar::-webkit-scrollbar { display: none; }
-        
         .stat-box {
-            background: var(--bg-card); backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--border-glow); border-radius: 12px; padding: 12px 24px; 
-            text-align: center; min-width: 120px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); flex-shrink: 0;
-            transition: transform 0.2s;
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 24px; 
+            text-align: center; min-width: 120px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); flex-shrink: 0;
         }
-        .stat-box:hover { transform: translateY(-2px); border-color: rgba(56, 189, 248, 0.4); }
-        .stat-box span { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .stat-box strong { font-size: 1.6rem; color: #fff; font-family: 'Poppins', sans-serif; }
+        .stat-box span { display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-box strong { font-size: 1.6rem; color: #0f172a; }
 
-        /* TABS */
-        .tab-wrapper { padding: 2rem 5% 0 5%; display: flex; gap: 12px; flex-wrap: wrap; width: 100%; }
+        /* 🚀 TABS */
+        .tab-wrapper { padding: 1.5rem 5% 0 5%; display: flex; gap: 10px; flex-wrap: wrap; width: 100%; }
         .tab-btn {
-            padding: 1rem 2rem; border-radius: 12px; font-weight: 600; border: 1px solid transparent; cursor: pointer; 
-            background: rgba(30, 41, 59, 0.6); color: var(--text-muted); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            flex-grow: 1; text-align: center; font-size: 1rem; backdrop-filter: var(--glass-blur);
+            padding: 1rem 2rem; border-radius: 12px; font-weight: 700; border: none; cursor: pointer; 
+            background: white; color: #64748b; transition: all 0.2s; flex-grow: 1; text-align: center; font-size: 1rem;
+            border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .tab-btn:hover { background: rgba(51, 65, 85, 0.8); color: white; }
-        .tab-btn.active { 
-            background: rgba(59, 130, 246, 0.15); color: #60a5fa; 
-            border: 1px solid rgba(59, 130, 246, 0.3); box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); 
-        }
+        .tab-btn:hover { background: #f1f5f9; color: #0f172a; }
+        .tab-btn.active { background: #2563eb; color: white; border-color: #2563eb; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
 
-        /* LAYOUT CONTAINERS */
-        .staging-layout { display: grid; grid-template-columns: 380px 1fr; max-width: 1500px; margin: 2rem auto; gap: 2rem; padding: 0 5%; width: 100%; align-items: start; }
-        .editor-layout { max-width: 1000px; margin: 2rem auto; padding: 0 5%; width: 100%; display: none; }
+        /* 🚀 LAYOUT CONTAINERS */
+        .staging-layout { display: grid; grid-template-columns: 350px 1fr; max-width: 1400px; margin: 1.5rem auto; gap: 1.5rem; padding: 0 5%; width: 100%; align-items: start; }
+        .editor-layout { max-width: 900px; margin: 1.5rem auto; padding: 0 5%; width: 100%; display: none; }
         
-        .panel-card { 
-            background: var(--bg-panel); backdrop-filter: var(--glass-blur); padding: 2.5rem; 
-            border-radius: 24px; border: 1px solid var(--border-subtle); 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; 
-        }
+        .panel-card { background: white; padding: 2rem; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); width: 100%; overflow: hidden; }
         
-        /* INPUTS & FORMS */
-        .input-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
-        .input-group select, .input-group input { 
-            width: 100%; padding: 1rem 1.2rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); 
-            background: rgba(0,0,0,0.2); color: white; font-family: 'Inter', sans-serif; 
-            margin-bottom: 1.5rem; font-size: 1rem; transition: all 0.2s; outline: none;
-        }
-        .input-group select:focus, .input-group input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
-        .input-group select option { background: #0f172a; color: white; }
+        /* INPUTS & BUTTONS */
+        .input-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
+        .input-group select, .input-group input { width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 2px solid #e2e8f0; font-family: 'Poppins', sans-serif; margin-bottom: 1rem; font-size: 1rem; box-sizing: border-box; outline: none; transition: border-color 0.2s;}
+        .input-group select:focus, .input-group input:focus { border-color: #2563eb; }
         
-        .search-flex { display: flex; gap: 12px; width: 100%; align-items: stretch; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .search-flex { display: flex; gap: 10px; width: 100%; align-items: stretch; margin-bottom: 1.5rem; flex-wrap: wrap; }
         .search-flex input { margin-bottom: 0; flex-grow: 1; min-width: 0; }
-        .search-flex button { flex-shrink: 0; margin-bottom: 0; }
+        .search-flex button { flex-shrink: 0; margin-bottom: 0; white-space: nowrap; }
 
-        /* HIGH-END BUTTONS */
-        .btn { 
-            width: 100%; padding: 1rem; border-radius: 12px; font-weight: 600; border: none; cursor: pointer; 
-            font-size: 1rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: center; align-items: center; gap: 8px; 
-            font-family: 'Inter', sans-serif;
-        }
+        .btn { width: 100%; padding: 1rem; border-radius: 10px; font-weight: 700; border: none; cursor: pointer; font-size: 1rem; transition: transform 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; font-family: 'Poppins', sans-serif;}
         .btn:hover { transform: translateY(-2px); }
-        .btn:active { transform: translateY(0); }
+        .btn-blue { background: #2563eb; color: white; }
+        .btn-green { background: #16a34a; color: white; }
+        .btn-red { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .btn-orange { background: #ea580c; color: white; }
         
-        .btn-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 10px 20px -10px rgba(37,99,235,0.5); }
-        .btn-blue:hover { box-shadow: 0 15px 25px -10px rgba(37,99,235,0.7); }
+        /* QUESTION PREVIEW */
+        .question-card { border: 2px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; background: #f8fafc; width: 100%; overflow-x: auto; }
+        .q-meta { display: flex; justify-content: space-between; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1.5rem; text-transform: uppercase; flex-wrap: wrap; gap: 10px; font-size: 0.85rem;}
+        .q-text { font-size: 1.15rem; font-weight: 500; margin-bottom: 2rem; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; color: #1e293b;}
         
-        .btn-green { background: linear-gradient(135deg, #059669, #047857); color: white; box-shadow: 0 10px 20px -10px rgba(16,185,129,0.5); }
-        .btn-green:hover { box-shadow: 0 15px 25px -10px rgba(16,185,129,0.7); }
-        
-        .btn-red { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
-        .btn-red:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239,68,68,0.4); color: white;}
-        
-        .btn-orange { background: linear-gradient(135deg, #ea580c, #c2410c); color: white; box-shadow: 0 10px 20px -10px rgba(234,88,12,0.5); }
+        .option-box { display: flex; align-items: center; padding: 1rem 1.2rem; background: white; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 1rem; word-wrap: break-word; }
+        .option-box.correct-ans { background: #dcfce7; border-color: #16a34a; }
+        .opt-letter { width: 30px; height: 30px; border-radius: 50%; background: #e2e8f0; display: flex; justify-content: center; align-items: center; font-weight: 800; margin-right: 15px; color: #475569; flex-shrink: 0;}
+        .option-box.correct-ans .opt-letter { background: #16a34a; color: white; }
 
-        /* 🚀 QUESTION PREVIEW (GLASS STYLE) */
-        .question-card { 
-            border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 2rem; 
-            background: rgba(0,0,0,0.2); width: 100%; overflow-x: auto; 
-        }
-        .q-meta { display: flex; justify-content: space-between; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.2rem; margin-bottom: 1.5rem; text-transform: uppercase; flex-wrap: wrap; gap: 10px; font-size: 0.85rem;}
-        .q-text { font-size: 1.15rem; font-weight: 400; margin-bottom: 2.5rem; line-height: 1.7; word-wrap: break-word; overflow-wrap: break-word; color: #f8fafc;}
-        
-        .option-box { 
-            display: flex; align-items: center; padding: 1rem 1.2rem; background: rgba(255,255,255,0.03); 
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; margin-bottom: 1rem; word-wrap: break-word; transition: all 0.2s;
-        }
-        .option-box.correct-ans { background: rgba(16, 185, 129, 0.1); border-color: rgba(16,185,129,0.4); box-shadow: 0 0 20px rgba(16,185,129,0.05); }
-        .opt-letter { 
-            width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; 
-            justify-content: center; align-items: center; font-weight: 700; margin-right: 15px; color: #cbd5e1; flex-shrink: 0;
-        }
-        .option-box.correct-ans .opt-letter { background: var(--accent-green); color: white; }
+        .instruction-box { background: #eff6ff; padding: 1rem 1.5rem; border-radius: 12px; border-left: 4px solid #2563eb; margin-bottom: 1.5rem; color: #1e40af; }
 
-        /* INSTRUCTION HIGHLIGHT BOX */
-        .instruction-box {
-            background: rgba(59, 130, 246, 0.1); padding: 1rem 1.5rem; border-radius: 12px; 
-            border-left: 4px solid var(--accent-blue); margin-bottom: 1.5rem; color: #e2e8f0;
-        }
-
-        /* MOBILE OVERRIDES */
         @media (max-width: 900px) {
-            .admin-nav { flex-direction: column; height: auto; padding: 1rem; gap: 15px; text-align: center; }
-            .staging-layout { grid-template-columns: 1fr; padding: 0 1rem; gap: 1.5rem; margin: 1.5rem auto;}
+            .admin-nav { flex-direction: column; height: auto; padding: 1rem; gap: 10px; text-align: center; }
+            .staging-layout { grid-template-columns: 1fr; padding: 0 1rem; gap: 1rem; }
             .editor-layout { padding: 0 1rem; }
-            .panel-card { padding: 1.5rem; }
-            .tab-wrapper { padding: 1.5rem 1rem 0 1rem; }
+            .panel-card { padding: 1.2rem; }
+            .tab-wrapper { padding: 1rem 1rem 0 1rem; }
             .search-flex { flex-direction: column; }
             .search-flex button { width: 100%; }
-            #edit-actions, #staging-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 2rem; }
+            #edit-actions, #staging-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 1.5rem; }
             #edit-actions button, #staging-actions button { width: 100%; }
         }
     </style>
@@ -178,47 +107,32 @@
 <body>
 
     <nav class="admin-nav">
-        <div style="font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
-            <div style="width: 10px; height: 10px; background: #38bdf8; border-radius: 50%; box-shadow: 0 0 10px #38bdf8;"></div>
-            Enterprise Bank Manager
-        </div>
-        <button onclick="window.location.href='../profile/index.html'" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Exit Terminal</button>
+        <div style="font-weight: 800; font-size: 1.2rem;">AFIT Admin | Question Bank Manager</div>
+        <button onclick="window.location.href='../profile/index.html'" style="background: #334155; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer;">Back to Profile</button>
     </nav>
 
-    <!-- GLOBAL STATS BAR -->
     <div class="global-stats-bar" id="stats-bar">
-        <div class="stat-box"><span>Telemetry</span><strong>Syncing...</strong></div>
+        <div class="stat-box"><span>Loading Stats</span><strong>...</strong></div>
     </div>
 
-    <!-- TABS -->
     <div class="tab-wrapper">
-        <button class="tab-btn active" id="tab-btn-staging" onclick="switchTab('staging')">
-            <svg style="width:18px; vertical-align:middle; margin-right:5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-            ALOC Staging API
-        </button>
-        <button class="tab-btn" id="tab-btn-editor" onclick="switchTab('editor')">
-            <svg style="width:18px; vertical-align:middle; margin-right:5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-            Live Database Editor
-        </button>
+        <button class="tab-btn active" id="tab-btn-staging" onclick="switchTab('staging')">📥 ALOC Staging Area</button>
+        <button class="tab-btn" id="tab-btn-editor" onclick="switchTab('editor')">✏️ Edit Main Bank</button>
     </div>
 
-    <!-- ========================================== -->
-    <!-- TAB 1: ALOC STAGING AREA                   -->
-    <!-- ========================================== -->
     <div class="staging-layout" id="section-staging">
         
-        <!-- LEFT PANEL: FETCH ENGINE -->
         <div class="panel-card">
-            <h3 style="color: #fff; font-size: 1.4rem; margin-bottom: 5px;">Data Ingestion</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Query the ALOC endpoints for fresh batch data.</p>
+            <h3 style="margin-top:0; color: #0f172a; font-size: 1.3rem;">1. Pull from ALOC</h3>
+            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.5rem;">Fetch 40 new questions to the holding queue.</p>
             
             <div class="input-group">
-                <label>Auth Token (API Key)</label>
-                <input type="text" id="aloc-key" placeholder="Paste ALOC Token...">
+                <label>ALOC API Key</label>
+                <input type="text" id="aloc-key" placeholder="Paste Token here...">
             </div>
             
             <div class="input-group">
-                <label>Target Subject</label>
+                <label>Select Subject</label>
                 <select id="aloc-subject">
                     <option value="english">English Language</option>
                     <option value="mathematics">Mathematics</option>
@@ -232,65 +146,61 @@
                 </select>
             </div>
             
-            <button class="btn btn-blue" id="fetch-btn" onclick="fetchFromALOC()">Execute Query</button>
-            <div id="fetch-status" style="font-size: 0.85rem; text-align: center; font-weight: 600; margin-top: 15px;"></div>
+            <button class="btn btn-blue" id="fetch-btn" onclick="fetchFromALOC()">Pull Questions</button>
+            <div id="fetch-status" style="font-size: 0.85rem; text-align: center; font-weight: 700; margin-top: 15px;"></div>
         </div>
 
-        <!-- RIGHT PANEL: REVIEW QUEUE -->
         <div class="panel-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 10px;">
-                <h3 style="color: #fff; font-size: 1.4rem;">Quality Control Queue</h3>
-                <div style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 6px 14px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; border: 1px solid rgba(59,130,246,0.3);">
-                    <span id="staging-count">0</span> Pending
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px;">
+                <h3 style="margin:0; color: #0f172a; font-size: 1.3rem;">2. Review & Approve</h3>
+                <div style="background: #eff6ff; color: #2563eb; padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 0.9rem;">
+                    <span id="staging-count">0</span> In Queue
                 </div>
             </div>
 
-            <div id="empty-state" style="text-align: center; color: var(--text-muted); padding: 4rem 0;">
-                <svg style="width: 60px; opacity: 0.3; margin-bottom: 15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                <p style="font-size: 1.1rem;">Buffer is empty. Awaiting ingestion.</p>
+            <div id="empty-state" style="text-align: center; color: #94a3b8; padding: 3rem 0;">
+                <svg style="width: 50px; opacity: 0.5; margin-bottom: 10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                <p>Holding queue is empty. Pull questions to begin.</p>
             </div>
 
             <div id="review-canvas" style="display: none;">
                 <div class="question-card" id="q-card"></div>
-                <div id="staging-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 2rem;">
-                    <button class="btn btn-red" onclick="deleteStagingQuestion()" id="del-btn">Discard Data</button>
-                    <button class="btn btn-green" onclick="approveAndMove()" id="app-btn">Commit to Database</button>
+                <div id="staging-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 1.5rem;">
+                    <button class="btn btn-red" onclick="deleteStagingQuestion()" id="del-btn">🗑️ Delete (Trash)</button>
+                    <button class="btn btn-green" onclick="approveAndMove()" id="app-btn">✅ Approve & Move to Main</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- TAB 2: QUESTION EDITOR (MAIN DB)           -->
-    <!-- ========================================== -->
     <div class="editor-layout" id="section-editor">
         <div class="panel-card">
-            <h3 style="color: #fff; font-size: 1.4rem; margin-bottom: 5px;">Live Production Editor</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Mutate or obliterate active records using their 4-character short hash.</p>
+            <h3 style="margin-top:0; color: #0f172a; font-size: 1.3rem;">Search & Edit Main Question Bank</h3>
+            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.5rem;">Enter the 4-character ID (e.g. X8B2) to find and modify a live question.</p>
             
             <div class="search-flex">
-                <input type="text" id="search-id" placeholder="Enter Hash (e.g. X8B2)" maxlength="5" style="text-transform: uppercase;">
-                <button class="btn btn-blue" onclick="searchMainDatabase()" id="search-btn" style="width: auto;">Query Database</button>
+                <input type="text" id="search-id" placeholder="Enter Short ID..." maxlength="5" style="text-transform: uppercase;">
+                <button class="btn btn-blue" onclick="searchMainDatabase()" id="search-btn" style="width: auto;">🔍 Search Bank</button>
             </div>
             
-            <div id="search-status" style="font-size: 0.95rem; font-weight: 600; margin-bottom: 1.5rem; text-align: center;"></div>
+            <div id="search-status" style="font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem; text-align: center;"></div>
 
-            <div id="editor-canvas" style="display: none; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;">
-                <div class="question-card" id="editor-q-card" style="margin-bottom: 2rem;"></div>
+            <div id="editor-canvas" style="display: none; border-top: 2px solid #f1f5f9; padding-top: 1.5rem;">
+                <div class="question-card" id="editor-q-card" style="margin-bottom: 1.5rem;"></div>
                 
                 <div class="input-group">
-                    <label>Modify Correct Pointer</label>
+                    <label>Change Correct Answer To:</label>
                     <select id="edit-correct-option">
-                        <option value="A">Pointer A</option>
-                        <option value="B">Pointer B</option>
-                        <option value="C">Pointer C</option>
-                        <option value="D">Pointer D</option>
+                        <option value="A">Option A</option>
+                        <option value="B">Option B</option>
+                        <option value="C">Option C</option>
+                        <option value="D">Option D</option>
                     </select>
                 </div>
 
                 <div id="edit-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <button class="btn btn-red" onclick="deleteMainQuestion()" id="edit-del-btn">Obliterate Record</button>
-                    <button class="btn btn-orange" onclick="updateMainAnswer()" id="edit-update-btn">Save Mutation</button>
+                    <button class="btn btn-red" onclick="deleteMainQuestion()" id="edit-del-btn">🗑️ Delete Permanently</button>
+                    <button class="btn btn-orange" onclick="updateMainAnswer()" id="edit-update-btn">💾 Save New Answer</button>
                 </div>
             </div>
         </div>
@@ -343,7 +253,7 @@
             
             const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', session.user.id).single();
             if (!profile || (profile.role !== 'admin' && profile.role !== 'jnr-admin')) {
-                alert("SECURITY LOCKOUT: Unauthorized Clearance.");
+                alert("SECURITY LOCKOUT: Admin & Jnr-Admin only.");
                 window.location.href = '../dashboard/index.html';
                 return;
             }
@@ -384,7 +294,7 @@
 
                 document.getElementById('stats-bar').innerHTML = html || '<div class="stat-box"><span>Bank Empty</span><strong>0</strong></div>';
             } catch (err) {
-                document.getElementById('stats-bar').innerHTML = '<div class="stat-box"><span>Error</span><strong>!</strong></div>';
+                document.getElementById('stats-bar').innerHTML = '<div class="stat-box"><span>Error Loading</span><strong>!</strong></div>';
             }
         }
 
@@ -394,11 +304,11 @@
             const btn = document.getElementById('fetch-btn');
             const status = document.getElementById('fetch-status');
             
-            if (!apiKey) { alert("Please enter API Key."); return; }
+            if (!apiKey) { alert("Please enter your ALOC API Key."); return; }
             localStorage.setItem('aloc_key', apiKey); 
 
-            btn.innerText = "Processing..."; btn.disabled = true;
-            status.style.color = "#60a5fa"; status.innerText = "Syncing with live database...";
+            btn.innerText = "Connecting..."; btn.disabled = true;
+            status.style.color = "#2563eb"; status.innerText = "Scanning database for existing questions...";
 
             try {
                 const dbSubject = (subject === 'mathematic' || subject === 'mathematics') ? 'mathematics' : subject;
@@ -415,7 +325,7 @@
                     ...(stageQs || []).map(q => q.question_text.trim().toLowerCase())
                 ]);
 
-                status.innerText = "Querying ALOC payload...";
+                status.innerText = "Pulling from ALOC API...";
 
                 let json = null, fetchSuccess = false;
                 for(let attempt = 1; attempt <= 3; attempt++) {
@@ -428,28 +338,26 @@
                     } catch(e) { console.warn(`Attempt ${attempt} failed.`); }
                 }
 
-                if (!fetchSuccess) throw new Error("Endpoint uncommunicative. Aborting.");
+                if (!fetchSuccess) throw new Error("ALOC API failed to respond after 3 attempts.");
 
-                status.innerText = "Sanitizing and decoding data...";
+                status.innerText = "Filtering duplicates & formatting...";
 
                 const newQuestions = [];
                 json.data.forEach(q => {
                     let finalQuestionText = q.question || "";
                     
-                    // 🚀 FIXED: Inject Passage/Instruction for BOTH English and Literature
                     if ((dbSubject === 'english' || dbSubject === 'literature') && q.section) {
                         finalQuestionText = `
                             <div class="instruction-box">
-                                <strong style="color: #93c5fd; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;">Instruction / Passage</strong><br>
+                                <strong style="color: #1e40af; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;">Instruction / Passage</strong><br>
                                 <em style="font-size: 1.05rem;">${q.section}</em>
                             </div>
                             ${finalQuestionText}
                         `;
                     }
 
-                    // 🚀 Failsafe for literal empty questions
                     if (!finalQuestionText.trim()) {
-                         finalQuestionText = `<em style="color: #fca5a5;">[Data Corruption: Endpoint provided no text body for this block. Recommend discard.]</em>`;
+                         finalQuestionText = `<em style="color: #dc2626;">[Data Error: ALOC provided no text body for this question. Delete this.]</em>`;
                     }
 
                     const qTextLower = finalQuestionText.trim().toLowerCase();
@@ -470,21 +378,21 @@
                     }
                 });
 
-                if (newQuestions.length === 0) throw new Error("Batch contained 100% duplicate signatures. Discarded.");
+                if (newQuestions.length === 0) throw new Error("ALOC returned duplicates of questions already in your bank! Try pulling again.");
 
-                status.innerText = `Committing ${newQuestions.length} valid blocks...`;
+                status.innerText = `Saving ${newQuestions.length} unique questions...`;
                 const { error } = await supabaseClient.from('staging_questions').insert(newQuestions);
                 if (error) throw error;
 
-                status.style.color = "#10b981";
-                status.innerText = `Ingestion successful. ${newQuestions.length} added (${json.data.length - newQuestions.length} duplicates rejected).`;
+                status.style.color = "#16a34a";
+                status.innerText = `Success! Added ${newQuestions.length} new questions. (${json.data.length - newQuestions.length} duplicates skipped).`;
                 setTimeout(() => loadStagingQueue(), 500);
 
             } catch (err) {
                 console.error(err);
-                status.style.color = "#fca5a5"; status.innerText = "Error: " + err.message;
+                status.style.color = "#dc2626"; status.innerText = "Error: " + err.message;
             } finally {
-                btn.innerText = "Execute Query"; btn.disabled = false;
+                btn.innerText = "Pull Questions"; btn.disabled = false;
             }
         }
 
@@ -511,8 +419,8 @@
             const isCorrect = (opt) => q.correct_answer === opt ? 'correct-ans' : '';
             const html = `
                 <div class="q-meta">
-                    <span>${q.subject} // YR: ${q.year}</span>
-                    <span style="background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 6px; font-family: monospace;">HASH: ${q.short_id}</span>
+                    <span>${q.subject.toUpperCase()} • Year: ${q.year}</span>
+                    <span style="background: #e2e8f0; padding: 4px 12px; border-radius: 6px;">ID: ${q.short_id}</span>
                 </div>
                 <div class="q-text">${prepText(q.question_text)}</div>
                 <div class="option-box ${isCorrect('A')}"><div class="opt-letter">A</div> <span class="opt-text">${prepText(q.option_a)}</span></div>
@@ -527,18 +435,18 @@
         async function approveAndMove() {
             const q = stagingQueue[currentIndex];
             const btn = document.getElementById('app-btn');
-            btn.innerText = "Processing..."; btn.disabled = true;
+            btn.innerText = "Checking..."; btn.disabled = true;
 
             try {
                 const { data: dupCheck } = await supabaseClient.from('questions').select('id').eq('question_text', q.question_text).maybeSingle();
                 if (dupCheck) {
-                    alert("Collision detected. Block already exists in target environment. Discarding.");
+                    alert("⚠️ Duplicate Prevented! This exact question is already in the Main Bank. Deleting from staging...");
                     await supabaseClient.from('staging_questions').delete().eq('id', q.id);
                     stagingQueue.splice(currentIndex, 1);
                     return updateUI();
                 }
 
-                btn.innerText = "Writing...";
+                btn.innerText = "Moving...";
                 const { error: insErr } = await supabaseClient.from('questions').insert([{
                     subject: q.subject, question_text: q.question_text,
                     option_a: q.option_a, option_b: q.option_b, option_c: q.option_c, option_d: q.option_d,
@@ -552,8 +460,8 @@
                 stagingQueue.splice(currentIndex, 1);
                 updateUI();
                 loadGlobalStats(); 
-            } catch (err) { alert("Commit Error: " + err.message); } 
-            finally { btn.innerHTML = "Commit to Database"; btn.disabled = false; }
+            } catch (err) { alert("Move Error: " + err.message); } 
+            finally { btn.innerHTML = "✅ Approve & Move to Main"; btn.disabled = false; }
         }
 
         async function deleteStagingQuestion() {
@@ -565,8 +473,8 @@
                 if (error) throw error;
                 stagingQueue.splice(currentIndex, 1);
                 updateUI();
-            } catch (err) { alert("Deletion Error: " + err.message); } 
-            finally { btn.innerHTML = "Discard Data"; btn.disabled = false; }
+            } catch (err) { alert("Delete Error: " + err.message); } 
+            finally { btn.innerHTML = "🗑️ Delete (Trash)"; btn.disabled = false; }
         }
 
         function updateUI() {
@@ -585,31 +493,31 @@
             const btn = document.getElementById('search-btn');
             const status = document.getElementById('search-status');
             
-            if (!shortId || shortId.length < 4) { status.style.color = "#fca5a5"; status.innerText = "Invalid Hash Format."; return; }
+            if (!shortId || shortId.length < 4) { status.style.color = "#dc2626"; status.innerText = "Enter a valid 4-char ID."; return; }
 
-            btn.innerText = "Scanning..."; btn.disabled = true; status.innerText = "";
+            btn.innerText = "Searching..."; btn.disabled = true; status.innerText = "";
 
             try {
                 const { data, error } = await supabaseClient.from('questions').select('*').eq('short_id', shortId).maybeSingle();
                 
                 if (error) throw error;
                 if (!data) {
-                    status.style.color = "#fca5a5"; status.innerText = `Zero matches for Hash: ${shortId}`;
+                    status.style.color = "#dc2626"; status.innerText = `No question found with ID: ${shortId}`;
                     document.getElementById('editor-canvas').style.display = 'none';
                     return;
                 }
 
                 activeEditorQuestion = data;
-                status.style.color = "#10b981"; status.innerText = "Target isolated successfully.";
+                status.style.color = "#16a34a"; status.innerText = "Question loaded successfully!";
                 document.getElementById('editor-canvas').style.display = 'block';
                 document.getElementById('edit-correct-option').value = data.correct_answer;
                 
                 renderEditorCard();
 
             } catch (err) {
-                status.style.color = "#fca5a5"; status.innerText = "Error: " + err.message;
+                status.style.color = "#dc2626"; status.innerText = "Error: " + err.message;
             } finally {
-                btn.innerHTML = "Query Database"; btn.disabled = false;
+                btn.innerHTML = "🔍 Search Bank"; btn.disabled = false;
             }
         }
 
@@ -618,8 +526,8 @@
             const isCorrect = (opt) => q.correct_answer === opt ? 'correct-ans' : '';
             const html = `
                 <div class="q-meta">
-                    <span>${q.subject} // YR: ${q.year}</span>
-                    <span style="background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 6px; font-family: monospace;">HASH: ${q.short_id}</span>
+                    <span>${q.subject.toUpperCase()} • Year: ${q.year}</span>
+                    <span style="background: #e2e8f0; padding: 4px 12px; border-radius: 6px;">ID: ${q.short_id}</span>
                 </div>
                 <div class="q-text">${prepText(q.question_text)}</div>
                 <div class="option-box ${isCorrect('A')}"><div class="opt-letter">A</div> <span class="opt-text">${prepText(q.option_a)}</span></div>
@@ -636,7 +544,7 @@
             const newAns = document.getElementById('edit-correct-option').value;
             const btn = document.getElementById('edit-update-btn');
             
-            btn.innerText = "Overwriting..."; btn.disabled = true;
+            btn.innerText = "Saving..."; btn.disabled = true;
 
             try {
                 const { data, error } = await supabaseClient.from('questions')
@@ -646,22 +554,22 @@
 
                 if (error) throw error;
                 if (!data || data.length === 0) {
-                    throw new Error("Mutation blocked by Row Level Security.");
+                    throw new Error("Update blocked by Database Security. Please run the SQL command provided to unlock UPDATE permissions.");
                 }
                 
-                alert(`System updated. Pointer set to ${newAns}`);
+                alert(`Success! Correct answer updated to Option ${newAns}`);
                 activeEditorQuestion.correct_answer = newAns;
                 renderEditorCard(); 
-            } catch (err) { alert("Mutation Error: " + err.message); } 
-            finally { btn.innerHTML = "Save Mutation"; btn.disabled = false; }
+            } catch (err) { alert("Update Error: " + err.message); } 
+            finally { btn.innerHTML = "💾 Save New Answer"; btn.disabled = false; }
         }
 
         async function deleteMainQuestion() {
             if(!activeEditorQuestion) return;
-            if(!confirm("CRITICAL WARNING: This will permanently purge the block from the live database. Proceed?")) return;
+            if(!confirm("⚠️ DANGER: Are you sure you want to permanently delete this question from the Main Bank? This cannot be undone.")) return;
             
             const btn = document.getElementById('edit-del-btn');
-            btn.innerText = "Purging..."; btn.disabled = true;
+            btn.innerText = "Deleting..."; btn.disabled = true;
 
             try {
                 const { data, error } = await supabaseClient.from('questions')
@@ -671,17 +579,17 @@
 
                 if (error) throw error;
                 if (!data || data.length === 0) {
-                    throw new Error("Purge blocked by Row Level Security.");
+                    throw new Error("Delete blocked by Database Security. Please run the SQL command provided to unlock DELETE permissions.");
                 }
                 
-                alert("Block purged successfully.");
+                alert("Question permanently deleted from Main Bank.");
                 document.getElementById('editor-canvas').style.display = 'none';
                 document.getElementById('search-id').value = '';
                 document.getElementById('search-status').innerText = '';
                 activeEditorQuestion = null;
                 loadGlobalStats(); 
-            } catch (err) { alert("Purge Error: " + err.message); } 
-            finally { btn.innerHTML = "Obliterate Record"; btn.disabled = false; }
+            } catch (err) { alert("Delete Error: " + err.message); } 
+            finally { btn.innerHTML = "🗑️ Delete Permanently"; btn.disabled = false; }
         }
     </script>
 </body>
