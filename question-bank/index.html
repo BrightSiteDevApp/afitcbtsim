@@ -20,7 +20,15 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        body { background-color: #f1f5f9; color: #0f172a; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; overflow-y: scroll;}
+        body { 
+            background-color: #f1f5f9; color: #0f172a; font-family: 'Poppins', sans-serif; 
+            margin: 0; padding: 0; overflow-y: scroll;
+            /* 🚀 ANTI-HIGHLIGHT CSS */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
         
         .vault-nav {
             height: 70px; background: #0f172a; color: white; display: flex; justify-content: space-between; align-items: center;
@@ -30,9 +38,7 @@
         .vault-container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 2rem; }
 
         /* HEADER BANNER */
-        .vault-header {
-            text-align: center; margin-bottom: 1rem;
-        }
+        .vault-header { text-align: center; margin-bottom: 1rem; }
         .vault-header h1 { font-size: 2.2rem; font-weight: 800; color: #1e293b; margin-bottom: 10px; }
         .vault-header p { color: #64748b; font-size: 1rem; max-width: 600px; margin: 0 auto; line-height: 1.6;}
 
@@ -44,7 +50,6 @@
         .input-group { flex-grow: 1; min-width: 200px; }
         .input-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
         
-        /* 🚀 FIXED ALIGNMENT: Explicitly matching heights and box-sizing */
         .input-group select { 
             width: 100%; height: 55px; padding: 0 1.2rem; border-radius: 12px; border: 2px solid #e2e8f0; 
             font-family: 'Poppins', sans-serif; font-size: 1rem; outline: none; transition: border-color 0.2s; 
@@ -117,7 +122,6 @@
         }
         .btn-cta:hover { transform: translateY(-2px); background: #1d4ed8;}
 
-        /* MOBILE RESPONSIVENESS */
         @media (max-width: 768px) {
             .vault-container { padding: 1.5rem 1rem; }
             .vault-header h1 { font-size: 1.8rem; }
@@ -149,7 +153,6 @@
         <div class="control-panel">
             <div class="input-group">
                 <label>Target Subject</label>
-                <!-- 🚀 REMOVED BIOLOGY -->
                 <select id="subject-select">
                     <option value="english">English Language</option>
                     <option value="mathematics">Mathematics</option>
@@ -194,7 +197,11 @@
     <script src="../static/app.js"></script>
 
     <script>
-        // 🚀 THE ULTIMATE UNIVERSAL MOJIBAKE DECODER
+        // 🚀 ANTI-COPY & ANTI-RIGHT-CLICK PROTECTION
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('copy', event => event.preventDefault());
+        document.addEventListener('cut', event => event.preventDefault());
+
         const MOJIBAKE_MAP = {
             "a\u0161": "\\sqrt{", "â€²â€²": "-", "âr′": "-", "\\l_s": "\\theta", "\\l,": "\\theta", "i\\in": "\\pi", "Î\\_s": "\\theta",
             "kgmal": "kgm^{-3}", "Nma 2": "Nm^{-2}", "msâˆ’1": "ms^{-1}", "msâˆ’2": "ms^{-2}", "â€™": "'", "â€˜": "'", "â€œ": '"', "â€": '"', "â€": '"', 
@@ -222,14 +229,12 @@
             return c;
         }
 
-        // 🚀 SECURITY CLEARANCE ENGINE
         document.addEventListener("DOMContentLoaded", async () => {
             const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
             if (!session || authError) return window.location.href = '../login/index.html';
 
             const { data: profile } = await supabaseClient.from('profiles').select('has_qbank_access, role').eq('id', session.user.id).single();
             
-            // Allow Admins to bypass for testing, otherwise enforce strict lock
             if (!profile.has_qbank_access && profile.role !== 'admin' && profile.role !== 'jnr-admin') {
                 alert("SECURITY LOCK: You do not have access to the Question Bank Vault. Please unlock it from your dashboard.");
                 window.location.href = '../dashboard/index.html';
@@ -245,7 +250,6 @@
             const bottomBtn = document.getElementById('bottom-load-btn');
             const bottomControls = document.getElementById('bottom-controls');
 
-            // UI Loading state
             canvas.innerHTML = '';
             bottomControls.style.display = 'none';
             loading.style.display = 'block';
@@ -253,7 +257,6 @@
             bottomBtn.disabled = true;
 
             try {
-                // Pulling exactly 30 randomized questions!
                 const { data, error } = await supabaseClient.rpc('get_random_questions', { 
                     subj_param: subject, 
                     lim_param: 30 
@@ -272,7 +275,6 @@
                     const shortId = q.short_id || q.id;
                     const actualAnsLetter = (q.correct_answer || q.answer || "N/A").toUpperCase().trim();
                     
-                    // Fetch the actual text of the correct option for display in the reveal box
                     let actualAnsText = "N/A";
                     if (actualAnsLetter === 'A') actualAnsText = q.option_a;
                     if (actualAnsLetter === 'B') actualAnsText = q.option_b;
@@ -328,7 +330,6 @@
                     MathJax.typesetPromise();
                 }
 
-                // Smooth scroll back to the top of the questions
                 document.getElementById('questions-canvas').scrollIntoView({ behavior: 'smooth' });
 
             } catch (err) {
