@@ -102,7 +102,7 @@
                     <form id="secure-otp-form" class="hidden" onsubmit="handleOtpSubmit(event)">
                         <div class="input-group">
                             <label for="secure-otp">Enter 8-Digit Code</label>
-                            <input type="text" id="secure-otp" placeholder="123456" pattern="[0-9]*" maxlength="8" required style="letter-spacing: 5px; font-size: 1.2rem; text-align: center; font-weight: 600;">
+                            <input type="text" id="secure-otp" placeholder="12345678" pattern="[0-9]*" maxlength="8" required style="letter-spacing: 5px; font-size: 1.2rem; text-align: center; font-weight: 600;">
                         </div>
                         <button type="submit" id="secure-verify-btn" class="auth-btn">Verify & Secure Login</button>
                     </form>
@@ -253,9 +253,9 @@
                     .maybeSingle();
 
                 if (!profile || !profile.full_name || profile.full_name.trim() === "") {
-                    window.location.replace('../bio-data/index.html');
+                    window.location.replace('../bio-data/');
                 } else {
-                    window.location.replace('../dashboard/index.html');
+                    window.location.replace('../dashboard/');
                 }
 
             } catch (error) {
@@ -281,9 +281,9 @@
                     if (session && session.user) {
                         const { data: profile } = await supabaseClient.from('profiles').select('full_name').eq('id', session.user.id).maybeSingle();
                         if (!profile || !profile.full_name || profile.full_name.trim() === "") {
-                            window.location.replace('../bio-data/index.html');
+                            window.location.replace('../bio-data/');
                         } else {
-                            window.location.replace('../dashboard/index.html');
+                            window.location.replace('../dashboard/');
                         }
                     }
                 } else {
