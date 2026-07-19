@@ -452,13 +452,27 @@
             const tbody = document.getElementById('history-body');
             const avgDisplay = document.getElementById('avg-score');
             const streakDisplay = document.getElementById('streak-count');
+            const trendContainer = document.getElementById('trendChart').parentElement;
+            const radarContainer = document.getElementById('radarChart').parentElement;
             
+            // 🚀 EMPTY STATE INJECTION 
             if (error || !data || data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">No exams taken yet. Start practicing!</td></tr>';
+                
+                const emptyStateHtml = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: #94a3b8; padding: 1rem;">
+                        <svg style="width: 48px; height: 48px; margin-bottom: 10px; color: #cbd5e1;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <p style="margin: 0; font-size: 0.95rem; font-weight: 600; color: #475569;">No Analytics Yet</p>
+                        <p style="margin: 5px 0 15px 0; font-size: 0.8rem; line-height: 1.5;">Take your first mock exam to generate this chart.</p>
+                        <button onclick="window.location.href='../exams/index.html'" style="background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.8rem; transition: background 0.2s;">Take an Exam</button>
+                    </div>
+                `;
+                trendContainer.innerHTML = emptyStateHtml;
+                radarContainer.innerHTML = emptyStateHtml;
+                
                 return;
             }
 
-            // 🚀 STREAK CALCULATOR
             let streak = 0;
             const uniqueDates = [...new Set(data.map(r => new Date(r.submitted_at).toLocaleDateString('en-CA')))];
             const today = new Date(); const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
@@ -477,17 +491,14 @@
             }
             streakDisplay.innerText = streak;
             
-            // 🔥 Activate Pulse Flame if Streak > 0
             if(streak > 0) { document.getElementById('streak-icon').classList.add('flame-active'); }
 
-            // 🚀 CONFETTI DOPAMINE HIT (If latest score >= 35)
             const latestScore = data[0].total_score;
             if (latestScore >= 35 && uniqueDates.includes(todayStr) && !sessionStorage.getItem('confetti_fired_today')) {
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 sessionStorage.setItem('confetti_fired_today', 'true');
             }
 
-            // Render History Table & Prep Chart Data
             let totalSum = 0; tbody.innerHTML = ''; 
             
             let chartLabels = [];
@@ -495,7 +506,6 @@
             let subjectAggregates = { 'ENG':0, 'GNS':0, 'MTH':0, 'PHY':0, 'CHM':0, 'ECO':0, 'LIT':0, 'GOV':0, 'COM':0 };
             let subjectCounts = { 'ENG':0, 'GNS':0, 'MTH':0, 'PHY':0, 'CHM':0, 'ECO':0, 'LIT':0, 'GOV':0, 'COM':0 };
             
-            // Limit chart data to last 10
             const chartData = data.slice(0, 10).reverse(); 
             chartData.forEach(row => {
                 chartLabels.push(new Date(row.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
@@ -527,12 +537,10 @@
             const average = (totalSum / data.length).toFixed(1);
             avgDisplay.innerHTML = `${average} <span style="font-size: 1rem; color: #94a3b8;">/ 50</span>`;
 
-            // 🚀 RENDER CHART.JS
             renderCharts(chartLabels, chartScores, subjectAggregates, subjectCounts);
         }
 
         function renderCharts(labels, scores, subjectAggregates, subjectCounts) {
-            // Line Chart
             const ctxTrend = document.getElementById('trendChart').getContext('2d');
             new Chart(ctxTrend, {
                 type: 'line',
@@ -547,13 +555,12 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 50 } } }
             });
 
-            // Radar Chart (Only plot subjects they actually take)
             const radarLabels = [];
             const radarData = [];
             for (const [subj, total] of Object.entries(subjectAggregates)) {
                 if (subjectCounts[subj] > 0) {
                     radarLabels.push(subj);
-                    radarData.push((total / subjectCounts[subj]).toFixed(1)); // Average score for that subject
+                    radarData.push((total / subjectCounts[subj]).toFixed(1)); 
                 }
             }
 
