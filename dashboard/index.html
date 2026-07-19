@@ -6,23 +6,20 @@
     <title>Dashboard - AFIT CBT Simulator</title>
     
     <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
-    <link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
-    <link rel="apple-touch-icon" href="../static/img/apple-touch-icon.png">
-    <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/main.css">
     
     <script src="https://js.paystack.co/v1/inline.js"></script>
+    <!-- 🚀 CHART.JS & CONFETTI LIBRARIES -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* 🚀 PREVENT HORIZONTAL SCROLL ON MOBILE */
         html, body { max-width: 100vw !important; overflow-x: hidden !important; margin: 0; padding: 0; }
         *, *::before, *::after { box-sizing: border-box !important; }
 
-        /* 🚀 ULTRA-RESPONSIVE TABLE OVERRIDES */
         .data-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         .data-table th, .data-table td { padding: 1rem 0.5rem; white-space: normal; word-wrap: break-word; overflow-wrap: break-word; vertical-align: middle; }
 
@@ -35,7 +32,6 @@
         .leaderboard-table th:nth-child(3) { width: 32%; }
         .leaderboard-table th:nth-child(4) { width: 18%; text-align: right; }
 
-        /* 🚀 BUTTON STYLES */
         .btn-action-main {
             padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 700; border: none; 
             cursor: pointer; font-size: 0.95rem; transition: transform 0.2s, box-shadow 0.2s;
@@ -56,7 +52,6 @@
         }
         .btn-whatsapp-small:hover { background: #dcfce7; transform: translateY(-1px); }
 
-        /* 🚀 COUNTDOWN BANNER (RESPONSIVE FIX) */
         .countdown-banner {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             border-radius: 16px; padding: 1.5rem 2rem; margin-bottom: 2rem; color: white;
@@ -72,18 +67,27 @@
         .timer-box span { display: block; font-size: 1.6rem; font-weight: 800; color: white; line-height: 1;}
         .timer-box small { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;}
 
-        /* 🚀 4-COLUMN STATS */
-        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 2rem; }
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 1.5rem; }
 
-        /* 🚀 MODAL STYLES */
+        /* 🚀 ANALYTICS GRID */
+        .analytics-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 1.5rem; }
+        .chart-container { position: relative; height: 250px; width: 100%; margin-top: 1rem; }
+
+        /* 🚀 CINEMATIC ANIMATIONS */
+        @keyframes pulse-flame {
+            0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(239, 68, 68, 0)); }
+            50% { transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.6)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(239, 68, 68, 0)); }
+        }
+        .flame-active svg { animation: pulse-flame 1.5s infinite; color: #ef4444; }
+
         .premium-modal-overlay {
             position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 10000; 
             display: none; justify-content: center; align-items: center; backdrop-filter: blur(8px); padding: 1rem;
         }
         .premium-modal {
             background: white; border-radius: 20px; padding: 2.5rem; max-width: 420px; width: 100%; 
-            position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center; max-height: 90vh; overflow-y: auto;
-            box-sizing: border-box;
+            position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center; max-height: 90vh; overflow-y: auto; box-sizing: border-box;
         }
         .close-modal-btn {
             position: absolute; top: 12px; right: 12px; background: #f1f5f9; border: none; width: 32px; 
@@ -96,54 +100,21 @@
         .upsell-block h4 { margin: 0 0 5px 0; color: #0f172a; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;}
         .upsell-block p { margin: 0 0 15px 0; color: #64748b; font-size: 0.85rem; line-height: 1.5; }
 
-        /* 🚀 MOBILE FIXES (2x2 Grid Overrides) */
         @media (max-width: 900px) {
             .dashboard-content { width: 100vw !important; max-width: 100vw !important; box-sizing: border-box; overflow-x: hidden !important; }
+            #action-buttons-container { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; width: 100% !important; }
+            .btn-action-main { width: 100% !important; padding: 0.8rem 0.5rem !important; font-size: 0.75rem !important; white-space: normal !important; line-height: 1.3; text-align: center; height: 100%; }
+            .btn-whatsapp-small { width: 100% !important; justify-content: center; padding: 0.8rem !important; font-size: 0.85rem !important; margin-top: 10px !important; }
             
-            /* Action Buttons 2x2 Grid */
-            #action-buttons-container {
-                display: grid !important;
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 10px !important;
-                width: 100% !important;
-            }
-            .btn-action-main {
-                width: 100% !important;
-                padding: 0.8rem 0.5rem !important;
-                font-size: 0.75rem !important; /* Smaller text to fit side-by-side */
-                white-space: normal !important;
-                line-height: 1.3;
-                text-align: center;
-                height: 100%;
-            }
-            .btn-whatsapp-small {
-                width: 100% !important;
-                justify-content: center;
-                padding: 0.8rem !important;
-                font-size: 0.85rem !important;
-                margin-top: 10px !important;
-            }
-
-            /* Stats Cards 2x2 Grid */
-            .stats-row { 
-                display: grid !important; 
-                grid-template-columns: repeat(2, 1fr) !important; 
-                gap: 10px !important; 
-                width: 100% !important;
-            }
-            .stat-card {
-                min-width: 0 !important; /* Breaks the fixed width from main.css */
-                padding: 1rem 0.5rem !important;
-                display: flex !important;
-                flex-direction: column !important; /* Stacks icon on top of text */
-                align-items: center !important;
-                text-align: center !important;
-                gap: 8px !important;
-            }
+            .stats-row { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; width: 100% !important; }
+            .stat-card { min-width: 0 !important; padding: 1rem 0.5rem !important; display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important; gap: 8px !important; }
             .stat-icon { margin: 0 !important; }
             .stat-info h4 { font-size: 0.7rem !important; margin-bottom: 2px !important; line-height: 1.2; }
             .stat-info .stat-val { font-size: 1rem !important; }
             .stat-info .stat-val span { font-size: 0.75rem !important; }
+
+            .analytics-grid { grid-template-columns: 1fr; } /* Stack charts on mobile */
+            .chart-container { height: 220px; }
 
             .data-table th, .data-table td { font-size: 0.75rem; padding: 0.7rem 0.2rem; }
             .dash-card { padding: 1.2rem 1rem; }
@@ -157,7 +128,6 @@
 </head>
 <body class="dashboard-body">
 
-    <!-- 🚀 DAILY UPSELL MODAL (WITH HIERARCHY LOGIC) -->
     <div class="premium-modal-overlay" id="daily-upsell-modal">
         <div class="premium-modal">
             <button class="close-modal-btn" onclick="closeDailyUpsell()">✕</button>
@@ -167,23 +137,18 @@
             <div class="upsell-block" id="daily-premium-block">
                 <h4>👑 Premium Exam Simulator</h4>
                 <p>Take unlimited timed mock exams. Get detailed score evaluations and conquer exam anxiety.</p>
-                <button id="upsell-premium-btn" style="width: 100%; padding: 0.8rem; border-radius: 8px; font-weight: 800; border: none; font-size: 1rem; transition: 0.2s;">
-                    <!-- JS Injects Button State -->
-                </button>
+                <button id="upsell-premium-btn" style="width: 100%; padding: 0.8rem; border-radius: 8px; font-weight: 800; border: none; font-size: 1rem; transition: 0.2s;"></button>
             </div>
 
             <div class="upsell-block" id="daily-qbank-block">
                 <h4>📚 Question Bank Vault</h4>
                 <p>Bypass the timer. Get direct, relaxed access to study over 3,500+ past questions and view instant answers.</p>
-                <button id="upsell-qbank-btn" style="width: 100%; padding: 0.8rem; border-radius: 8px; font-weight: 800; border: none; font-size: 1rem; transition: 0.2s;">
-                    <!-- JS Injects Button State -->
-                </button>
+                <button id="upsell-qbank-btn" style="width: 100%; padding: 0.8rem; border-radius: 8px; font-weight: 800; border: none; font-size: 1rem; transition: 0.2s;"></button>
             </div>
             <button onclick="closeDailyUpsell()" style="background: none; border: none; color: #94a3b8; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 10px; text-decoration: underline;">Maybe later</button>
         </div>
     </div>
 
-    <!-- 🚀 PRIMARY PREMIUM MODAL -->
     <div class="premium-modal-overlay" id="premium-modal-overlay">
         <div class="premium-modal">
             <button class="close-modal-btn" onclick="closePremiumModal()">✕</button>
@@ -196,7 +161,6 @@
         </div>
     </div>
 
-    <!-- 🚀 QUESTION BANK UPSELL MODAL -->
     <div class="premium-modal-overlay" id="qbank-modal-overlay">
         <div class="premium-modal">
             <button class="close-modal-btn" onclick="closeQbankModal()">✕</button>
@@ -217,29 +181,16 @@
                 <rect width="100" height="100" rx="22" fill="url(#logo-grad-dash)"/>
                 <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
                 <path d="M32 54 L45 67 L75 32" stroke="#38bdf8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
-                <defs>
-                    <linearGradient id="logo-grad-dash" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                        <stop stop-color="#0f172a"/>
-                        <stop offset="1" stop-color="#1d4ed8"/>
-                    </linearGradient>
-                </defs>
+                <defs><linearGradient id="logo-grad-dash" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse"><stop stop-color="#0f172a"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
             </svg>
             <span style="font-weight: 800; font-size: 1.15rem; color: #1e293b; letter-spacing: -0.5px; white-space: nowrap;">AFIT CBT SIM</span>
         </div>
         
         <ul class="sidebar-nav">
-            <li class="active">
-                <a href="#"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> Dashboard</a>
-            </li>
-            <li>
-                <a href="../exams/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>Exams</a>
-            </li>
-            <li>
-                <a href="../view-results/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> My Results</a>
-            </li>
-            <li>
-                <a href="../profile/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> Profile</a>
-            </li>
+            <li class="active"><a href="#"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> Dashboard</a></li>
+            <li><a href="../exams/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>Exams</a></li>
+            <li><a href="../view-results/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg> My Results</a></li>
+            <li><a href="../profile/"><svg style="width: 20px; margin-right: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> Profile</a></li>
         </ul>
 
         <div class="sidebar-footer">
@@ -248,19 +199,13 @@
     </aside>
 
     <div class="main-wrapper">
-        
         <header class="top-header">
-            <button class="mobile-menu-btn" onclick="toggleSidebar()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
-            </button>
+            <button class="mobile-menu-btn" onclick="toggleSidebar()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg></button>
             <div class="avatar" id="user-avatar">?</div>
         </header>
 
         <main class="dashboard-content">
             
-            <!-- 🚀 COUNTDOWN BANNER -->
             <div class="countdown-banner">
                 <div class="cd-title">Post-UTME Exam Date</div>
                 <div id="countdown-display" class="cd-value">WILL BE ANNOUNCED SOON</div>
@@ -282,10 +227,9 @@
                 </div>
             </div>
 
-            <!-- 🚀 4-COLUMN STATS ROW -->
             <div class="stats-row">
                 <div class="stat-card">
-                    <div class="stat-icon" style="background: #fef2f2; color: #dc2626;">
+                    <div class="stat-icon" id="streak-icon" style="background: #fef2f2; color: #dc2626;">
                         <svg fill="currentColor" viewBox="0 0 24 24"><path d="M17.66 11.2c-.23-.3-.51-.56-.77-.82-.67-.6-1.43-1.03-2.07-1.66C13.33 7.26 13 4.85 13.95 3c-.95.23-1.78.75-2.49 1.32-2.59 2.08-3.61 5.75-2.39 8.9.04.1.08.2.08.33 0 .22-.15.42-.35.5-.23.1-.47.04-.66-.12a.58.58 0 01-.14-.17c-1.13-1.43-1.31-3.48-.55-5.12C5.78 10 4.87 12.3 5 14.47c.06.5.12 1 .29 1.5.14.6.41 1.2.74 1.73 1.08 1.73 2.86 2.97 4.96 3.22 2.14.25 4.43-.12 6.07-1.6 1.83-1.66 2.47-4.32 1.53-6.6l-.13-.26c-.21-.46-.57-.87-.8-1.26z"/></svg>
                     </div>
                     <div class="stat-info">
@@ -293,34 +237,43 @@
                         <div class="stat-val"><span id="streak-count">0</span> <span style="font-size: 1rem; color: #94a3b8;">Days</span></div>
                     </div>
                 </div>
-
                 <div class="stat-card">
                     <div class="stat-icon blue"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
-                    <div class="stat-info">
-                        <h4>Exams Taken</h4>
-                        <div class="stat-val"><span id="tests-count">0</span></div>
-                    </div>
+                    <div class="stat-info"><h4>Exams Taken</h4><div class="stat-val"><span id="tests-count">0</span></div></div>
                 </div>
-                
                 <div class="stat-card">
                     <div class="stat-icon green"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
-                    <div class="stat-info">
-                        <h4>Account Plan</h4>
-                        <div class="stat-val" id="account-status" style="font-size: 1.1rem; margin-top: 5px; color: #16a34a;">Free Tier</div>
-                    </div>
+                    <div class="stat-info"><h4>Account Plan</h4><div class="stat-val" id="account-status" style="font-size: 1.1rem; margin-top: 5px; color: #16a34a;">Free Tier</div></div>
                 </div>
-
                 <div class="stat-card">
                     <div class="stat-icon purple"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
-                    <div class="stat-info">
-                        <h4>Average Score</h4>
-                        <div class="stat-val" id="avg-score">0 <span style="font-size: 1rem; color: #94a3b8;">/ 50</span></div>
+                    <div class="stat-info"><h4>Average Score</h4><div class="stat-val" id="avg-score">0 <span style="font-size: 1rem; color: #94a3b8;">/ 50</span></div></div>
+                </div>
+            </div>
+
+            <!-- 🚀 NEW ANALYTICS GRID -->
+            <div class="analytics-grid">
+                <div class="dash-card">
+                    <h3>
+                        <svg style="width: 20px; color: #3b82f6; vertical-align: middle; margin-right: 5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        Performance Trend (Last 10 Exams)
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <h3>
+                        <svg style="width: 20px; color: #8b5cf6; vertical-align: middle; margin-right: 5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Subject Mastery
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="radarChart"></canvas>
                     </div>
                 </div>
             </div>
 
             <div class="dashboard-grid">
-                
                 <div class="dash-card">
                     <h3>
                         <svg style="width: 20px; color: var(--brand-blue);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
@@ -328,12 +281,8 @@
                     </h3>
                     <div style="overflow-x: hidden;">
                         <table class="data-table history-table">
-                            <thead>
-                                <tr><th>Date</th><th>Breakdown</th><th style="text-align: right;">Total Score</th></tr>
-                            </thead>
-                            <tbody id="history-body">
-                                <tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading history...</td></tr>
-                            </tbody>
+                            <thead><tr><th>Date</th><th>Breakdown</th><th style="text-align: right;">Total Score</th></tr></thead>
+                            <tbody id="history-body"><tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading history...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -345,33 +294,11 @@
                     </h3>
                     <div style="overflow-x: hidden;">
                         <table class="data-table leaderboard-table">
-                            <thead>
-                                <tr><th style="text-align: center;">Rank</th><th>Aspirant</th><th>Course</th><th style="text-align: right;">Score</th></tr>
-                            </thead>
-                            <tbody id="today-leaderboard-body">
-                                <tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading today's results...</td></tr>
-                            </tbody>
+                            <thead><tr><th style="text-align: center;">Rank</th><th>Aspirant</th><th>Course</th><th style="text-align: right;">Score</th></tr></thead>
+                            <tbody id="today-leaderboard-body"><tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading today's results...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
-
-                <div class="dash-card">
-                    <h3>
-                        <svg style="width: 20px; color: #ea580c;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        Top 15 Achievers (All Time)
-                    </h3>
-                    <div style="overflow-x: hidden;">
-                        <table class="data-table leaderboard-table">
-                            <thead>
-                                <tr><th style="text-align: center;">Rank</th><th>Aspirant</th><th>Course</th><th style="text-align: right;">Score</th></tr>
-                            </thead>
-                            <tbody id="leaderboard-body">
-                                <tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">Loading results...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
             </div>
         </main>
     </div>
@@ -380,11 +307,8 @@
     <script src="../static/app.js"></script>
 
    <script>
-        // 🚨 POST UTME DATE CONFIGURATION 🚨
         const POST_UTME_DATE = null;
-
-        let sessionEmail = null;
-        let sessionId = null;
+        let sessionEmail = null; let sessionId = null;
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
@@ -393,30 +317,22 @@
 
         function showPremiumModal(email, userId) {
             document.getElementById('premium-modal-overlay').style.display = 'flex';
-            const proceedBtn = document.getElementById('modal-proceed-btn');
-            proceedBtn.onclick = function() {
-                closePremiumModal();
-                initiatePayment(email, userId, 'premium_access');
+            document.getElementById('modal-proceed-btn').onclick = function() {
+                closePremiumModal(); initiatePayment(email, userId, 'premium_access');
             };
         }
         function closePremiumModal() { document.getElementById('premium-modal-overlay').style.display = 'none'; }
 
         function showQbankModal(email, userId) {
             document.getElementById('qbank-modal-overlay').style.display = 'flex';
-            const proceedBtn = document.getElementById('qbank-proceed-btn');
-            proceedBtn.onclick = function() {
-                closeQbankModal();
-                initiatePayment(email, userId, 'qbank_access');
+            document.getElementById('qbank-proceed-btn').onclick = function() {
+                closeQbankModal(); initiatePayment(email, userId, 'qbank_access');
             };
         }
         function closeQbankModal() { document.getElementById('qbank-modal-overlay').style.display = 'none'; }
 
         function closeDailyUpsell() { document.getElementById('daily-upsell-modal').style.display = 'none'; }
-
-        function initiateDailyPayment(paymentType) {
-            closeDailyUpsell();
-            initiatePayment(sessionEmail, sessionId, paymentType);
-        }
+        function initiateDailyPayment(paymentType) { closeDailyUpsell(); initiatePayment(sessionEmail, sessionId, paymentType); }
 
         function setTimeGreeting() {
             const hour = new Date().getHours();
@@ -431,47 +347,29 @@
             if (!POST_UTME_DATE) return; 
 
             const targetDate = new Date(POST_UTME_DATE).getTime();
-
             const timer = setInterval(() => {
                 const now = new Date().getTime();
                 const distance = targetDate - now;
-
                 if (distance < 0) {
-                    clearInterval(timer);
-                    display.innerHTML = "EXAM IS TODAY! GOOD LUCK!";
-                    display.style.color = "#10b981";
-                    return;
+                    clearInterval(timer); display.innerHTML = "EXAM IS TODAY! GOOD LUCK!"; display.style.color = "#10b981"; return;
                 }
-
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                display.innerHTML = `
-                    <div class="timer-grid">
-                        <div class="timer-box"><span>${days < 10 ? '0'+days : days}</span><small>Days</small></div>
-                        <div class="timer-box"><span>${hours < 10 ? '0'+hours : hours}</span><small>Hours</small></div>
-                        <div class="timer-box"><span>${minutes < 10 ? '0'+minutes : minutes}</span><small>Mins</small></div>
-                        <div class="timer-box"><span>${seconds < 10 ? '0'+seconds : seconds}</span><small>Secs</small></div>
-                    </div>
-                `;
+                display.innerHTML = `<div class="timer-grid"><div class="timer-box"><span>${days < 10 ? '0'+days : days}</span><small>Days</small></div><div class="timer-box"><span>${hours < 10 ? '0'+hours : hours}</span><small>Hours</small></div><div class="timer-box"><span>${minutes < 10 ? '0'+minutes : minutes}</span><small>Mins</small></div><div class="timer-box"><span>${seconds < 10 ? '0'+seconds : seconds}</span><small>Secs</small></div></div>`;
             }, 1000);
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            setTimeGreeting();
-            startCountdown();
-            initializeDashboard();
+            setTimeGreeting(); startCountdown(); initializeDashboard();
         });
 
         async function initializeDashboard() {
             const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
             if (!session || authError) return window.location.href = '../login/index.html';
 
-            sessionEmail = session.user.email;
-            sessionId = session.user.id;
-
+            sessionEmail = session.user.email; sessionId = session.user.id;
             const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
             const { data: resultsData } = await supabaseClient.from('results').select('id').eq('student_id', session.user.id);
             const actualTestsTaken = resultsData ? resultsData.length : 0;
@@ -490,7 +388,6 @@
             const actionContainer = document.getElementById('action-buttons-container');
             actionContainer.innerHTML = '';
 
-            // 🚀 MODULAR UPSELL LOGIC & DAILY POPUP WITH HIERARCHY
             const todayStr = new Date().toLocaleDateString('en-CA');
             const lastPopup = localStorage.getItem('last_upsell_date');
             let showPopup = (lastPopup !== todayStr);
@@ -504,109 +401,46 @@
                 
                 if (profile.has_qbank_access) {
                     showPopup = false; 
-                    actionContainer.innerHTML = `
-                        <button onclick="window.location.href='../exam-room/index.html'" class="btn-action-main btn-green">
-                            Start Premium Exam →
-                        </button>
-                        <button onclick="window.location.href='../question-bank/index.html'" class="btn-action-main btn-purple">
-                            📚 Open Question Bank
-                        </button>
-                    `;
+                    actionContainer.innerHTML = `<button onclick="window.location.href='../exam-room/index.html'" class="btn-action-main btn-green">Start Premium Exam →</button> <button onclick="window.location.href='../question-bank/index.html'" class="btn-action-main btn-purple">📚 Open Question Bank</button>`;
                 } else {
                     if (showPopup) {
                         document.getElementById('daily-upsell-modal').style.display = 'flex';
-                        
                         document.getElementById('daily-premium-block').style.display = 'block';
-                        dailyPremiumBtn.style.background = '#e2e8f0';
-                        dailyPremiumBtn.style.color = '#64748b';
-                        dailyPremiumBtn.style.boxShadow = 'none';
-                        dailyPremiumBtn.style.cursor = 'not-allowed';
-                        dailyPremiumBtn.innerText = '✅ Activated';
-                        dailyPremiumBtn.onclick = null;
-
+                        dailyPremiumBtn.style.background = '#e2e8f0'; dailyPremiumBtn.style.color = '#64748b'; dailyPremiumBtn.style.boxShadow = 'none'; dailyPremiumBtn.style.cursor = 'not-allowed'; dailyPremiumBtn.innerText = '✅ Activated'; dailyPremiumBtn.onclick = null;
                         document.getElementById('daily-qbank-block').style.display = 'block';
-                        dailyQbankBtn.style.background = '#8b5cf6';
-                        dailyQbankBtn.style.color = 'white';
-                        dailyQbankBtn.style.cursor = 'pointer';
-                        dailyQbankBtn.innerText = 'Unlock Vault ₦1,050';
-                        dailyQbankBtn.onclick = () => initiateDailyPayment('qbank_access');
-                        
+                        dailyQbankBtn.style.background = '#8b5cf6'; dailyQbankBtn.style.color = 'white'; dailyQbankBtn.style.cursor = 'pointer'; dailyQbankBtn.innerText = 'Unlock Vault ₦1,050'; dailyQbankBtn.onclick = () => initiateDailyPayment('qbank_access');
                         localStorage.setItem('last_upsell_date', todayStr);
                     }
-                    actionContainer.innerHTML = `
-                        <button onclick="window.location.href='../exam-room/index.html'" class="btn-action-main btn-green">
-                            Start Premium Exam →
-                        </button>
-                        <button onclick="showQbankModal('${session.user.email}', '${session.user.id}')" class="btn-action-main btn-outline-purple">
-                            📚 Unlock Question Bank
-                        </button>
-                    `;
+                    actionContainer.innerHTML = `<button onclick="window.location.href='../exam-room/index.html'" class="btn-action-main btn-green">Start Premium Exam →</button> <button onclick="showQbankModal('${session.user.email}', '${session.user.id}')" class="btn-action-main btn-outline-purple">📚 Unlock Question Bank</button>`;
                 }
             } else {
                 if (showPopup) {
                     document.getElementById('daily-upsell-modal').style.display = 'flex';
-                    
                     document.getElementById('daily-premium-block').style.display = 'block';
-                    dailyPremiumBtn.style.background = '#ea580c';
-                    dailyPremiumBtn.style.color = 'white';
-                    dailyPremiumBtn.style.cursor = 'pointer';
-                    dailyPremiumBtn.innerText = 'Upgrade for ₦1,050';
-                    dailyPremiumBtn.onclick = () => initiateDailyPayment('premium_access');
-
+                    dailyPremiumBtn.style.background = '#ea580c'; dailyPremiumBtn.style.color = 'white'; dailyPremiumBtn.style.cursor = 'pointer'; dailyPremiumBtn.innerText = 'Upgrade for ₦1,050'; dailyPremiumBtn.onclick = () => initiateDailyPayment('premium_access');
                     document.getElementById('daily-qbank-block').style.display = 'block';
-                    dailyQbankBtn.style.background = '#e2e8f0';
-                    dailyQbankBtn.style.color = '#64748b';
-                    dailyQbankBtn.style.boxShadow = 'none';
-                    dailyQbankBtn.style.cursor = 'not-allowed';
-                    dailyQbankBtn.innerText = '🔒 Requires Premium First';
-                    dailyQbankBtn.onclick = null;
-
+                    dailyQbankBtn.style.background = '#e2e8f0'; dailyQbankBtn.style.color = '#64748b'; dailyQbankBtn.style.boxShadow = 'none'; dailyQbankBtn.style.cursor = 'not-allowed'; dailyQbankBtn.innerText = '🔒 Requires Premium First'; dailyQbankBtn.onclick = null;
                     localStorage.setItem('last_upsell_date', todayStr);
                 }
 
                 if (actualTestsTaken >= 1) {
-                    statusText.innerText = 'Free Limit Reached';
-                    statusText.style.color = '#ea580c';
-                    actionContainer.innerHTML = `
-                        <button onclick="showPremiumModal('${session.user.email}', '${session.user.id}')" class="btn-action-main btn-orange">
-                            👑 Unlock Full Access (₦1,050)
-                        </button>
-                    `;
+                    statusText.innerText = 'Free Limit Reached'; statusText.style.color = '#ea580c';
+                    actionContainer.innerHTML = `<button onclick="showPremiumModal('${session.user.email}', '${session.user.id}')" class="btn-action-main btn-orange">👑 Unlock Full Access (₦1,050)</button>`;
                 } else {
                     statusText.innerText = `Free Tier (1 Left)`;
-                    actionContainer.innerHTML = `
-                        <button onclick="window.location.href='../exam-room/index.html'" class="btn-action-main btn-blue">
-                            Start Free Test →
-                        </button>
-                        <button onclick="showPremiumModal('${session.user.email}', '${session.user.id}')" class="btn-action-main btn-outline-orange">
-                            👑 Upgrade Now
-                        </button>
-                    `;
+                    actionContainer.innerHTML = `<button onclick="window.location.href='../exam-room/index.html'" class="btn-action-main btn-blue">Start Free Test →</button> <button onclick="showPremiumModal('${session.user.email}', '${session.user.id}')" class="btn-action-main btn-outline-orange">👑 Upgrade Now</button>`;
                 }
             }
 
-            fetchUserHistory(session.user.id);
-            fetchTodayLeaderboard(); 
-            fetchLeaderboard();      
+            fetchUserHistory(session.user.id); fetchTodayLeaderboard();
         }
 
         function initiatePayment(email, userId, paymentType) {
             let handler = PaystackPop.setup({
-                key: 'pk_live_f1ca0bad0d6913267fb525e6c58cd2c447a1ae29',
-                email: email,
-                amount: 1050 * 100,
-                currency: 'NGN',
+                key: 'pk_live_f1ca0bad0d6913267fb525e6c58cd2c447a1ae29', email: email, amount: 1050 * 100, currency: 'NGN',
                 ref: 'AFIT_' + Math.floor((Math.random() * 1000000000) + 1),
-                metadata: {
-                    custom_fields: [
-                        { display_name: "Student ID", variable_name: "student_id", value: userId },
-                        { display_name: "Payment Type", variable_name: "payment_type", value: paymentType } 
-                    ]
-                },
-                callback: function(response) {
-                    alert('Payment successful! Verifying your account upgrade. The page will refresh momentarily.');
-                    setTimeout(() => { window.location.reload(); }, 3000);
-                },
+                metadata: { custom_fields: [{ display_name: "Student ID", variable_name: "student_id", value: userId }, { display_name: "Payment Type", variable_name: "payment_type", value: paymentType }] },
+                callback: function(response) { alert('Payment successful! Verifying account upgrade.'); setTimeout(() => { window.location.reload(); }, 3000); },
                 onClose: function() { alert('Payment process was cancelled.'); }
             });
             handler.openIframe();
@@ -627,166 +461,131 @@
             // 🚀 STREAK CALCULATOR
             let streak = 0;
             const uniqueDates = [...new Set(data.map(r => new Date(r.submitted_at).toLocaleDateString('en-CA')))];
-            
-            const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-
-            const todayStr = today.toLocaleDateString('en-CA');
-            const yesterdayStr = yesterday.toLocaleDateString('en-CA');
+            const today = new Date(); const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+            const todayStr = today.toLocaleDateString('en-CA'); const yesterdayStr = yesterday.toLocaleDateString('en-CA');
 
             let checkDate = new Date();
-            if (uniqueDates.includes(todayStr)) {
-                // Streak active today
-            } else if (uniqueDates.includes(yesterdayStr)) {
-                // Streak active as of yesterday, haven't tested today yet
-                checkDate = yesterday;
-            } else {
-                // Streak broken
-                checkDate = null;
-            }
+            if (uniqueDates.includes(todayStr)) {} 
+            else if (uniqueDates.includes(yesterdayStr)) { checkDate = yesterday; } 
+            else { checkDate = null; }
 
             if (checkDate) {
                 while(true) {
                     const str = checkDate.toLocaleDateString('en-CA');
-                    if (uniqueDates.includes(str)) {
-                        streak++;
-                        checkDate.setDate(checkDate.getDate() - 1);
-                    } else {
-                        break;
-                    }
+                    if (uniqueDates.includes(str)) { streak++; checkDate.setDate(checkDate.getDate() - 1); } else { break; }
                 }
             }
             streakDisplay.innerText = streak;
-
-            // Render History Table
-            let totalSum = 0;
-            tbody.innerHTML = ''; 
             
+            // 🔥 Activate Pulse Flame if Streak > 0
+            if(streak > 0) { document.getElementById('streak-icon').classList.add('flame-active'); }
+
+            // 🚀 CONFETTI DOPAMINE HIT (If latest score >= 35)
+            const latestScore = data[0].total_score;
+            if (latestScore >= 35 && uniqueDates.includes(todayStr) && !sessionStorage.getItem('confetti_fired_today')) {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                sessionStorage.setItem('confetti_fired_today', 'true');
+            }
+
+            // Render History Table & Prep Chart Data
+            let totalSum = 0; tbody.innerHTML = ''; 
+            
+            let chartLabels = [];
+            let chartScores = [];
+            let subjectAggregates = { 'ENG':0, 'GNS':0, 'MTH':0, 'PHY':0, 'CHM':0, 'ECO':0, 'LIT':0, 'GOV':0, 'COM':0 };
+            let subjectCounts = { 'ENG':0, 'GNS':0, 'MTH':0, 'PHY':0, 'CHM':0, 'ECO':0, 'LIT':0, 'GOV':0, 'COM':0 };
+            
+            // Limit chart data to last 10
+            const chartData = data.slice(0, 10).reverse(); 
+            chartData.forEach(row => {
+                chartLabels.push(new Date(row.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                chartScores.push(row.total_score);
+            });
+
             data.forEach((row) => {
                 totalSum += row.total_score;
                 const formattedDate = new Date(row.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 
-                const allScores = [
-                    { name: 'ENG', val: row.english_score }, { name: 'GNS', val: row.gns_score },
-                    { name: 'MTH', val: row.math_score }, { name: 'PHY', val: row.physics_score },
-                    { name: 'CHM', val: row.chemistry_score }, { name: 'ECO', val: row.economics_score },
-                    { name: 'LIT', val: row.literature_score }, { name: 'GOV', val: row.government_score },
-                    { name: 'COM', val: row.commerce_score }
-                ].filter(s => s.val !== undefined && s.val !== null && s.val > 0);
+                const rawScores = { 'ENG': row.english_score, 'GNS': row.gns_score, 'MTH': row.math_score, 'PHY': row.physics_score, 'CHM': row.chemistry_score, 'ECO': row.economics_score, 'LIT': row.literature_score, 'GOV': row.government_score, 'COM': row.commerce_score };
+                
+                let breakdownArray = [];
+                for (const [subj, score] of Object.entries(rawScores)) {
+                    if (score !== undefined && score !== null && score > 0) {
+                        breakdownArray.push(`${subj}: <strong>${score}</strong>`);
+                        subjectAggregates[subj] += score;
+                        subjectCounts[subj]++;
+                    }
+                }
+                if (breakdownArray.length === 0) { breakdownArray.push(`ENG: <strong>0</strong>`); } 
 
-                if (allScores.length === 0) allScores.push({ name: 'ENG', val: 0 }); 
-
-                let breakdownHtml = allScores.map(s => `${s.name}: <strong>${s.val}</strong>`).join(' | ');
                 const badgeClass = row.total_score >= 25 ? 'badge-green' : 'badge-orange';
-
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${formattedDate}</strong></td>
-                    <td style="color: #64748b; line-height: 1.8;">${breakdownHtml}</td>
-                    <td style="text-align: right;"><span class="score-badge ${badgeClass}" style="white-space: nowrap;">${row.total_score} / 50</span></td>
-                `;
+                tr.innerHTML = `<td><strong>${formattedDate}</strong></td><td style="color: #64748b; line-height: 1.8;">${breakdownArray.join(' | ')}</td><td style="text-align: right;"><span class="score-badge ${badgeClass}" style="white-space: nowrap;">${row.total_score} / 50</span></td>`;
                 tbody.appendChild(tr);
             });
 
             const average = (totalSum / data.length).toFixed(1);
             avgDisplay.innerHTML = `${average} <span style="font-size: 1rem; color: #94a3b8;">/ 50</span>`;
+
+            // 🚀 RENDER CHART.JS
+            renderCharts(chartLabels, chartScores, subjectAggregates, subjectCounts);
+        }
+
+        function renderCharts(labels, scores, subjectAggregates, subjectCounts) {
+            // Line Chart
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Score', data: scores,
+                        borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3, pointBackgroundColor: '#ffffff', pointBorderColor: '#3b82f6', pointRadius: 5, fill: true, tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 50 } } }
+            });
+
+            // Radar Chart (Only plot subjects they actually take)
+            const radarLabels = [];
+            const radarData = [];
+            for (const [subj, total] of Object.entries(subjectAggregates)) {
+                if (subjectCounts[subj] > 0) {
+                    radarLabels.push(subj);
+                    radarData.push((total / subjectCounts[subj]).toFixed(1)); // Average score for that subject
+                }
+            }
+
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: radarLabels,
+                    datasets: [{
+                        label: 'Average Score', data: radarData,
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)', borderColor: '#8b5cf6',
+                        pointBackgroundColor: '#8b5cf6', borderWidth: 2
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { beginAtZero: true, suggestedMax: 20 } } }
+            });
         }
 
         async function fetchTodayLeaderboard() {
-            const todayDate = new Date();
-            const monthStr = todayDate.toLocaleDateString('en-US', { month: 'long' });
-            const dayNum = todayDate.getDate();
-            
-            let suffix = 'th';
-            if (dayNum % 10 === 1 && dayNum !== 11) suffix = 'st';
-            else if (dayNum % 10 === 2 && dayNum !== 12) suffix = 'nd';
-            else if (dayNum % 10 === 3 && dayNum !== 13) suffix = 'rd';
-            
-            document.getElementById('today-leaderboard-title').innerText = `Top 10 Achievers Today, ${monthStr} ${dayNum}${suffix}`;
-
-            const startOfDay = new Date();
-            startOfDay.setHours(0, 0, 0, 0);
-            
-            const endOfDay = new Date();
-            endOfDay.setHours(23, 59, 59, 999);
-
-            const { data, error } = await supabaseClient
-                .from('results')
-                .select(`total_score, submitted_at, profiles (full_name, course_applied)`)
-                .gte('submitted_at', startOfDay.toISOString())
-                .lte('submitted_at', endOfDay.toISOString())
-                .order('total_score', { ascending: false })
-                .order('submitted_at', { ascending: false })
-                .limit(10); 
-
+            const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+            const endOfDay = new Date(); endOfDay.setHours(23, 59, 59, 999);
+            const { data, error } = await supabaseClient.from('results').select(`total_score, profiles(full_name, course_applied)`).gte('submitted_at', startOfDay.toISOString()).lte('submitted_at', endOfDay.toISOString()).order('total_score', { ascending: false }).limit(10); 
             const tbody = document.getElementById('today-leaderboard-body');
-            if (error || !data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">No exams have been completed today.</td></tr>';
-                return;
-            }
-
+            if (error || !data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">No exams taken today.</td></tr>'; return; }
             tbody.innerHTML = ''; 
-            data.forEach((row, index) => {
-                const fullName = row.profiles?.full_name || 'Unknown Aspirant';
-                const courseApplied = row.profiles?.course_applied || 'General';
-
-                let rankDisplay = `<span style="color: #64748b; font-weight: 700;">#${index + 1}</span>`;
-                if (index === 0) rankDisplay = '🥇';
-                if (index === 1) rankDisplay = '🥈';
-                if (index === 2) rankDisplay = '🥉';
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-size: 1.1rem; text-align: center;">${rankDisplay}</td>
-                    <td><span style="font-weight: 600; color: #1e293b; line-height: 1.3; display: block;">${fullName}</span></td>
-                    <td style="color: #64748b; font-weight: 500; line-height: 1.3; font-size: 0.85rem;">${courseApplied}</td>
-                    <td style="text-align: right;"><span class="score-badge badge-blue" style="white-space: nowrap;">${row.total_score}</span></td>
-                `;
-                tbody.appendChild(tr);
+            data.forEach((row, i) => {
+                let rank = `<span style="color:#64748b;font-weight:700;">#${i+1}</span>`; if(i===0) rank='🥇'; if(i===1) rank='🥈'; if(i===2) rank='🥉';
+                tbody.innerHTML += `<tr><td style="text-align:center;">${rank}</td><td><span style="font-weight:600;color:#1e293b;">${row.profiles?.full_name||'Unknown'}</span></td><td style="font-size:0.85rem;color:#64748b;">${row.profiles?.course_applied||'General'}</td><td style="text-align:right;"><span class="score-badge badge-blue">${row.total_score}</span></td></tr>`;
             });
         }
 
-        async function fetchLeaderboard() {
-            const { data, error } = await supabaseClient
-                .from('results')
-                .select(`total_score, submitted_at, profiles (full_name, course_applied)`)
-                .order('total_score', { ascending: false })
-                .order('submitted_at', { ascending: false })
-                .limit(15); 
-
-            const tbody = document.getElementById('leaderboard-body');
-            if (error || !data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 2rem;">No results yet.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = ''; 
-            data.forEach((row, index) => {
-                const fullName = row.profiles?.full_name || 'Unknown Aspirant';
-                const courseApplied = row.profiles?.course_applied || 'General';
-
-                let rankDisplay = `<span style="color: #64748b; font-weight: 700;">#${index + 1}</span>`;
-                if (index === 0) rankDisplay = '🥇';
-                if (index === 1) rankDisplay = '🥈';
-                if (index === 2) rankDisplay = '🥉';
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-size: 1.1rem; text-align: center;">${rankDisplay}</td>
-                    <td><span style="font-weight: 600; color: #1e293b; line-height: 1.3; display: block;">${fullName}</span></td>
-                    <td style="color: #64748b; font-weight: 500; line-height: 1.3; font-size: 0.85rem;">${courseApplied}</td>
-                    <td style="text-align: right;"><span class="score-badge badge-blue" style="white-space: nowrap;">${row.total_score}</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        window.logout = async function() {
-            await supabaseClient.auth.signOut();
-            localStorage.removeItem('cbt_session_token');
-            window.location.href = '../index.html';
-        }
+        window.logout = async function() { await supabaseClient.auth.signOut(); localStorage.removeItem('cbt_session_token'); window.location.href = '../index.html'; }
     </script>
 </body>
 </html>
