@@ -53,7 +53,7 @@
         .input-group select { 
             width: 100%; height: 55px; padding: 0 1.2rem; border-radius: 12px; border: 2px solid #e2e8f0; 
             font-family: 'Poppins', sans-serif; font-size: 1rem; outline: none; transition: border-color 0.2s; 
-            color: #1e293b; font-weight: 500; box-sizing: border-box;
+            color: #1e293b; font-weight: 500; box-sizing: border-box; cursor: pointer;
         }
         .input-group select:focus { border-color: #8b5cf6; }
         
@@ -147,21 +147,15 @@
         
         <div class="vault-header">
             <h1>Study & Practice</h1>
-            <p>Select a subject below to generate a fresh batch of randomized questions from our extensive database. Review your answers instantly.</p>
+            <p>Select a subject below to generate a fresh batch of randomized questions tailored to your course profile.</p>
         </div>
 
         <div class="control-panel">
             <div class="input-group">
                 <label>Target Subject</label>
+                <!-- 🚀 The options are now injected dynamically by JS -->
                 <select id="subject-select">
-                    <option value="english">English Language</option>
-                    <option value="mathematics">Mathematics</option>
-                    <option value="physics">Physics</option>
-                    <option value="chemistry">Chemistry</option>
-                    <option value="economics">Economics</option>
-                    <option value="commerce">Commerce</option>
-                    <option value="government">Government</option>
-                    <option value="literature">Literature in English</option>
+                    <option value="">Loading your subjects...</option>
                 </select>
             </div>
             <button class="btn-load" id="top-load-btn" onclick="fetchVaultQuestions()">
@@ -229,21 +223,62 @@
             return c;
         }
 
+        // 🚀 SMART INITIALIZATION ENGINE
         document.addEventListener("DOMContentLoaded", async () => {
             const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
             if (!session || authError) return window.location.href = '../login/index.html';
 
-            const { data: profile } = await supabaseClient.from('profiles').select('has_qbank_access, role').eq('id', session.user.id).single();
+            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
             
             if (!profile.has_qbank_access && profile.role !== 'admin' && profile.role !== 'jnr-admin') {
                 alert("SECURITY LOCK: You do not have access to the Question Bank Vault. Please unlock it from your dashboard.");
                 window.location.href = '../dashboard/index.html';
                 return;
             }
+
+            // 🚀 DYNAMIC SUBJECT FILTER LOGIC
+            const course = profile.course_applied || "";
+            let expectedSubjects = [];
+            
+            if (course.includes("International Relations")) {
+                expectedSubjects = ['english', 'gns', 'economics', 'literature', 'government'];
+            } else if (course.includes("Accounting") || course.includes("Business") || course.includes("Economics")) {
+                const match = course.match(/\[(.*?)\]/);
+                const elective = match ? match[1].toLowerCase() : 'commerce';
+                expectedSubjects = ['english', 'gns', 'mathematics', 'economics', elective];
+            } else {
+                expectedSubjects = ['english', 'gns', 'mathematics', 'physics', 'chemistry'];
+            }
+
+            // Map database IDs to display names
+            const subjectNames = {
+                'english': 'English Language',
+                'gns': 'GNS',
+                'mathematics': 'Mathematics',
+                'physics': 'Physics',
+                'chemistry': 'Chemistry',
+                'economics': 'Economics',
+                'commerce': 'Commerce',
+                'government': 'Government',
+                'literature': 'Literature in English'
+            };
+
+            // Inject the filtered options into the select box
+            const selectEl = document.getElementById('subject-select');
+            selectEl.innerHTML = ''; 
+
+            expectedSubjects.forEach(subj => {
+                const opt = document.createElement('option');
+                opt.value = subj;
+                opt.innerText = subjectNames[subj] || (subj.charAt(0).toUpperCase() + subj.slice(1));
+                selectEl.appendChild(opt);
+            });
         });
 
         async function fetchVaultQuestions() {
             const subject = document.getElementById('subject-select').value;
+            if(!subject) return;
+
             const canvas = document.getElementById('questions-canvas');
             const loading = document.getElementById('loading-state');
             const topBtn = document.getElementById('top-load-btn');
