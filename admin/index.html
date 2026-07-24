@@ -107,10 +107,11 @@
         .btn-action:hover { background: #f1f5f9; transform: translateY(-1px); }
         .btn-primary { background: #2563eb; color: white; border: none; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
         .btn-primary:hover { background: #1d4ed8; color: white; }
+        .btn-purple { background: #8b5cf6; color: white; border: none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+        .btn-purple:hover { background: #7c3aed; color: white; }
         .btn-danger { background: #ef4444; border: none; color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
         .btn-danger:hover { background: #dc2626; color: white;}
         
-        /* 🚀 NEW SMALL BUTTONS FOR DEMOGRAPHICS */
         .btn-sm { padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; }
 
         /* TABLES */
@@ -123,12 +124,15 @@
         .admin-table td { padding: 1.2rem 1rem; border-bottom: 1px solid #f1f5f9; font-weight: 600; color: #334155; font-size: 0.9rem; white-space: nowrap;}
         .admin-table tr:hover td { background: #f8fafc; }
         
-        /* BEAUTIFUL HIDDEN CAPTURE AREAS FOR SCREENSHOTS */
+        /* 🚀 BEAUTIFUL HIDDEN CAPTURE AREAS FOR SCREENSHOTS */
+        /* Forced width and max-width prevent mobile shrinking entirely! */
         .capture-layer {
-            position: absolute; left: -9999px; top: 0; width: 850px;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            color: white; padding: 50px; border-radius: 30px; font-family: 'Poppins', sans-serif; 
-            box-sizing: border-box; z-index: -100; overflow: hidden;
+            position: absolute !important; left: -9999px !important; top: 0 !important; 
+            width: 850px !important; max-width: none !important;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%) !important;
+            color: white !important; padding: 50px !important; border-radius: 30px !important; 
+            font-family: 'Poppins', sans-serif !important; 
+            box-sizing: border-box !important; z-index: -100 !important; overflow: hidden !important;
         }
         .capture-layer::before {
             content: ''; position: absolute; top: -20%; left: -10%; width: 400px; height: 400px;
@@ -142,12 +146,13 @@
         .report-header { border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 25px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;}
         .report-title { margin: 0; font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; text-shadow: 0 2px 10px rgba(0,0,0,0.3);}
         .report-date { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 10px; font-weight: 700; font-size: 1rem; display: inline-block; border: 1px solid rgba(255,255,255,0.2);}
-        .report-total { margin-top: 10px; font-size: 0.95rem; color: #bae6fd; font-weight: 600; text-align: right;}
+        
+        .report-total { margin-top: 10px; font-size: 1rem; color: #bae6fd; font-weight: 600; text-align: right; line-height: 1.4; max-width: 300px; margin-left: auto;}
         
         .report-row { 
             display: flex; justify-content: space-between; align-items: center; 
             background: rgba(255,255,255,0.08); padding: 18px 25px; border-radius: 16px; 
-            margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.15); 
+            border: 1px solid rgba(255,255,255,0.15); 
             backdrop-filter: blur(10px); position: relative; z-index: 2;
         }
         .r-rank { font-size: 1.5rem; font-weight: 800; color: #93c5fd; width: 40px;}
@@ -162,7 +167,7 @@
             .admin-wrapper { padding: 0 1rem; margin: 1rem auto; }
             .kpi-card { padding: 1.2rem; flex-direction: column; align-items: flex-start; gap: 5px;}
             .kpi-value { font-size: 2.2rem; }
-            #capture-area, #capture-area-demo { width: 100%; } 
+            /* Note: .capture-layer is intentionally NOT modified here so it stays desktop-width */
         }
     </style>
 </head>
@@ -176,7 +181,7 @@
         <h3 style="margin:0; font-size: 1.1rem;">Verifying Clearance...</h3>
     </div>
 
-    <!-- IMAGE CAPTURE 1: TOP SCORERS -->
+    <!-- 🚀 IMAGE CAPTURE 1: TOP SCORERS -->
     <div id="capture-area" class="capture-layer">
         <div class="report-header">
             <div>
@@ -189,7 +194,7 @@
             </div>
         </div>
         
-        <div id="img-list"></div>
+        <div id="img-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
         
         <div style="text-align: center; margin-top: 40px; font-size: 0.95rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">
             Powered by brightsitedev
@@ -205,10 +210,11 @@
             </div>
             <div style="text-align: right;">
                 <div class="report-date" id="demo-img-date">--</div>
-                <div class="report-total" id="demo-total-candidates">0 Total Candidates</div>
+                <div class="report-total" id="demo-total-candidates">0 Candidates Registered</div>
             </div>
         </div>
         
+        <!-- This container is dynamically set to grid or flex depending on the tier via JS -->
         <div id="demo-img-list" style="position: relative; z-index: 2;"></div>
         
         <div style="text-align: center; margin-top: 40px; font-size: 0.95rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; position: relative; z-index: 2;">
@@ -317,6 +323,7 @@
     <script src="../static/app.js"></script>
 
     <script>
+        // 🚀 ADMIN FAILSAFE
         if (typeof supabaseClient === 'undefined') {
             const supabaseUrl = 'PASTE_YOUR_SUPABASE_URL_HERE';
             const supabaseKey = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
@@ -428,7 +435,8 @@
                 globalCourseArray = Object.keys(courseCounts).map(key => ({ name: key, count: courseCounts[key] }));
                 globalCourseArray.sort((a, b) => b.count - a.count);
 
-               document.getElementById('demo-total-candidates').innerText = `${globalTotalCandidates} Candidates Registered in AFIT CBT SIM`;
+                // 🚀 MODIFIED TEXT
+                document.getElementById('demo-total-candidates').innerHTML = `${globalTotalCandidates} Candidates Registered<br>in AFIT CBT SIM`;
 
                 if (globalCourseArray.length === 0) {
                     courseBody.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #94a3b8; padding: 2rem;">No demographic data available.</div>';
@@ -508,7 +516,7 @@
                 if(index === 2) rankStr = '🥉';
 
                 imgList.innerHTML += `
-                    <div class="report-row">
+                    <div class="report-row" style="margin-bottom: 12px;">
                         <span class="r-rank">${rankStr}</span>
                         <div class="r-name">
                             ${fullName}
@@ -523,7 +531,7 @@
             captureArea.style.left = '0'; 
             
             setTimeout(() => {
-                html2canvas(captureArea, { scale: 3, backgroundColor: null }).then(canvas => {
+                html2canvas(captureArea, { scale: 2, backgroundColor: null }).then(canvas => {
                     const link = document.createElement('a');
                     const dateStr = new Date().toISOString().split('T')[0];
                     link.download = `AFIT_Top_Scorers_${dateStr}.png`;
@@ -543,7 +551,7 @@
             }, 300);
         }
 
-        // 🚀 NEW LOGIC: TIERED DEMOGRAPHICS SPLIT
+        // 🚀 IMAGE 2: DYNAMIC DEMOGRAPHICS SPLIT & GRID FIX
         function downloadDemographicsReport(tier) {
             let btnId = 'dl-high-btn';
             if (tier === 'mid') btnId = 'dl-mid-btn';
@@ -567,21 +575,19 @@
 
             // Smart Array Slicing Based on Tier
             if (tier === 'high') {
-                dataToRender = globalCourseArray.slice(0, 5); // Changed to grab Top 5
+                dataToRender = globalCourseArray.slice(0, 5); // Top 5
                 mainTitle = "🔥 Highly Competitive";
                 accentColor = "#ef4444"; // Red
             } else if (tier === 'low') {
-                // Ensure we only get the bottom 10, but don't overlap with the top 5
                 let startIdx = Math.max(5, globalCourseArray.length - 10);
                 dataToRender = globalCourseArray.slice(startIdx);
                 mainTitle = "🎯 Less Competitive";
                 accentColor = "#10b981"; // Green
             } else if (tier === 'mid') {
-                // Grab whatever is between top 5 and bottom 10
-                if (globalCourseArray.length > 15) { // 5 (top) + 10 (bottom) = 15
+                if (globalCourseArray.length > 15) { 
                     dataToRender = globalCourseArray.slice(5, globalCourseArray.length - 10);
                 } else {
-                    dataToRender = globalCourseArray.slice(5); // Fallback if list is short
+                    dataToRender = globalCourseArray.slice(5); 
                 }
                 mainTitle = "⚡ Mid-Level Competition";
                 accentColor = "#f59e0b"; // Orange/Yellow
@@ -598,21 +604,35 @@
             document.getElementById('demo-report-title').innerHTML = mainTitle;
             document.getElementById('demo-report-subtitle').innerText = "Department Tracker";
 
-            // Inject the selected tier into the visual list (NUMBERS HIDDEN)
+            // 🚀 DYNAMIC LAYOUT: Single column for High, 2-Column Grid for Mid/Low
+            if (tier === 'high') {
+                demoList.style.display = 'block';
+            } else {
+                demoList.style.display = 'grid';
+                demoList.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                demoList.style.gap = '15px';
+            }
+
+            // 🚀 INJECT CARDS (NUMBERS HIDDEN + CENTERED)
             let listHtml = "";
+            
+            // Handle bottom margin differently depending on layout type
+            let marginB = (tier === 'high') ? 'margin-bottom: 12px;' : 'margin-bottom: 0; height: 100%;';
+
             dataToRender.forEach(item => {
                 listHtml += `
-                    <div class="report-row" style="padding: 18px 20px; justify-content: center; border-left: 5px solid ${accentColor};">
-                        <div class="r-name" style="margin: 0; font-size: 1.3rem; text-align: center; width: 100%;">${item.name}</div>
+                    <div class="report-row" style="padding: 18px 20px; justify-content: center; border-left: 5px solid ${accentColor}; ${marginB} box-sizing: border-box;">
+                        <div class="r-name" style="margin: 0; font-size: 1.25rem; text-align: center; width: 100%; word-break: break-word; line-height: 1.4;">${item.name}</div>
                     </div>
                 `;
             });
             demoList.innerHTML = listHtml;
+
             const captureArea = document.getElementById('capture-area-demo');
             captureArea.style.left = '0'; 
             
             setTimeout(() => {
-                html2canvas(captureArea, { scale: 3, backgroundColor: null }).then(canvas => {
+                html2canvas(captureArea, { scale: 2, backgroundColor: null }).then(canvas => {
                     const link = document.createElement('a');
                     const dateStr = new Date().toISOString().split('T')[0];
                     link.download = `AFIT_Demographics_${tier.toUpperCase()}_${dateStr}.png`;
