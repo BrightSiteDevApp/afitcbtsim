@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="../static/main.css">
     
     <script src="https://js.paystack.co/v1/inline.js"></script>
-    <!-- 🚀 CHART.JS & CONFETTI LIBRARIES -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -52,7 +51,7 @@
         }
         .btn-whatsapp-small:hover { background: #dcfce7; transform: translateY(-1px); }
 
-        /* 🚀 NEW MULTI-SCHEDULE COUNTDOWN BANNER */
+        /* 🚀 MULTI-SCHEDULE COUNTDOWN BANNER */
         .countdown-banner {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; color: white;
@@ -103,24 +102,59 @@
         .upsell-block h4 { margin: 0 0 5px 0; color: #0f172a; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;}
         .upsell-block p { margin: 0 0 15px 0; color: #64748b; font-size: 0.85rem; line-height: 1.5; }
 
+        /* 🚀 MOBILE FIXES & SWIPEABLE CAROUSEL */
         @media (max-width: 900px) {
             .dashboard-content { width: 100vw !important; max-width: 100vw !important; box-sizing: border-box; overflow-x: hidden !important; }
             #action-buttons-container { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; width: 100% !important; }
             .btn-action-main { width: 100% !important; padding: 0.8rem 0.5rem !important; font-size: 0.75rem !important; white-space: normal !important; line-height: 1.3; text-align: center; height: 100%; }
             .btn-whatsapp-small { width: 100% !important; justify-content: center; padding: 0.8rem !important; font-size: 0.85rem !important; margin-top: 10px !important; }
             
-            /* 🚀 MOBILE COUNTDOWN FIX: STACK THEM VERTICALLY */
-            .multi-countdown-grid { grid-template-columns: 1fr; gap: 10px; }
-            .mc-card { padding: 12px; }
+            /* 🚀 THE MAGIC: HORIZONTAL SWIPING */
+            .countdown-banner { padding: 1rem 0; margin-bottom: 1.5rem; border-radius: 12px; }
+            .cd-title { font-size: 0.8rem; margin-bottom: 10px; }
+            
+            .multi-countdown-grid { 
+                display: flex !important; 
+                flex-direction: row !important; 
+                overflow-x: auto !important; 
+                scroll-snap-type: x mandatory; 
+                gap: 12px !important; 
+                padding: 0 1rem 15px 1rem !important; /* Space for the scrollbar */
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Clean thin scrollbar */
+            .multi-countdown-grid::-webkit-scrollbar { height: 4px; }
+            .multi-countdown-grid::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px;}
+            .multi-countdown-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px;}
 
-            .stats-row { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; width: 100% !important; }
+            .mc-card { 
+                min-width: 85%; /* Shows a peek of the next card */
+                flex-shrink: 0; 
+                scroll-snap-align: center; 
+                padding: 12px; 
+                box-sizing: border-box;
+            }
+            
+            .mc-state { font-size: 1rem; margin-bottom: 2px;}
+            .mc-date { font-size: 0.75rem; margin-bottom: 6px;}
+            .mc-loc { font-size: 0.7rem; margin-bottom: 8px; padding: 4px; }
+            
+            .timer-box { min-width: 48px; padding: 6px 4px; }
+            .timer-box span { font-size: 1.25rem; }
+            .timer-box small { font-size: 0.55rem; }
+
+            .stats-row { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; width: 100% !important; padding: 0 1rem; box-sizing: border-box;}
+            .welcome-banner { margin: 0 1rem; }
+            .analytics-grid { grid-template-columns: 1fr; padding: 0 1rem; box-sizing: border-box;}
+            .dashboard-grid { padding: 0 1rem; box-sizing: border-box;}
+            
             .stat-card { min-width: 0 !important; padding: 1rem 0.5rem !important; display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important; gap: 8px !important; }
             .stat-icon { margin: 0 !important; }
             .stat-info h4 { font-size: 0.7rem !important; margin-bottom: 2px !important; line-height: 1.2; }
             .stat-info .stat-val { font-size: 1rem !important; }
             .stat-info .stat-val span { font-size: 0.75rem !important; }
 
-            .analytics-grid { grid-template-columns: 1fr; }
             .chart-container { height: 220px; }
 
             .data-table th, .data-table td { font-size: 0.75rem; padding: 0.7rem 0.2rem; }
@@ -209,7 +243,7 @@
 
         <main class="dashboard-content">
             
-            <!-- 🚀 NEW MULTI-SCHEDULE BANNER -->
+            <!-- 🚀 NEW SWIPEABLE MULTI-SCHEDULE BANNER -->
             <div class="countdown-banner">
                 <div class="cd-title">2026 Post-UTME Exam Schedule</div>
                 
@@ -219,10 +253,7 @@
                     <div class="mc-card">
                         <div class="mc-state">📍 Port Harcourt</div>
                         <div class="mc-date">Aug 17, 2026</div>
-                        
-                        <!-- 🚨 INSTRUCTIONS: Replace the <span...>...</span> tag with the real address when announced -->
                         <div class="mc-loc">Venue: <span style="color:#f59e0b;">Coming Soon</span></div>
-                        
                         <div id="cd-ph"></div>
                     </div>
 
@@ -230,10 +261,7 @@
                     <div class="mc-card">
                         <div class="mc-state">📍 Lagos</div>
                         <div class="mc-date">Aug 20, 2026</div>
-                        
-                        <!-- 🚨 INSTRUCTIONS: Replace the <span...>...</span> tag with the real address when announced -->
                         <div class="mc-loc">Venue: <span style="color:#f59e0b;">Coming Soon</span></div>
-                        
                         <div id="cd-lag"></div>
                     </div>
 
@@ -241,10 +269,7 @@
                     <div class="mc-card">
                         <div class="mc-state">📍 Kaduna</div>
                         <div class="mc-date">Aug 24, 2026</div>
-                        
-                        <!-- Location is already set -->
                         <div class="mc-loc">Venue: <span style="color:#10b981;">AFIT Campus</span></div>
-                        
                         <div id="cd-kad"></div>
                     </div>
 
@@ -315,7 +340,7 @@
             <div class="dashboard-grid">
                 <div class="dash-card">
                     <h3>
-                        <svg style="width: 20px; color: var(--brand-blue);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <svg style="width: 20px; color: var(--brand-blue);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                         Performance History
                     </h3>
                     <div style="overflow-x: hidden;">
@@ -346,7 +371,6 @@
     <script src="../static/app.js"></script>
 
    <script>
-        // 🚀 NEW MULTI-SCHEDULE CONFIGURATION
         const EXAM_SCHEDULE = [
             { id: 'cd-ph', date: '2026-08-17T08:00:00' },
             { id: 'cd-lag', date: '2026-08-20T08:00:00' },
@@ -387,7 +411,6 @@
             document.getElementById('time-greeting').innerText = greeting;
         }
 
-        // 🚀 UPDATED COUNTDOWN LOGIC FOR MULTIPLE TIMERS
         function startCountdown() {
             const timer = setInterval(() => {
                 const now = new Date().getTime();
