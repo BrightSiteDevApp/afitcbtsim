@@ -52,28 +52,31 @@
         }
         .btn-whatsapp-small:hover { background: #dcfce7; transform: translateY(-1px); }
 
+        /* 🚀 NEW MULTI-SCHEDULE COUNTDOWN BANNER */
         .countdown-banner {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-radius: 16px; padding: 1.5rem 2rem; margin-bottom: 2rem; color: white;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid #334155; text-align: center;
+            border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; color: white;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid #334155; 
             width: 100%; box-sizing: border-box; overflow: hidden;
         }
-        .cd-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; font-weight: 700; margin-bottom: 5px; }
-        .cd-value { font-size: 1.8rem; font-weight: 800; color: #38bdf8; font-family: 'Poppins', monospace; letter-spacing: 1px;}
+        .cd-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; font-weight: 800; margin-bottom: 15px; text-align: center; }
         
-        .timer-grid { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; width: 100%; }
-        .timer-box { background: rgba(255,255,255,0.1); padding: 10px 12px; border-radius: 10px; min-width: 60px; text-align: center;}
-        .timer-box span { display: block; font-size: 1.6rem; font-weight: 800; color: white; line-height: 1;}
-        .timer-box small { font-size: 0.65rem; color: #94a3b8; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;}
+        .multi-countdown-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; }
+        .mc-card { background: rgba(255,255,255,0.05); padding: 15px 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+        .mc-state { font-weight: 800; color: #38bdf8; font-size: 1.1rem; margin-bottom: 2px;}
+        .mc-date { font-size: 0.85rem; color: #cbd5e1; margin-bottom: 8px; font-weight: 600; }
+        .mc-loc { font-size: 0.75rem; color: #e2e8f0; margin-bottom: 12px; padding: 6px; background: rgba(0,0,0,0.3); border-radius: 8px; line-height: 1.4;}
+        
+        .timer-grid { display: flex; gap: 8px; justify-content: center; width: 100%; }
+        .timer-box { background: rgba(255,255,255,0.15); padding: 8px 5px; border-radius: 8px; min-width: 50px; text-align: center;}
+        .timer-box span { display: block; font-size: 1.4rem; font-weight: 800; color: white; line-height: 1;}
+        .timer-box small { font-size: 0.6rem; color: #cbd5e1; text-transform: uppercase; font-weight: 600; letter-spacing: 1px;}
 
         .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 1.5rem; }
 
-        /* 🚀 ANALYTICS GRID */
         .analytics-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 1.5rem; }
         .chart-container { position: relative; height: 250px; width: 100%; margin-top: 1rem; }
 
-        /* 🚀 CINEMATIC ANIMATIONS */
         @keyframes pulse-flame {
             0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(239, 68, 68, 0)); }
             50% { transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.6)); }
@@ -106,6 +109,10 @@
             .btn-action-main { width: 100% !important; padding: 0.8rem 0.5rem !important; font-size: 0.75rem !important; white-space: normal !important; line-height: 1.3; text-align: center; height: 100%; }
             .btn-whatsapp-small { width: 100% !important; justify-content: center; padding: 0.8rem !important; font-size: 0.85rem !important; margin-top: 10px !important; }
             
+            /* 🚀 MOBILE COUNTDOWN FIX: STACK THEM VERTICALLY */
+            .multi-countdown-grid { grid-template-columns: 1fr; gap: 10px; }
+            .mc-card { padding: 12px; }
+
             .stats-row { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; width: 100% !important; }
             .stat-card { min-width: 0 !important; padding: 1rem 0.5rem !important; display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important; gap: 8px !important; }
             .stat-icon { margin: 0 !important; }
@@ -113,16 +120,12 @@
             .stat-info .stat-val { font-size: 1rem !important; }
             .stat-info .stat-val span { font-size: 0.75rem !important; }
 
-            .analytics-grid { grid-template-columns: 1fr; } /* Stack charts on mobile */
+            .analytics-grid { grid-template-columns: 1fr; }
             .chart-container { height: 220px; }
 
             .data-table th, .data-table td { font-size: 0.75rem; padding: 0.7rem 0.2rem; }
             .dash-card { padding: 1.2rem 1rem; }
             .premium-modal { padding: 2rem 1.2rem; }
-            .countdown-banner { padding: 1.2rem 1rem; border-radius: 12px; margin-bottom: 1.5rem;}
-            .cd-value { font-size: 1rem; }
-            .timer-box { padding: 8px; min-width: 55px; }
-            .timer-box span { font-size: 1.3rem; }
         }
     </style>
 </head>
@@ -206,9 +209,46 @@
 
         <main class="dashboard-content">
             
+            <!-- 🚀 NEW MULTI-SCHEDULE BANNER -->
             <div class="countdown-banner">
-                <div class="cd-title">Post-UTME Exam Date</div>
-                <div id="countdown-display" class="cd-value">WILL BE ANNOUNCED SOON</div>
+                <div class="cd-title">2026 Post-UTME Exam Schedule</div>
+                
+                <div class="multi-countdown-grid">
+                    
+                    <!-- Card 1: Port Harcourt -->
+                    <div class="mc-card">
+                        <div class="mc-state">📍 Port Harcourt</div>
+                        <div class="mc-date">Aug 17, 2026</div>
+                        
+                        <!-- 🚨 INSTRUCTIONS: Replace the <span...>...</span> tag with the real address when announced -->
+                        <div class="mc-loc">Venue: <span style="color:#f59e0b;">Coming Soon</span></div>
+                        
+                        <div id="cd-ph"></div>
+                    </div>
+
+                    <!-- Card 2: Lagos -->
+                    <div class="mc-card">
+                        <div class="mc-state">📍 Lagos</div>
+                        <div class="mc-date">Aug 20, 2026</div>
+                        
+                        <!-- 🚨 INSTRUCTIONS: Replace the <span...>...</span> tag with the real address when announced -->
+                        <div class="mc-loc">Venue: <span style="color:#f59e0b;">Coming Soon</span></div>
+                        
+                        <div id="cd-lag"></div>
+                    </div>
+
+                    <!-- Card 3: Kaduna -->
+                    <div class="mc-card">
+                        <div class="mc-state">📍 Kaduna</div>
+                        <div class="mc-date">Aug 24, 2026</div>
+                        
+                        <!-- Location is already set -->
+                        <div class="mc-loc">Venue: <span style="color:#10b981;">AFIT Campus</span></div>
+                        
+                        <div id="cd-kad"></div>
+                    </div>
+
+                </div>
             </div>
 
             <div class="welcome-banner">
@@ -251,7 +291,6 @@
                 </div>
             </div>
 
-            <!-- 🚀 NEW ANALYTICS GRID -->
             <div class="analytics-grid">
                 <div class="dash-card">
                     <h3>
@@ -307,7 +346,13 @@
     <script src="../static/app.js"></script>
 
    <script>
-        const POST_UTME_DATE = null;
+        // 🚀 NEW MULTI-SCHEDULE CONFIGURATION
+        const EXAM_SCHEDULE = [
+            { id: 'cd-ph', date: '2026-08-17T08:00:00' },
+            { id: 'cd-lag', date: '2026-08-20T08:00:00' },
+            { id: 'cd-kad', date: '2026-08-24T08:00:00' }
+        ];
+
         let sessionEmail = null; let sessionId = null;
 
         function toggleSidebar() {
@@ -342,22 +387,37 @@
             document.getElementById('time-greeting').innerText = greeting;
         }
 
+        // 🚀 UPDATED COUNTDOWN LOGIC FOR MULTIPLE TIMERS
         function startCountdown() {
-            const display = document.getElementById('countdown-display');
-            if (!POST_UTME_DATE) return; 
-
-            const targetDate = new Date(POST_UTME_DATE).getTime();
             const timer = setInterval(() => {
                 const now = new Date().getTime();
-                const distance = targetDate - now;
-                if (distance < 0) {
-                    clearInterval(timer); display.innerHTML = "EXAM IS TODAY! GOOD LUCK!"; display.style.color = "#10b981"; return;
-                }
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                display.innerHTML = `<div class="timer-grid"><div class="timer-box"><span>${days < 10 ? '0'+days : days}</span><small>Days</small></div><div class="timer-box"><span>${hours < 10 ? '0'+hours : hours}</span><small>Hours</small></div><div class="timer-box"><span>${minutes < 10 ? '0'+minutes : minutes}</span><small>Mins</small></div><div class="timer-box"><span>${seconds < 10 ? '0'+seconds : seconds}</span><small>Secs</small></div></div>`;
+                
+                EXAM_SCHEDULE.forEach(exam => {
+                    const display = document.getElementById(exam.id);
+                    if (!display) return;
+
+                    const targetDate = new Date(exam.date).getTime();
+                    const distance = targetDate - now;
+
+                    if (distance < 0) {
+                        display.innerHTML = "<span style='color: #10b981; font-weight: 800; font-size: 0.9rem;'>EXAM DAY! GOOD LUCK!</span>";
+                        return;
+                    }
+
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    display.innerHTML = `
+                        <div class="timer-grid">
+                            <div class="timer-box"><span>${days < 10 ? '0'+days : days}</span><small>Days</small></div>
+                            <div class="timer-box"><span>${hours < 10 ? '0'+hours : hours}</span><small>Hrs</small></div>
+                            <div class="timer-box"><span>${minutes < 10 ? '0'+minutes : minutes}</span><small>Min</small></div>
+                            <div class="timer-box"><span>${seconds < 10 ? '0'+seconds : seconds}</span><small>Sec</small></div>
+                        </div>
+                    `;
+                });
             }, 1000);
         }
 
@@ -455,7 +515,6 @@
             const trendContainer = document.getElementById('trendChart').parentElement;
             const radarContainer = document.getElementById('radarChart').parentElement;
             
-            // 🚀 EMPTY STATE INJECTION 
             if (error || !data || data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 2rem;">No exams taken yet. Start practicing!</td></tr>';
                 
