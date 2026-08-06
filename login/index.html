@@ -95,6 +95,18 @@
         .auth-btn:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.5); }
         .auth-btn:disabled { background: #94a3b8; transform: none; box-shadow: none; cursor: not-allowed; }
 
+        /* 🚀 SECONDARY ACTIONS (Change Email & Resend) */
+        .secondary-actions {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 15px; font-size: 0.85rem; font-weight: 600;
+        }
+        .text-link {
+            color: #2563eb; cursor: pointer; background: none; border: none; padding: 0; 
+            font-family: 'Poppins', sans-serif; font-weight: 600; text-decoration: none; transition: color 0.2s;
+        }
+        .text-link:hover { color: #1d4ed8; text-decoration: underline; }
+        .text-link:disabled { color: #94a3b8; cursor: not-allowed; text-decoration: none; }
+
         .hidden { display: none !important; }
 
         /* Form Animation */
@@ -196,12 +208,21 @@
                         <button type="submit" id="secure-request-btn" class="auth-btn">Continue with Email</button>
                     </form>
 
+                    <!-- 🚀 UPDATED OTP FORM -->
                     <form id="secure-otp-form" class="hidden" onsubmit="handleOtpSubmit(event)">
+                        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.5rem; line-height: 1.5; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            Code sent to <br><strong id="display-email" style="color: #0f172a; font-size: 0.95rem;"></strong>
+                        </p>
                         <div class="input-group">
                             <label for="secure-otp">Enter 8-Digit Code</label>
                             <input type="text" id="secure-otp" class="modern-input" placeholder="••••••••" pattern="[0-9]*" maxlength="8" required>
                         </div>
                         <button type="submit" id="secure-verify-btn" class="auth-btn">Verify & Secure Login</button>
+                        
+                        <div class="secondary-actions">
+                            <button type="button" class="text-link" onclick="changeEmail()">← Change Email</button>
+                            <button type="button" class="text-link" id="resend-code-btn" onclick="resendCode()">Resend Code</button>
+                        </div>
                     </form>
 
                     <div style="margin-top: 2.5rem; border-top: 2px solid #f1f5f9; padding-top: 1.5rem; text-align: center;">
@@ -226,14 +247,55 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../static/app.js"></script>
     <script>
-
-        // --- COUNTDOWN LOGIC ---
         const launchDate = new Date("2026-06-26T18:00:00+01:00").getTime();
         const isAdminBypass = window.location.search.toLowerCase().includes('admin');
 
+        // 🚀 SMART RESEND TIMER ENGINE
+        let resendInterval;
+        function startResendTimer(timestamp) {
+            const btn = document.getElementById('resend-code-btn');
+            clearInterval(resendInterval);
+            
+            resendInterval = setInterval(() => {
+                const now = Date.now();
+                const diff = now - timestamp;
+                const timeLeft = Math.ceil((30000 - diff) / 1000); // 30 second delay
+                
+                if (timeLeft <= 0) {
+                    clearInterval(resendInterval);
+                    btn.disabled = false;
+                    btn.innerText = "Resend Code";
+                } else {
+                    btn.disabled = true;
+                    btn.innerText = `Resend in ${timeLeft}s`;
+                }
+            }, 1000);
+        }
+
+        // 🚀 SMART 15-MINUTE MEMORY CHECK
         function revealLoginForm() {
             document.getElementById('coming-soon-block').style.display = 'none';
             document.getElementById('secret-login-block').style.display = 'block';
+            
+            const cachedStr = localStorage.getItem('afit_otp_request');
+            if (cachedStr) {
+                try {
+                    const cached = JSON.parse(cachedStr);
+                    const now = Date.now();
+                    // If requested within the last 15 mins (900,000 ms), show OTP form!
+                    if (now - cached.timestamp < 900000) {
+                        document.getElementById('secure-email').value = cached.email;
+                        document.getElementById('display-email').innerText = cached.email;
+                        document.getElementById('secure-email-form').classList.add('hidden');
+                        document.getElementById('secure-otp-form').classList.remove('hidden');
+                        startResendTimer(cached.timestamp);
+                    } else {
+                        localStorage.removeItem('afit_otp_request'); // Expired
+                    }
+                } catch (e) {
+                    localStorage.removeItem('afit_otp_request');
+                }
+            }
         }
 
         if (isAdminBypass || new Date().getTime() >= launchDate) {
@@ -284,9 +346,16 @@
 
                 if (otpError) throw otpError;
 
+                // SAVE REQUEST TO LOCAL STORAGE MEMORY
+                const timestamp = Date.now();
+                localStorage.setItem('afit_otp_request', JSON.stringify({ email: emailInput, timestamp: timestamp }));
+
+                document.getElementById('display-email').innerText = emailInput;
                 document.getElementById('secure-email-form').classList.add('hidden');
                 document.getElementById('secure-otp-form').classList.remove('hidden');
                 messageDiv.innerHTML = `<p style="color: #10b981; background: #dcfce7; padding: 10px; border-radius: 8px; font-weight: 600; margin-top: 15px; text-align: center;">Verification code sent to your email!</p>`;
+                
+                startResendTimer(timestamp);
 
             } catch (error) {
                 console.error("Auth Error:", error);
@@ -299,6 +368,50 @@
                     </div>`;
                 btn.innerText = originalText;
                 btn.disabled = false;
+            }
+        };
+
+        // 🚀 CHANGE EMAIL ACTION
+        window.changeEmail = function() {
+            localStorage.removeItem('afit_otp_request');
+            clearInterval(resendInterval);
+            document.getElementById('secure-otp-form').classList.add('hidden');
+            document.getElementById('secure-email-form').classList.remove('hidden');
+            document.getElementById('auth-message').innerHTML = '';
+            document.getElementById('secure-otp').value = '';
+            
+            const btn = document.getElementById('secure-request-btn');
+            btn.innerText = "Continue with Email";
+            btn.disabled = false;
+        };
+
+        // 🚀 RESEND CODE ACTION
+        window.resendCode = async function() {
+            const btn = document.getElementById('resend-code-btn');
+            btn.disabled = true;
+            btn.innerText = "Sending...";
+            
+            const email = document.getElementById('secure-email').value.toLowerCase().trim();
+            const messageDiv = document.getElementById('auth-message');
+            
+            try {
+                const { error } = await supabaseClient.auth.signInWithOtp({
+                    email: email,
+                    options: { shouldCreateUser: true }
+                });
+                
+                if (error) throw error;
+                
+                const newTimestamp = Date.now();
+                localStorage.setItem('afit_otp_request', JSON.stringify({ email: email, timestamp: newTimestamp }));
+                startResendTimer(newTimestamp);
+                
+                messageDiv.innerHTML = `<p style="color: #10b981; background: #dcfce7; padding: 10px; border-radius: 8px; font-weight: 600; margin-top: 15px; text-align: center;">New code sent successfully!</p>`;
+            } catch (error) {
+                console.error(error);
+                messageDiv.innerHTML = `<p style="color: #dc2626; background: #fef2f2; padding: 10px; border-radius: 8px; font-weight: 600; margin-top: 15px; text-align: center;">${error.message || "Failed to resend code."}</p>`;
+                btn.disabled = false;
+                btn.innerText = "Resend Code";
             }
         };
 
@@ -334,6 +447,9 @@
                 }
 
                 if (!userId) throw new Error("Invalid verification response. Please try again.");
+
+                // Clears memory so next time they log out, they start fresh
+                localStorage.removeItem('afit_otp_request');
 
                 btn.innerText = "Routing...";
 
