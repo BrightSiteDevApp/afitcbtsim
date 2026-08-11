@@ -84,6 +84,8 @@
         .btn-admin.primary:hover { background-color: #1e3a8a; }
         .btn-admin.secondary { background-color: #3b82f6; color: white; }
         .btn-admin.secondary:hover { background-color: #2563eb; }
+        .btn-admin.success { background-color: #10b981; color: white; }
+        .btn-admin.success:hover { background-color: #059669; }
 
         /* WHATSAPP BUTTON STYLING */
         .admin-contact-section {
@@ -232,6 +234,9 @@
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                         <button id="btn-admin-panel" class="btn-admin primary" onclick="window.location.href='../admin/index.html'">Command Center</button>
                         <button id="btn-admin-staging" class="btn-admin secondary" onclick="window.location.href='../admin-staging/index.html'">ALOC Question Staging</button>
+                        
+                        <!-- 🚀 NEW PREMIUM GROUP ADMIN BUTTON -->
+                        <button id="btn-admin-wgroup" class="btn-admin success" onclick="window.location.href='../wgroup-admin/index.html'">Premium Group Admin</button>
                     </div>
                 </div>
 
@@ -309,8 +314,9 @@
                 document.getElementById('account-type-badge').innerText = (profile.role === 'admin') ? 'Super Admin' : 'Junior Admin';
                 document.getElementById('account-type-badge').style.background = '#1e40af';
 
-                // Both admins get the Staging button
+                // Both admins get the Staging and Premium Group buttons
                 document.getElementById('btn-admin-staging').style.display = 'block';
+                document.getElementById('btn-admin-wgroup').style.display = 'block';
 
                 // ONLY Super Admins get the Command Center button
                 if (profile.role === 'admin') {
