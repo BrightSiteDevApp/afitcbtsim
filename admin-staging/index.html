@@ -143,6 +143,8 @@
                     <option value="commerce">Commerce</option>
                     <option value="government">Government</option>
                     <option value="literature">Literature in English</option>
+                    <option value="currentaffairs">Current Affairs (GNS)</option>
+                    <option value="civiceducation">Civic Education (GNS)</option>
                 </select>
             </div>
             
@@ -279,7 +281,8 @@
         }
 
         async function loadGlobalStats() {
-            const subjectsToCount = ['english', 'mathematics', 'physics', 'chemistry', 'biology', 'economics', 'commerce', 'government', 'literature', 'gns'];
+            // 🚀 Changed 'gns' to 'GNS' to match the database requirement
+            const subjectsToCount = ['english', 'mathematics', 'physics', 'chemistry', 'biology', 'economics', 'commerce', 'government', 'literature', 'GNS'];
             try {
                 const countPromises = subjectsToCount.map(async (subj) => {
                     const { count, error } = await supabaseClient.from('questions').select('*', { count: 'exact', head: true }).eq('subject', subj);
@@ -311,7 +314,11 @@
             status.style.color = "#2563eb"; status.innerText = "Scanning database for existing questions...";
 
             try {
-                const dbSubject = (subject === 'mathematic' || subject === 'mathematics') ? 'mathematics' : subject;
+                // 🚀 Changed dbSubject assignment to strictly use 'GNS' (uppercase)
+                let dbSubject = subject;
+                if (subject === 'mathematic') dbSubject = 'mathematics';
+                if (subject === 'currentaffairs' || subject === 'civiceducation') dbSubject = 'GNS';
+
                 let alocSlug = subject;
                 if (subject === 'literature') alocSlug = 'englishlit';
 
