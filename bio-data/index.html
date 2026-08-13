@@ -317,15 +317,14 @@
                         program_type: program,
                         course_applied: course, 
                         state_of_origin: state,
-                        jamb_score: jambScore,
-                        role: 'student',
-                        has_paid: false,
-                        tests_taken: 0
+                        jamb_score: jambScore
+                        // Notice: We completely removed role, has_paid, and tests_taken!
+                        // The database will now assign these securely by default.
                     }]);
 
                     if (insertError) throw insertError;
                 }
-
+                
                 msg.innerText = "Profile securely saved! Redirecting...";
                 msg.style.color = "#10b981";
                 
