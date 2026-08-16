@@ -52,7 +52,6 @@
 
         .alert-box { padding: 1rem; border-radius: 12px; font-weight: 600; font-size: 0.9rem; margin-bottom: 1.5rem; display: none; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; text-align: left;}
 
-        /* 🚀 LOADED PROFILE DETAILS STYLES */
         .loaded-profile { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.5rem; text-align: left; margin-bottom: 2rem; }
         .lp-item { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
         .lp-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
@@ -89,7 +88,7 @@
         .btn-next { background: #2563eb; color: white; }
         .btn-submit { background: #ef4444; color: white; padding: 1rem; border-radius: 10px; font-weight: 800; border: none; cursor: pointer; margin-top: auto; }
 
-        /* 🚀 RESULT SCREEN STYLES */
+        /* RESULT SCREEN STYLES */
         #result-screen { display: none; padding: 2rem 5%; max-width: 1000px; margin: 0 auto; }
         .result-banner { background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%); border-radius: 16px; padding: 2rem 2.5rem; margin-bottom: 2rem; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.3); position: relative; overflow: hidden; }
         .result-banner::after { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(56,189,248,0.2) 0%, transparent 70%); border-radius: 50%; }
@@ -117,10 +116,13 @@
         /* HIDDEN CAPTURE CARD DESIGN */
         #capture-area { position: absolute; left: -9999px; top: 0; width: 700px; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; padding: 50px; border-radius: 24px; font-family: 'Poppins', sans-serif; box-sizing: border-box; z-index: -100; }
 
+        /* 🚀 MOBILE SCROLLING FIX & RESPONSIVENESS */
         @media (max-width: 900px) {
-            .gate-card { padding: 2rem 1.5rem; margin: 15px; }
-            .exam-layout { height: auto; min-height: 100vh; }
+            body { overflow-y: auto !important; }
+            #exam-layout { height: auto !important; min-height: 100vh !important; overflow: visible !important; }
             .exam-main { display: flex; flex-direction: column; height: auto; overflow: visible;}
+            
+            .gate-card { padding: 2rem 1.5rem; margin: 15px; }
             .nav-sidebar { padding: 1rem; border-right: none; border-bottom: 1px solid #e2e8f0; height: auto; }
             .grid-status { display: flex; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; gap: 8px; flex-grow: 0; }
             .q-dot { flex-shrink: 0; width: 40px; height: 40px; }
@@ -196,7 +198,6 @@
             
             <div id="alert-container" class="alert-box"></div>
             
-            <!-- Step A: Enter Details -->
             <form id="verify-form" onsubmit="loadDetails(event)">
                 <div class="input-group">
                     <label>Registered Email</label>
@@ -210,13 +211,11 @@
                 
                 <button type="submit" id="load-btn" class="btn-action-main">Load Details</button>
                 
-                <!-- 🚀 NEW VIEW LEADERBOARD BUTTON -->
                 <button type="button" onclick="window.location.href='../leaderboard-17th/index.html'" class="btn-action-main btn-outline-blue" style="margin-top: 15px;">
                     🏆 View Live Leaderboard
                 </button>
             </form>
 
-            <!-- Step B: Loaded Profile -->
             <div id="profile-step" class="hidden">
                 <div class="loaded-profile">
                     <div class="lp-item">
@@ -236,12 +235,10 @@
                 <button onclick="location.reload()" style="background:none; border:none; color: #64748b; font-weight: 600; margin-top: 15px; cursor: pointer; font-family: 'Poppins', sans-serif;">← Use different account</button>
             </div>
 
-            <!-- Denied Step -->
             <div id="denied-state" class="hidden" style="margin-top: 10px;">
                 <div style="font-size: 3rem; margin-bottom: 10px;">⛔</div>
                 <h3 style="margin: 0 0 5px 0; color: #0f172a;">Access Denied</h3>
                 
-                <!-- 🚀 UPDATED ACCESS DENIED TEXT -->
                 <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5;">
                     You are currently on the Free Tier. To access this exclusive mock exam, you need to <strong>Upgrade to Premium</strong> or pay a one-time <strong>₦500 Mock Fee</strong>.<br><br>
                     <em style="font-size: 0.8rem; color: #ef4444;">Note: Paying the ₦500 mock fee only grants you access to take this single test, it does not upgrade your account to Premium.</em>
@@ -342,7 +339,7 @@
         <div class="exam-grid">
             <div class="dash-card">
                 <h3 style="margin-top: 0; font-size: 1.2rem;">
-                    <svg style="width: 20px; color: #8b5cf6; vertical-align: middle; margin-right: 5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002-2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <svg style="width: 20px; color: #8b5cf6; vertical-align: middle; margin-right: 5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     Performance Breakdown
                 </h3>
                 <div class="subject-grid" id="res-breakdown"></div>
@@ -354,19 +351,15 @@
                     <button class="btn-action-main btn-blue" id="dl-btn" onclick="downloadResultCard()" style="margin-bottom: 10px;">
                         <svg style="width: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Download Result
                     </button>
-                    
-                    <!-- 🚀 NEW VIEW LEADERBOARD BUTTON ON RESULT PAGE -->
                     <button class="btn-action-main btn-outline-blue" onclick="window.location.href='../leaderboard-17th/index.html'" style="margin-bottom: 10px;">
                         🏆 View Mock Leaderboard
                     </button>
-                    
                     <button class="btn-action-main btn-outline-gray" onclick="window.location.href='../index.html'">← Return Home</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Ensure Supabase loads BEFORE app.js -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../static/app.js"></script>
 
@@ -497,12 +490,14 @@
                     subjectsToFetch = ['english', 'gns', 'mathematics', 'economics', 'commerce']; 
                 } else { subjectsToFetch = ['english', 'gns', 'mathematics', 'physics', 'chemistry']; }
 
+                // 🚀 FIXED: USING GET_RANDOM_QUESTIONS RPC
                 const fetchPromises = subjectsToFetch.map((subj, idx) => {
-    return supabaseClient.rpc('get_random_questions', { 
-        subj_param: subj, 
-        lim_param: limits[idx] 
-    });
-});
+                    return supabaseClient.rpc('get_random_questions', { 
+                        subj_param: subj, 
+                        lim_param: limits[idx] 
+                    });
+                });
+
                 const results = await Promise.all(fetchPromises);
                 
                 let allQuestions = [];
@@ -604,9 +599,8 @@
                 breakdown.calculated_aggregate = finalAggregate;
                 breakdown.calculated_putme = postUtmeScore;
                 breakdown.jamb_score = jambScore;
-                breakdown.course = studentData.course;
+                breakdown.course = studentData.course; // 🚀 ADDED BACK IN: To feed the Leaderboard
 
-                // 🚀 FIXED: Saving postUtmeScore strictly to the total_score column
                 await supabaseClient.from('mock_17_results').insert([{
                     email: studentData.email,
                     full_name: studentData.name,
@@ -633,8 +627,9 @@
                 let breakdownHtml = "";
                 let delay = 0.5;
                 for (const [subj, data] of Object.entries(breakdown)) {
-                    // 🚀 ADDED 'course' TO THE IGNORE LIST
+                    // 🚀 IGNORE THE NON-SUBJECT ITEMS IN THE LOOP
                     if (subj === 'calculated_aggregate' || subj === 'calculated_putme' || subj === 'jamb_score' || subj === 'course') continue;
+                    
                     let displaySubj = subj === 'gns' ? 'GNS' : subj.charAt(0).toUpperCase() + subj.slice(1);
                     breakdownHtml += `<div class="subject-pill" style="animation: fadeInDown 0.5s ${delay}s forwards;"><h4>${displaySubj}</h4><p>${data.score}/${data.total}</p></div>`;
                     delay += 0.1;
