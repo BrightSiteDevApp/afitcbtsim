@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aggregate Calculator - AFIT CBT Simulator</title>
+    
+    <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/main.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0; }
+        *, *::before, *::after { box-sizing: border-box; }
+
+        /* 🚀 CINEMATIC BACKGROUND */
+        body { 
+            background-color: #0f172a;
+            color: #f8fafc; font-family: 'Poppins', sans-serif; 
+            min-height: 100vh; position: relative;
+        }
+
+        /* Ambient Glowing Orbs */
+        .bg-orb { position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.5; pointer-events: none; }
+        .orb-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #1e3a8a; }
+        .orb-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #4c1d95; }
+        .orb-3 { top: 40%; left: 60%; width: 300px; height: 300px; background: #0369a1; opacity: 0.3; }
+
+        .nav-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.2rem 5%; background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        .nav-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; color: white; }
+        .nav-logo img { width: 32px; height: 32px; border-radius: 8px; }
+
+        .btn-back {
+            background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; font-family: 'Poppins', sans-serif; font-size: 0.85rem;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
+
+        .main-container { max-width: 850px; margin: 0 auto; padding: 4rem 1.5rem; text-align: center; position: relative; z-index: 1; }
+
+        .hero-title { font-size: 2.5rem; font-weight: 900; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px; color: white; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .hero-subtitle { color: #93c5fd; font-size: 1.05rem; font-weight: 500; margin: 0 0 3rem 0; }
+
+        /* 🚀 SMOOTH ANIMATIONS */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* 🚀 PREMIUM SELECTION SCREEN */
+        .option-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 2rem; text-align: center; }
+        .opt-card {
+            background: rgba(255, 255, 255, 0.98); border-radius: 24px; padding: 3rem 2rem; color: #0f172a;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border: 2px solid transparent;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); position: relative; overflow: hidden;
+        }
+        .opt-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: #e2e8f0; transition: 0.3s; }
+        .opt-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.4); }
+        
+        /* Custom Hover Colors */
+        .opt-card.personal:hover::before { background: #3b82f6; }
+        .opt-card.custom:hover::before { background: #8b5cf6; }
+
+        .opt-icon-wrap {
+            width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px auto;
+            display: flex; justify-content: center; align-items: center; font-size: 2.2rem;
+            transition: transform 0.3s;
+        }
+        .opt-card.personal .opt-icon-wrap { background: #eff6ff; color: #2563eb; }
+        .opt-card.custom .opt-icon-wrap { background: #f5f3ff; color: #8b5cf6; }
+        
+        .opt-card:hover .opt-icon-wrap { transform: scale(1.1); }
+
+        .opt-card h2 { margin: 0 0 12px 0; font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; }
+        .opt-card p { margin: 0; color: #64748b; font-size: 0.9rem; line-height: 1.6; }
+
+        /* 🚀 SLEEK CALCULATOR SCREEN */
+        .calc-card {
+            background: white; border-radius: 24px; padding: 3rem 2.5rem; color: #0f172a;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3); text-align: left; max-width: 500px; margin: 0 auto;
+            position: relative;
+        }
+
+        .input-group { margin-bottom: 1.8rem; }
+        .input-group label { display: block; font-size: 0.8rem; font-weight: 800; color: #475569; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1.5px;}
+        
+        .huge-input {
+            width: 100%; padding: 1.2rem; border-radius: 16px; border: 2px solid #e2e8f0;
+            font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 800; text-align: center;
+            color: #0f172a; background: #f8fafc; transition: all 0.3s ease; box-sizing: border-box;
+        }
+        .huge-input:focus { border-color: #3b82f6; background: white; outline: none; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2); transform: translateY(-2px); }
+        .huge-input:read-only { background: #f1f5f9; color: #94a3b8; border-color: #f1f5f9; cursor: not-allowed; }
+
+        .warning-box {
+            background: #fff1f2; border-left: 4px solid #ef4444; padding: 1.2rem; border-radius: 12px;
+            margin-bottom: 2rem; display: flex; gap: 12px; align-items: flex-start;
+        }
+        .warning-box p { margin: 0; color: #b91c1c; font-size: 0.85rem; font-weight: 600; line-height: 1.6; }
+
+        .btn-calc {
+            width: 100%; padding: 1.2rem; border-radius: 16px; 
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white;
+            font-weight: 800; font-size: 1.1rem; border: none; cursor: pointer; text-transform: uppercase;
+            transition: all 0.2s; box-shadow: 0 10px 20px rgba(37,99,235,0.3); letter-spacing: 1px;
+        }
+        .btn-calc:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(37,99,235,0.4); }
+
+        /* 🚀 ANALYTICS-STYLE RESULTS SCREEN */
+        .breakdown-container { margin-top: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+        
+        .math-step {
+            background: white; border-radius: 20px; padding: 1.5rem 2rem; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center; color: #0f172a;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15); position: relative; border: 1px solid #f1f5f9;
+        }
+        
+        .math-info { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+        .math-label { font-size: 0.8rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;}
+        .math-formula { font-size: 1.4rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px;}
+        
+        .math-result-box {
+            background: #eff6ff; color: #2563eb; padding: 0.5rem 1rem; border-radius: 12px;
+            font-size: 1.6rem; font-weight: 900; border: 1px solid #bfdbfe;
+        }
+
+        .math-connector {
+            height: 25px; width: 2px; background: #38bdf8; margin: 0 auto; opacity: 0.5;
+        }
+
+        .final-agg-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;
+            border-radius: 24px; padding: 2.5rem 2rem; margin-top: 15px; text-align: center;
+            box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.5); border: 2px solid rgba(255,255,255,0.2);
+            position: relative; overflow: hidden;
+        }
+        .final-agg-card::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+            animation: rotateGlow 10s linear infinite; pointer-events: none;
+        }
+        @keyframes rotateGlow { 100% { transform: rotate(360deg); } }
+
+        .final-agg-card h4 { margin: 0 0 8px 0; font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #dcfce7; position: relative; z-index: 2;}
+        .final-agg-card h1 { margin: 0; font-size: 4.5rem; font-weight: 900; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.2); position: relative; z-index: 2;}
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 650px) {
+            .main-container { padding: 2rem 1rem; }
+            .hero-title { font-size: 1.8rem; }
+            .option-cards { grid-template-columns: 1fr; gap: 15px; }
+            .opt-card { padding: 2rem 1.5rem; }
+            .calc-card { padding: 2rem 1.5rem; border-radius: 20px;}
+            .math-step { flex-direction: row; padding: 1.2rem; }
+            .math-formula { font-size: 1.2rem; }
+            .math-result-box { font-size: 1.3rem; padding: 0.4rem 0.8rem; }
+            .final-agg-card h1 { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 🚀 AMBIENT GLOWING BACKGROUND -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <nav class="nav-header">
+        <div class="nav-logo">
+            <img src="../static/img/afitcbtsim-logo.png" alt="Logo">
+            AFIT CBT SIM
+        </div>
+        <button onclick="window.location.href='../dashboard/index.html'" class="btn-back">← Dashboard</button>
+    </nav>
+
+    <div class="main-container">
+        
+        <div id="loading-spinner">
+            <svg class="animate-spin" style="width: 50px; height: 50px; color: #38bdf8; margin-bottom: 15px; display: block; margin: 0 auto 15px auto;" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <h3 style="color: white; font-weight: 600;">Authenticating Profile...</h3>
+        </div>
+
+        <!-- 🚀 1. SELECTION SCREEN -->
+        <div id="selection-screen" class="hidden">
+            <div class="animate-up">
+                <h1 class="hero-title">Aggregate Calculator</h1>
+                <p class="hero-subtitle">Know exactly where you stand for admission.</p>
+
+                <div class="option-cards">
+                    <div class="opt-card personal" onclick="openCalculator('personal')">
+                        <div class="opt-icon-wrap">👤</div>
+                        <h2>My Aggregate</h2>
+                        <p>Auto-fetches your JAMB score from your profile to calculate your personal standing.</p>
+                    </div>
+                    
+                    <div class="opt-card custom" onclick="openCalculator('custom')">
+                        <div class="opt-icon-wrap">⚙️</div>
+                        <h2>Custom Aggregate</h2>
+                        <p>Manually input any JAMB and Post-UTME score to calculate someone else's aggregate.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🚀 2. CALCULATOR INPUT SCREEN -->
+        <div id="calculator-screen" class="hidden">
+            <div class="animate-up">
+                <h1 class="hero-title" id="calc-title">Calculator</h1>
+                <p class="hero-subtitle" style="margin-bottom: 1.5rem;">Enter the details below accurately.</p>
+
+                <div class="calc-card">
+                    <div class="input-group">
+                        <label>JAMB Score (Max 400)</label>
+                        <input type="number" id="input-jamb" class="huge-input" placeholder="e.g. 250" max="400" required>
+                    </div>
+
+                    <div class="warning-box">
+                        <div style="font-size: 1.5rem;">⚠️</div>
+                        <p><strong>ATTENTION:</strong> Enter your raw Post-UTME score out of 100. Do <strong>NOT</strong> divide it by 2 yourself. The system will do the math automatically.</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Post-UTME Score (Max 100)</label>
+                        <input type="number" id="input-putme" class="huge-input" placeholder="e.g. 70" min="0" max="100" step="2" required>
+                    </div>
+
+                    <button class="btn-calc" onclick="processCalculation()">Calculate Aggregate</button>
+                    <button onclick="resetToSelection()" style="width: 100%; background: none; border: none; color: #64748b; font-weight: 700; margin-top: 20px; cursor: pointer; text-decoration: underline; transition: color 0.2s;">← Choose different option</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🚀 3. RESULT & BREAKDOWN SCREEN -->
+        <div id="result-screen" class="hidden">
+            <div class="animate-up">
+                <h1 class="hero-title">Calculation Breakdown</h1>
+                <p class="hero-subtitle">Here is the exact mathematical step-by-step.</p>
+
+                <div class="breakdown-container">
+                    
+                    <!-- Step 1: JAMB -->
+                    <div class="math-step">
+                        <div class="math-info">
+                            <div class="math-label">Step 1: JAMB (50%)</div>
+                            <div class="math-formula"><span id="res-jamb">0</span> <span style="color:#94a3b8; font-weight:400; font-size:1rem; margin:0 5px;">÷</span> 8</div>
+                        </div>
+                        <div class="math-result-box" id="res-jamb-weight">0.0</div>
+                    </div>
+
+                    <div class="math-connector"></div>
+
+                    <!-- Step 2: PUTME -->
+                    <div class="math-step">
+                        <div class="math-info">
+                            <div class="math-label">Step 2: Post-UTME (50%)</div>
+                            <div class="math-formula"><span id="res-putme">0</span> <span style="color:#94a3b8; font-weight:400; font-size:1rem; margin:0 5px;">÷</span> 2</div>
+                        </div>
+                        <div class="math-result-box" id="res-putme-weight">0.0</div>
+                    </div>
+
+                    <div class="math-connector" style="background: #10b981;"></div>
+
+                    <!-- Final Output -->
+                    <div class="final-agg-card">
+                        <h4>Final Aggregate</h4>
+                        <h1><span id="res-total">0.0</span>%</h1>
+                    </div>
+
+                    <button class="btn-calc" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); box-shadow: none; margin-top: 2.5rem; max-width: 300px;" onclick="resetToSelection()">Calculate Another</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../static/app.js"></script>
+
+    <script>
+        let myJambScore = 0;
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Setup DB connection if not inherited from app.js
+            if (typeof supabaseClient === 'undefined') {
+                const supabaseUrl = 'PASTE_YOUR_SUPABASE_URL_HERE';
+                const supabaseKey = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
+                window.supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+            }
+
+            try {
+                const { data: { session }, error: authError } = await supabaseClient.auth.getSession();
+                if (!session || authError) {
+                    window.location.href = '../login/index.html';
+                    return;
+                }
+
+                // Fetch User JAMB Score
+                const { data: profile } = await supabaseClient.from('profiles').select('jamb_score').eq('id', session.user.id).single();
+                myJambScore = profile?.jamb_score || 0;
+
+                // Hide loader, show selection with animation trigger
+                document.getElementById('loading-spinner').classList.add('hidden');
+                
+                const selectionScreen = document.getElementById('selection-screen');
+                selectionScreen.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error("Auth error:", error);
+            }
+        });
+
+        function triggerAnimation(elementId) {
+            const el = document.getElementById(elementId).querySelector('.animate-up');
+            el.style.animation = 'none';
+            el.offsetHeight; /* trigger reflow */
+            el.style.animation = null; 
+        }
+
+        function openCalculator(type) {
+            document.getElementById('selection-screen').classList.add('hidden');
+            document.getElementById('calculator-screen').classList.remove('hidden');
+            triggerAnimation('calculator-screen');
+
+            const jambInput = document.getElementById('input-jamb');
+            const putmeInput = document.getElementById('input-putme');
+
+            putmeInput.value = ''; // Clear previous input
+
+            if (type === 'personal') {
+                document.getElementById('calc-title').innerText = "My Aggregate";
+                if (myJambScore > 0) {
+                    jambInput.value = myJambScore;
+                    jambInput.readOnly = true;
+                } else {
+                    alert("We couldn't find a JAMB score on your profile. Please enter it manually.");
+                    jambInput.value = '';
+                    jambInput.readOnly = false;
+                }
+            } else {
+                document.getElementById('calc-title').innerText = "Custom Aggregate";
+                jambInput.value = '';
+                jambInput.readOnly = false;
+            }
+        }
+
+        function resetToSelection() {
+            document.getElementById('calculator-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('selection-screen').classList.remove('hidden');
+            triggerAnimation('selection-screen');
+        }
+
+        function processCalculation() {
+            const rawJamb = parseInt(document.getElementById('input-jamb').value);
+            const rawPutme = parseInt(document.getElementById('input-putme').value);
+
+            // Validations
+            if (isNaN(rawJamb) || rawJamb < 0 || rawJamb > 400) {
+                alert("Please enter a valid JAMB score between 0 and 400.");
+                return;
+            }
+            if (isNaN(rawPutme) || rawPutme < 0 || rawPutme > 100) {
+                alert("Please enter a valid Post-UTME score between 0 and 100.");
+                return;
+            }
+
+            // 🚀 STRICT EVEN NUMBER VALIDATION
+            if (rawPutme % 2 !== 0) {
+                alert("Your Post-UTME score must be an even number (e.g., 50, 68, 70).\n\nSince there are 50 questions worth 2 marks each, it is impossible to get an odd number!");
+                return;
+            }
+
+            // Calculation Math
+            const jambWeight = parseFloat((rawJamb / 8).toFixed(1));
+            const putmeWeight = parseFloat((rawPutme / 2).toFixed(1));
+            const finalAggregate = parseFloat((jambWeight + putmeWeight).toFixed(1));
+
+            // Populate Breakdown DOM
+            document.getElementById('res-jamb').innerText = rawJamb;
+            document.getElementById('res-jamb-weight').innerText = jambWeight;
+
+            document.getElementById('res-putme').innerText = rawPutme;
+            document.getElementById('res-putme-weight').innerText = putmeWeight;
+
+            document.getElementById('res-total').innerText = finalAggregate;
+
+            // Transition UI
+            document.getElementById('calculator-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            triggerAnimation('result-screen');
+
+            // Trigger Celebration if score is great
+            if (finalAggregate >= 60) {
+                setTimeout(() => {
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                }, 400);
+            }
+        }
+    </script>
+</body>
+</html>
