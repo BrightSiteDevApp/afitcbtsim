@@ -13,135 +13,129 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/main.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* MOBILE OVERFLOW KILLER - STRICT BOX SIZING */
-        html, body { max-width: 100vw !important; overflow-x: hidden !important; margin: 0; padding: 0; }
+        html, body { max-width: 100vw !important; overflow-x: hidden !important; margin: 0; padding: 0; background-color: #f8fafc; }
         *, *::before, *::after { box-sizing: border-box !important; }
 
-        /* RESULTS PAGE SPECIFIC STYLES */
-        .results-wrapper {
-            animation: fadeIn 0.4s ease;
-            max-width: 1200px;
-            width: 100%;
-        }
+        .results-wrapper { animation: fadeIn 0.5s ease; width: 100%; max-width: 1200px; margin: 0 auto;}
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ANALYTICS CARDS */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-            width: 100%;
+        /* 🚀 MILLION-DOLLAR WELCOME BANNER */
+        .welcome-banner {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            border-radius: 24px; padding: 2.5rem 3rem; margin-bottom: 2rem;
+            position: relative; overflow: hidden; box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.4);
+            display: flex; justify-content: space-between; align-items: center; color: white;
         }
-
-        .analytic-card {
-            background: white; padding: 2rem; border-radius: 20px;
-            border: 1px solid #e2e8f0; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
-            display: flex; align-items: center; gap: 20px;
-            width: 100%; max-width: 100%;
+        .welcome-banner::after {
+            content: ''; position: absolute; top: -50%; right: -10%; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+            border-radius: 50%; pointer-events: none;
         }
+        .welcome-text { position: relative; z-index: 2; max-width: 65%; }
+        .welcome-text h1 { font-size: 2.2rem; font-weight: 900; letter-spacing: -0.5px; margin: 0 0 10px 0; }
+        .welcome-text p { color: #93c5fd; font-size: 1rem; margin: 0; font-weight: 500; line-height: 1.6;}
 
-        .analytic-icon {
-            width: 60px; height: 60px; border-radius: 15px;
-            display: flex; justify-content: center; align-items: center; flex-shrink: 0;
+        .btn-new-exam {
+            position: relative; z-index: 2; background: white; color: #1e40af; border: none; 
+            padding: 1rem 1.8rem; border-radius: 12px; font-weight: 800; cursor: pointer; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: all 0.2s; white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 8px; font-family: 'Poppins', sans-serif;
         }
+        .btn-new-exam svg { width: 18px; height: 18px; }
+        .btn-new-exam:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.3); background: #f8fafc; }
+
+        /* 🚀 SLEEK ANALYTICS CARDS */
+        .analytics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 2rem; width: 100%; }
+        .stat-card {
+            background: white; border-radius: 24px; padding: 1.8rem; display: flex; align-items: center; gap: 18px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); border-color: #cbd5e1; box-shadow: 0 15px 35px -10px rgba(0,0,0,0.08); }
         
-        .analytic-icon.blue { background: #eff6ff; color: #2563eb; }
-        .analytic-icon.green { background: #dcfce7; color: #16a34a; }
-        .analytic-icon.purple { background: #faf5ff; color: #ea580c; }
+        .stat-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+        .stat-icon svg { width: 28px; height: 28px; }
+        .stat-icon.blue { background: #eff6ff; color: #2563eb; }
+        .stat-icon.green { background: #ecfdf5; color: #10b981; }
+        .stat-icon.purple { background: #f5f3ff; color: #8b5cf6; }
 
-        .analytic-info h4 { margin: 0 0 5px 0; font-size: 0.95rem; color: #64748b; font-weight: 600; text-transform: uppercase; }
-        .analytic-info div { font-size: 2rem; font-weight: 800; color: #0f172a; line-height: 1; }
+        .stat-info h4 { margin: 0 0 5px 0; font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-val { font-size: 2rem; font-weight: 900; color: #0f172a; line-height: 1; }
+        .stat-val span { font-size: 1.2rem; color: #94a3b8; font-weight: 600; margin-left: 2px;}
 
-        /* FULL HISTORY TABLE WITH SCROLLING FOR 115 RESULTS */
+        /* 🚀 HISTORY TABLE */
         .full-history-section {
-            background: white; padding: 2.5rem; border-radius: 20px;
-            border: 1px solid #e2e8f0; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
-            width: 100%; max-width: 100%;
+            background: white; padding: 2.5rem; border-radius: 24px;
+            border: 1px solid #e2e8f0; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.04);
+            width: 100%; max-width: 100%; margin-bottom: 2rem;
         }
+        .section-title { margin: 0 0 1.5rem 0; font-size: 1.4rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 10px;}
+        .section-title svg { color: #3b82f6; width: 24px; height: 24px; }
 
         .table-responsive { 
-            width: 100%; 
-            max-width: 100vw; 
-            max-height: 600px; /* Keeps the table from getting too long */
-            overflow-y: auto; 
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch; 
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            width: 100%; max-height: 650px; overflow-y: auto; overflow-x: auto; 
+            -webkit-overflow-scrolling: touch; border: 1px solid #e2e8f0; border-radius: 16px;
         }
         
         .data-table { width: 100%; border-collapse: collapse; white-space: nowrap; margin: 0; }
         .data-table th { 
-            background: #f8fafc; color: #64748b; font-weight: 700; text-transform: uppercase; 
-            font-size: 0.85rem; padding: 1.2rem 1rem; text-align: left;
-            position: sticky; top: 0; z-index: 10; /* Sticky header */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background: #f8fafc; color: #475569; font-weight: 800; text-transform: uppercase; 
+            font-size: 0.8rem; padding: 1.2rem 1.5rem; text-align: left;
+            position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.02); letter-spacing: 0.5px;
         }
-        .data-table td { padding: 1.2rem 1rem; border-bottom: 1px solid #e2e8f0; color: #1e293b; vertical-align: middle; }
-        .data-table tr:hover { background-color: #f1f5f9; transition: background 0.2s; }
+        .data-table td { padding: 1.2rem 1.5rem; border-bottom: 1px solid #f1f5f9; color: #1e293b; vertical-align: middle; }
+        .data-table tr:hover td { background-color: #f8fafc; }
         
-        .badge-green { background: #dcfce7; color: #166534; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;}
-        .badge-orange { background: #ffedd5; color: #9a3412; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;}
+        .badge-green { background: #dcfce7; color: #166534; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 800; font-size: 0.85rem;}
+        .badge-orange { background: #ffedd5; color: #9a3412; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 800; font-size: 0.85rem;}
 
-        /* BUTTON FOR HISTORY DOWNLOAD */
+        /* 🚀 SLEEK DOWNLOAD BUTTON */
         .dl-row-btn {
-            background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;
-            padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer;
-            transition: all 0.2s; font-family: 'Poppins', sans-serif; font-size: 0.85rem; white-space: nowrap;
+            background: white; color: #2563eb; border: 1px solid #bfdbfe;
+            padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s; font-family: 'Poppins', sans-serif; font-size: 0.85rem; 
+            display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(37,99,235,0.05);
         }
-        .dl-row-btn:hover { background: #2563eb; color: white; box-shadow: 0 4px 10px rgba(37,99,235,0.2); }
+        .dl-row-btn svg { width: 16px; height: 16px; }
+        .dl-row-btn:hover { background: #eff6ff; box-shadow: 0 4px 10px rgba(37,99,235,0.15); transform: translateY(-1px); border-color: #93c5fd;}
+        .dl-row-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
-        /* HIDDEN CAPTURE CARD DESIGN */
-        #capture-area {
-            position: absolute;
-            left: -9999px;
-            top: 0;
-            width: 700px;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            color: white;
-            padding: 50px;
-            border-radius: 24px;
-            font-family: 'Poppins', sans-serif;
-            box-sizing: border-box;
-            z-index: -100;
+        /* Subject Pills */
+        .subj-pill {
+            background: #f1f5f9; border: 1px solid #e2e8f0; padding: 4px 10px; 
+            border-radius: 8px; font-size: 0.75rem; color: #64748b; font-weight: 600;
         }
+        .subj-pill strong { color: #0f172a; font-weight: 800; margin-left: 2px;}
 
-        /* 🔥 STRICT MOBILE LOCKDOWN 🔥 */
+        /* HIDDEN CAPTURE CARD */
+        #capture-area { position: absolute; left: -9999px; top: 0; width: 700px; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; padding: 50px; border-radius: 24px; font-family: 'Poppins', sans-serif; box-sizing: border-box; z-index: -100; }
+
+        /* 🚀 MOBILE RESPONSIVENESS */
         @media (max-width: 900px) {
-            .dashboard-content { 
-                padding: 1rem !important; 
-                width: 100vw !important;
-                max-width: 100vw !important;
-            }
-            
-            .welcome-banner {
-                padding: 1.5rem !important;
-                border-radius: 16px !important;
-                width: 100% !important;
-                flex-direction: column !important;
-                align-items: flex-start !important;
-                gap: 1.5rem;
-            }
+            .dashboard-content { padding: 1rem !important; width: 100vw !important; max-width: 100vw !important; }
+            .welcome-banner { padding: 2rem 1.5rem !important; border-radius: 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 1.5rem; }
             .welcome-text { max-width: 100% !important; }
-            .welcome-banner button { width: 100% !important; }
+            .welcome-text h1 { font-size: 1.8rem; }
+            .btn-new-exam { width: 100%; justify-content: center; }
 
-            .analytics-grid { grid-template-columns: 1fr; gap: 1rem; }
-            .analytic-card { padding: 1.5rem !important; }
-            .full-history-section { padding: 1.5rem !important; }
-            .data-table th, .data-table td { padding: 0.8rem 0.5rem; font-size: 0.85rem; }
+            .analytics-grid { grid-template-columns: 1fr; gap: 15px; }
+            .stat-card { padding: 1.5rem !important; border-radius: 20px;}
+            
+            .full-history-section { padding: 1.5rem 1rem !important; border-radius: 20px;}
+            .data-table th, .data-table td { padding: 1rem 0.8rem; font-size: 0.8rem; }
+            .dl-row-btn { padding: 0.5rem 0.8rem; font-size: 0.8rem; }
+            .subj-pill { padding: 3px 6px; font-size: 0.7rem; }
         }
     </style>
 </head>
 <body class="dashboard-body">
 
+    <!-- 🚀 HIDDEN CAPTURE AREA FOR DOWNLOAD -->
     <div id="capture-area">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 25px; margin-bottom: 30px;">
             <div style="display: flex; align-items: center;">
@@ -152,7 +146,7 @@
                 </svg>
                 <div style="margin-left: 20px;">
                     <h2 style="margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -0.5px;">AFIT CBT Simulator</h2>
-                    <p style="margin: 0; color: #93c5fd; font-size: 1.1rem; font-weight: 500;">Mock Result</p>
+                    <p style="margin: 0; color: #93c5fd; font-size: 1.1rem; font-weight: 500;">Examination Record</p>
                 </div>
             </div>
             <div style="text-align: right; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 8px;">
@@ -181,11 +175,12 @@
             <p style="margin: 0; font-size: 0.9rem; color: #64748b; font-weight: 500;">Engineered for Excellence by Brightsitedev</p>
         </div>
     </div>
+
     <div class="sidebar-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header" style="display: flex; align-items: center; gap: 12px; padding: 1rem 0;">
-            <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 8px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(37,99,235,0.3);">
+            <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 10px; flex-shrink: 0; box-shadow: 0 4px 10px rgba(37,99,235,0.3);">
                 <rect width="100" height="100" rx="22" fill="url(#logo-grad-results)"/>
                 <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
                 <path d="M32 54 L45 67 L75 32" stroke="#38bdf8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
@@ -232,61 +227,57 @@
 
         <main class="dashboard-content">
             
-            <div class="welcome-banner" style="margin-bottom: 2rem; position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); padding: 2.5rem; border-radius: 20px;">
-                <div class="welcome-text" style="position: relative; z-index: 2; max-width: 60%;">
-                    <h1 style="color: white; margin: 0 0 10px 0; font-size: 2rem;">Performance Analytics</h1>
-                    <p style="color: #93c5fd; margin: 0; font-size: 1rem; line-height: 1.5;">Review your complete examination history and track your aggregate progress over time.</p>
-                </div>
-
-                <div style="position: absolute; right: -50px; top: -50px; opacity: 0.08; pointer-events: none;">
-                    <svg width="300" height="300" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="100" cy="100" r="90" fill="#ffffff"/>
-                    </svg>
+            <div class="welcome-banner">
+                <div class="welcome-text">
+                    <h1>Performance Analytics</h1>
+                    <p>Review your complete examination history and track your aggregate progress over time.</p>
                 </div>
                 
-                <div style="position: relative; z-index: 2;">
-                    <button onclick="window.location.href='../exams/index.html'" style="background: white; color: #1e40af; border: none; padding: 1rem 1.8rem; border-radius: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.15); transition: transform 0.2s; white-space: nowrap;">
-                        Take New Exam
-                    </button>
-                </div>
+                <button class="btn-new-exam" onclick="window.location.href='../exams/index.html'">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    Take New Exam
+                </button>
             </div>
 
             <div class="results-wrapper">
                 
                 <div class="analytics-grid">
-                    <div class="analytic-card">
-                        <div class="analytic-icon blue">
-                            <svg style="width: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                         </div>
-                        <div class="analytic-info">
+                        <div class="stat-info">
                             <h4>Exams Completed</h4>
-                            <div id="stat-total-exams">0</div>
+                            <div class="stat-val" id="stat-total-exams">0</div>
                         </div>
                     </div>
 
-                    <div class="analytic-card">
-                        <div class="analytic-icon green">
-                            <svg style="width: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                         </div>
-                        <div class="analytic-info">
+                        <div class="stat-info">
                             <h4>Highest Aggregate</h4>
-                            <div><span id="stat-high-score">0</span><span style="font-size: 1.2rem; color: #94a3b8;">%</span></div>
+                            <div class="stat-val"><span id="stat-high-score">0</span><span>%</span></div>
                         </div>
                     </div>
 
-                    <div class="analytic-card">
-                        <div class="analytic-icon purple">
-                            <svg style="width: 30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                         </div>
-                        <div class="analytic-info">
+                        <div class="stat-info">
                             <h4>Average Aggregate</h4>
-                            <div><span id="stat-avg-score">0</span><span style="font-size: 1.2rem; color: #94a3b8;">%</span></div>
+                            <div class="stat-val"><span id="stat-avg-score">0</span><span>%</span></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="full-history-section">
-                    <h2 style="margin-top: 0; font-size: 1.5rem; color: #0f172a; margin-bottom: 1.5rem;">Recent Examination Records</h2>
+                    <h2 class="section-title">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Examination Ledger
+                    </h2>
                     
                     <div class="table-responsive">
                         <table class="data-table">
@@ -294,13 +285,13 @@
                                 <tr>
                                     <th>Date Taken</th>
                                     <th>Subject Breakdown</th>
-                                    <th>Post-UTME</th>
-                                    <th>Final Aggregate</th>
-                                    <th>Action</th>
+                                    <th style="text-align: center;">Post-UTME</th>
+                                    <th style="text-align: center;">Final Aggregate</th>
+                                    <th style="text-align: right;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="full-history-body">
-                                <tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 3rem;">Loading your academic records...</td></tr>
+                                <tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 3rem; font-weight: 500;">Loading your academic records...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -339,7 +330,7 @@
         });
 
         async function fetchAllHistory(userId) {
-            // 🚀 EXPANDED TO SHOW RECENT 115 EXAMS AS REQUESTED
+            // Fetch recent 115 exams
             const { data, error } = await supabaseClient
                 .from('results')
                 .select('*')
@@ -350,7 +341,7 @@
             const tbody = document.getElementById('full-history-body');
             
             if (error || !data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 3rem;">No examination records found. Complete a test to generate data.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748b; padding: 4rem; font-weight: 500;">No examination records found. Complete a test to generate data.</td></tr>';
                 return;
             }
 
@@ -374,38 +365,34 @@
                 totalAggregateSum += finalAggregate;
 
                 const allScores = [
-                    { name: 'ENG', val: row.english_score },
-                    { name: 'GNS', val: row.gns_score },
-                    { name: 'MTH', val: row.math_score },
-                    { name: 'PHY', val: row.physics_score },
-                    { name: 'CHM', val: row.chemistry_score },
-                    { name: 'ECO', val: row.economics_score },
-                    { name: 'LIT', val: row.literature_score },
-                    { name: 'GOV', val: row.government_score },
+                    { name: 'ENG', val: row.english_score }, { name: 'GNS', val: row.gns_score },
+                    { name: 'MTH', val: row.math_score }, { name: 'PHY', val: row.physics_score },
+                    { name: 'CHM', val: row.chemistry_score }, { name: 'ECO', val: row.economics_score },
+                    { name: 'LIT', val: row.literature_score }, { name: 'GOV', val: row.government_score },
                     { name: 'COM', val: row.commerce_score }
                 ].filter(s => s.val !== undefined && s.val !== null && s.val > 0);
 
                 if (allScores.length === 0) allScores.push({ name: 'ENG', val: 0 }); // Fallback
 
-                let breakdownHtml = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">`;
+                // 🚀 NEW: Render subjects as sleek pills
+                let breakdownHtml = `<div style="display: flex; flex-wrap: wrap; gap: 6px;">`;
                 allScores.forEach(s => {
-                    breakdownHtml += `<span>${s.name}: <strong>${s.val}</strong></span>`;
+                    breakdownHtml += `<span class="subj-pill">${s.name}: <strong>${s.val}</strong></span>`;
                 });
                 breakdownHtml += `</div>`;
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
-                        <strong style="color: #0f172a;">${formattedDate}</strong><br>
-                        <span style="font-size: 0.85rem; color: #64748b;">${formattedTime}</span>
+                        <strong style="color: #0f172a; font-size: 0.95rem;">${formattedDate}</strong><br>
+                        <span style="font-size: 0.8rem; color: #64748b; font-weight: 500;">${formattedTime}</span>
                     </td>
-                    <td style="font-size: 0.9rem; color: #475569; line-height: 1.6;">
-                        ${breakdownHtml}
-                    </td>
-                    <td><span class="score-badge ${badgeClass}">${row.total_score} / 50</span></td>
-                    <td><strong style="font-size: 1.2rem; color: #2563eb;">${finalAggregate}%</strong></td>
-                    <td>
-                        <button class="dl-row-btn" onclick="downloadHistoryResult('${formattedDate}', '${row.total_score}', '${finalAggregate}', this)">
+                    <td>${breakdownHtml}</td>
+                    <td style="text-align: center;"><span class="score-badge ${badgeClass}">${row.total_score} / 50</span></td>
+                    <td style="text-align: center;"><strong style="font-size: 1.15rem; color: #0f172a;">${finalAggregate}%</strong></td>
+                    <td style="text-align: right;">
+                        <button class="dl-row-btn" onclick="downloadHistoryResult('${formattedDate}', '${row.total_score}', '${finalAggregate}', this)" title="Download Image">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             Download
                         </button>
                     </td>
@@ -414,7 +401,7 @@
             });
 
             document.getElementById('stat-total-exams').innerText = data.length;
-            document.getElementById('stat-high-score').innerText = highestAggregate;
+            document.getElementById('stat-high-score').innerText = highestAggregate.toFixed(1);
             
             const averageAggregate = (totalAggregateSum / data.length).toFixed(1);
             document.getElementById('stat-avg-score').innerText = averageAggregate;
@@ -422,8 +409,8 @@
 
         // 🚀 DYNAMIC DOWNLOAD ENGINE FOR HISTORY ROWS
         function downloadHistoryResult(dateString, putmeScore, aggregate, btnElement) {
-            const originalText = btnElement.innerHTML;
-            btnElement.innerHTML = 'Generating...';
+            const originalHtml = btnElement.innerHTML;
+            btnElement.innerHTML = '<svg class="animate-spin" style="width:16px; height:16px; margin-right:4px;" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Generating...';
             btnElement.disabled = true;
 
             // 1. Populate the hidden card with THIS row's specific data
@@ -447,12 +434,12 @@
                 
                 // Hide card and restore button
                 captureArea.style.left = '-9999px';
-                btnElement.innerHTML = originalText;
+                btnElement.innerHTML = originalHtml;
                 btnElement.disabled = false;
             }).catch(err => {
                 console.error("Image generation failed", err);
                 captureArea.style.left = '-9999px';
-                btnElement.innerHTML = originalText;
+                btnElement.innerHTML = originalHtml;
                 btnElement.disabled = false;
                 alert("Could not generate image. Please try again.");
             });
