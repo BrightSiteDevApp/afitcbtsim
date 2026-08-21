@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - AFIT CBT Simulator</title>
+    
     <link rel="icon" type="image/svg+xml" href="../static/img/afitcbtsim-logo.svg">
     <link rel="icon" type="image/png" sizes="512x512" href="../static/img/afitcbtsim-logo.png">
     <link rel="icon" type="image/png" sizes="192x192" href="../static/img/afitcbtsim-logo1.png">
@@ -12,15 +13,21 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="../static/main.css">
 
     <style>
         /* 🚀 ELITE UI OVERRIDES */
+        html, body { max-width: 100vw !important; overflow-x: hidden !important; margin: 0; padding: 0; }
+        *, *::before, *::after { box-sizing: border-box !important; }
+
         body.auth-page { 
-            margin: 0; padding: 0; font-family: 'Poppins', sans-serif; 
-            background: #f8fafc; overflow: hidden; height: 100vh;
+            font-family: 'Poppins', sans-serif; 
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden; height: 100vh;
         }
 
         .auth-split-layout {
@@ -29,7 +36,7 @@
 
         /* 🚀 LEFT BANNER - PREMIUM BRANDING */
         .auth-banner {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
             position: relative; display: flex; flex-direction: column; justify-content: center;
             padding: 4rem; color: white; overflow: hidden;
         }
@@ -45,8 +52,8 @@
         }
 
         .banner-content { position: relative; z-index: 2; max-width: 600px; }
-        .banner-content h2 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -1px; }
-        .banner-content p { font-size: 1.1rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 3rem; }
+        .banner-content h2 { font-size: 3.5rem; font-weight: 900; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -1px; }
+        .banner-content p { font-size: 1.1rem; color: #93c5fd; line-height: 1.6; margin-bottom: 3rem; font-weight: 500;}
 
         /* Social Proof Badge */
         .social-proof { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.2); width: fit-content; backdrop-filter: blur(10px);}
@@ -60,72 +67,77 @@
         /* 🚀 RIGHT SIDE - FORM CONTAINER */
         .auth-form-container {
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 2rem; background: #ffffff;
+            padding: 2rem; position: relative; z-index: 2;
         }
         .auth-form-wrapper {
-            width: 100%; max-width: 420px; background: white; padding: 3rem; 
-            border-radius: 24px; box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05);
-            border: 1px solid #f1f5f9;
+            width: 100%; max-width: 440px; background: white; padding: 3.5rem 3rem; 
+            border-radius: 24px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0; text-align: center;
         }
 
-        .auth-title { font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 8px; letter-spacing: -0.5px;}
-        .auth-subtitle { color: #64748b; font-size: 0.95rem; margin-bottom: 2.5rem; line-height: 1.5; }
+        .auth-title { font-size: 2rem; font-weight: 900; color: #0f172a; margin: 0 0 8px 0; letter-spacing: -0.5px;}
+        .auth-subtitle { color: #64748b; font-size: 0.95rem; margin: 0 0 2.5rem 0; line-height: 1.6; font-weight: 500;}
 
-        /* Modern Input Fields */
+        /* 🚀 MODERN INPUT FIELDS */
         .input-group { margin-bottom: 1.5rem; text-align: left; }
-        .input-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .input-group label { display: block; font-size: 0.8rem; font-weight: 800; color: #475569; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
         .modern-input {
-            width: 100%; padding: 1.2rem 1.5rem; border-radius: 12px; border: 2px solid #e2e8f0; 
-            background: #f8fafc; font-family: 'Poppins', sans-serif; font-size: 1rem; 
-            transition: all 0.3s ease; box-sizing: border-box; color: #1e293b; font-weight: 500;
+            width: 100%; padding: 1.1rem 1.2rem; border-radius: 12px; border: 1px solid #cbd5e1; 
+            background: white; font-family: 'Poppins', sans-serif; font-size: 1rem; 
+            transition: all 0.2s ease; box-sizing: border-box; color: #0f172a; font-weight: 600;
         }
-        .modern-input:focus { border-color: #3b82f6; background: #ffffff; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); outline: none; }
-        .modern-input::placeholder { color: #94a3b8; font-weight: 400; }
+        .modern-input:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        .modern-input::placeholder { color: #94a3b8; font-weight: 500; }
 
         /* OTP Specific Styling */
-        #secure-otp { letter-spacing: 8px; font-size: 1.5rem; text-align: center; font-weight: 800; color: #0f172a;}
+        #secure-otp { letter-spacing: 12px; font-size: 1.8rem; text-align: center; font-weight: 900; color: #2563eb; background: #f8fafc;}
 
-        /* Modern Buttons */
+        /* 🚀 MODERN BUTTONS */
         .auth-btn {
-            width: 100%; padding: 1.2rem; border-radius: 12px; background: #2563eb; color: white;
-            font-weight: 700; font-size: 1.05rem; border: none; cursor: pointer;
-            transition: all 0.2s; box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
-            font-family: 'Poppins', sans-serif;
+            width: 100%; padding: 1.1rem; border-radius: 12px; background: #2563eb; color: white;
+            font-weight: 800; font-size: 1.05rem; border: none; cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.4);
+            font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .auth-btn:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.5); }
+        .auth-btn svg { width: 20px; height: 20px; }
+        .auth-btn:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 12px 25px -5px rgba(37, 99, 235, 0.5); }
         .auth-btn:disabled { background: #94a3b8; transform: none; box-shadow: none; cursor: not-allowed; }
 
-        /* 🚀 SECONDARY ACTIONS (Change Email & Resend) */
+        /* 🚀 SECONDARY ACTIONS */
         .secondary-actions {
             display: flex; justify-content: space-between; align-items: center;
-            margin-top: 15px; font-size: 0.85rem; font-weight: 600;
+            margin-top: 15px; font-size: 0.85rem; font-weight: 700;
         }
         .text-link {
             color: #2563eb; cursor: pointer; background: none; border: none; padding: 0; 
-            font-family: 'Poppins', sans-serif; font-weight: 600; text-decoration: none; transition: color 0.2s;
+            font-family: 'Poppins', sans-serif; font-weight: 700; text-decoration: none; transition: color 0.2s;
+            display: inline-flex; align-items: center; gap: 4px;
         }
-        .text-link:hover { color: #1d4ed8; text-decoration: underline; }
-        .text-link:disabled { color: #94a3b8; cursor: not-allowed; text-decoration: none; }
+        .text-link svg { width: 14px; height: 14px; }
+        .text-link:hover { color: #1d4ed8; }
+        .text-link:disabled { color: #94a3b8; cursor: not-allowed; }
 
         .hidden { display: none !important; }
 
         /* Form Animation */
         form { animation: slideIn 0.4s ease forwards; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Countdown Widget */
-        .countdown-container { display: flex; justify-content: center; gap: 15px; margin: 2rem 0; }
-        .countdown-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px 20px; border-radius: 16px; min-width: 80px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .countdown-value { display: block; font-size: 2.5rem; font-weight: 800; color: #2563eb; line-height: 1; margin-bottom: 5px; }
-        .countdown-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700; }
+        /* 🚀 COUNTDOWN WIDGET */
+        .countdown-container { display: flex; justify-content: center; gap: 12px; margin: 2rem 0; }
+        .countdown-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 15px; border-radius: 14px; min-width: 75px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02); }
+        .countdown-value { display: block; font-size: 2rem; font-weight: 900; color: #2563eb; line-height: 1; margin-bottom: 5px; }
+        .countdown-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 800; }
 
+        /* 🚀 WHATSAPP SUPPORT BUTTON */
         .whatsapp-support-btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 8px; 
-            background-color: #f0fdf4; color: #16a34a; padding: 0.8rem 1.5rem; border-radius: 12px; 
-            font-weight: 700; text-decoration: none; font-size: 0.95rem; border: 1px solid #bbf7d0;
-            transition: all 0.2s; width: 100%; box-sizing: border-box; margin-top: 10px;
+            background-color: white; color: #16a34a; padding: 0.8rem 1.5rem; border-radius: 10px; 
+            font-weight: 700; text-decoration: none; font-size: 0.9rem; border: 1px solid #bbf7d0;
+            transition: all 0.2s; box-shadow: 0 4px 10px rgba(22, 163, 74, 0.1); margin-top: 10px;
         }
-        .whatsapp-support-btn:hover { background-color: #dcfce7; transform: translateY(-1px); }
+        .whatsapp-support-btn svg { width: 18px; height: 18px; }
+        .whatsapp-support-btn:hover { background-color: #ecfdf5; transform: translateY(-1px); border-color: #86efac; box-shadow: 0 6px 15px rgba(22, 163, 74, 0.15);}
 
         /* 🚀 MOBILE RESPONSIVENESS */
         @media (max-width: 900px) {
@@ -137,13 +149,14 @@
             .banner-content p { font-size: 1rem; margin-bottom: 2rem;}
             .social-proof { margin: 0 auto; }
             
-            .auth-form-container { padding: 1.5rem; background: #f8fafc; align-items: flex-start;}
-            .auth-form-wrapper { padding: 2rem 1.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+            .auth-form-container { padding: 1.5rem 1rem; align-items: center;}
+            .auth-form-wrapper { padding: 2.5rem 1.5rem; border-radius: 20px;}
             
             .countdown-container { gap: 8px; }
-            .countdown-box { padding: 10px; min-width: 65px; }
-            .countdown-value { font-size: 1.8rem; }
+            .countdown-box { padding: 10px; min-width: 65px; border-radius: 12px;}
+            .countdown-value { font-size: 1.6rem; }
             .countdown-label { font-size: 0.65rem; }
+            .auth-title { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -175,17 +188,17 @@
         <div class="auth-form-container">
             <div class="auth-form-wrapper">
                 
-                <div class="logo" style="display: flex; align-items: center; margin-bottom: 2.5rem; justify-content: center;">
-                    <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); flex-shrink: 0;">
+                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2.5rem;">
+                    <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: 14px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); flex-shrink: 0;">
                         <rect width="100" height="100" rx="22" fill="url(#logo-grad)"/>
                         <path d="M50 20 L22 75 H36 L43 60 H57 L64 75 H78 L50 20 Z" fill="#ffffff"/>
                         <path d="M32 54 L45 67 L75 32" stroke="#38bdf8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
                         <defs><linearGradient id="logo-grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse"><stop stop-color="#0f172a"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
                     </svg>
-                    <span style="font-weight: 800; color: #0f172a; margin-left: 12px; font-size: 1.5rem; letter-spacing: -0.5px;">AFIT CBT SIM</span>
+                    <span style="font-weight: 900; color: #0f172a; margin-left: 12px; font-size: 1.5rem; letter-spacing: -0.5px;">AFIT CBT SIM</span>
                 </div>
                 
-                <div id="coming-soon-block" style="text-align: center; padding: 1rem 0; display: none;">
+                <div id="coming-soon-block" style="display: none;">
                     <h2 class="auth-title">Launching Soon</h2>
                     <p class="auth-subtitle">The ultimate AFIT Simulator goes live in:</p>
                     <div class="countdown-container" id="launch-countdown">
@@ -205,30 +218,44 @@
                             <label for="secure-email">Email Address</label>
                             <input type="email" id="secure-email" class="modern-input" placeholder="name@example.com" maxlength="60" required>
                         </div>
-                        <button type="submit" id="secure-request-btn" class="auth-btn">Continue with Email</button>
+                        <button type="submit" id="secure-request-btn" class="auth-btn">
+                            Continue with Email
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </button>
                     </form>
 
                     <!-- 🚀 UPDATED OTP FORM -->
                     <form id="secure-otp-form" class="hidden" onsubmit="handleOtpSubmit(event)">
-                        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.5rem; line-height: 1.5; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
-                            Code sent to <br><strong id="display-email" style="color: #0f172a; font-size: 0.95rem;"></strong>
-                        </p>
+                        <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; text-align: left;">
+                            <svg style="width: 24px; height: 24px; color: #3b82f6; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            <p style="margin: 0; font-size: 0.85rem; color: #1e40af; font-weight: 500; line-height: 1.4;">Code sent to <br><strong id="display-email" style="font-weight: 800;"></strong></p>
+                        </div>
+
                         <div class="input-group">
                             <label for="secure-otp">Enter 8-Digit Code</label>
                             <input type="text" id="secure-otp" class="modern-input" placeholder="••••••••" pattern="[0-9]*" maxlength="8" required>
                         </div>
-                        <button type="submit" id="secure-verify-btn" class="auth-btn">Verify & Secure Login</button>
+                        <button type="submit" id="secure-verify-btn" class="auth-btn">
+                            Verify & Secure Login
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </button>
                         
                         <div class="secondary-actions">
-                            <button type="button" class="text-link" onclick="changeEmail()">← Change Email</button>
-                            <button type="button" class="text-link" id="resend-code-btn" onclick="resendCode()">Resend Code</button>
+                            <button type="button" class="text-link" onclick="changeEmail()">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                                Change Email
+                            </button>
+                            <button type="button" class="text-link" id="resend-code-btn" onclick="resendCode()">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                Resend Code
+                            </button>
                         </div>
                     </form>
 
                     <div style="margin-top: 2.5rem; border-top: 2px solid #f1f5f9; padding-top: 1.5rem; text-align: center;">
                         <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 5px; font-weight: 600;">Having issues logging in?</p>
                         <a href="https://wa.me/2349153375488?text=Hello%20Admin,%20I%20am%20having%20issues%20logging%20into%20my%20AFIT%20CBT%20Simulator%20account..." target="_blank" class="whatsapp-support-btn">
-                            <svg style="width: 20px; height: 20px;" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                            <svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
                             Contact Support
                         </a>
                     </div>
@@ -236,8 +263,9 @@
 
                 <div id="auth-message"></div>
                 
-                <div style="text-align: center; margin-top: 1.5rem;">
-                    <p style="color: #94a3b8; font-size: 0.8rem; font-weight: 500;">Secured by <strong>Supabase</strong> Enterprise Auth</p>
+                <div style="text-align: center; margin-top: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" stroke-width="2" style="width: 14px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <p style="color: #94a3b8; font-size: 0.8rem; font-weight: 500; margin: 0;">Secured by <strong>Supabase</strong> Enterprise Auth</p>
                 </div>
 
             </div>
@@ -264,10 +292,10 @@
                 if (timeLeft <= 0) {
                     clearInterval(resendInterval);
                     btn.disabled = false;
-                    btn.innerText = "Resend Code";
+                    btn.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Resend Code`;
                 } else {
                     btn.disabled = true;
-                    btn.innerText = `Resend in ${timeLeft}s`;
+                    btn.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Resend in ${timeLeft}s`;
                 }
             }, 1000);
         }
@@ -282,7 +310,6 @@
                 try {
                     const cached = JSON.parse(cachedStr);
                     const now = Date.now();
-                    // If requested within the last 15 mins (900,000 ms), show OTP form!
                     if (now - cached.timestamp < 900000) {
                         document.getElementById('secure-email').value = cached.email;
                         document.getElementById('display-email').innerText = cached.email;
@@ -327,8 +354,8 @@
         window.handleEmailSubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('secure-request-btn');
-            const originalText = btn.innerText;
-            btn.innerText = "Sending Code...";
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<svg class="animate-spin" style="width:20px;height:20px;" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sending Code...`;
             btn.disabled = true;
 
             const emailInput = document.getElementById('secure-email').value.toLowerCase().trim();
@@ -336,7 +363,7 @@
 
             try {
                 if (typeof supabaseClient === 'undefined') {
-                    throw new Error("Your browser is blocking the secure connection. Please try using a different browser like Firefox (which works perfectly).");
+                    throw new Error("Your browser is blocking the secure connection. Please try using a different browser like Firefox.");
                 }
 
                 const { error: otpError } = await supabaseClient.auth.signInWithOtp({
@@ -353,7 +380,12 @@
                 document.getElementById('display-email').innerText = emailInput;
                 document.getElementById('secure-email-form').classList.add('hidden');
                 document.getElementById('secure-otp-form').classList.remove('hidden');
-                messageDiv.innerHTML = `<p style="color: #10b981; background: #dcfce7; padding: 10px; border-radius: 8px; font-weight: 600; margin-top: 15px; text-align: center;">Verification code sent to your email!</p>`;
+                
+                messageDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px; border-radius: 12px; margin-top: 15px;">
+                        <svg style="width: 20px; height: 20px; color: #10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                        <span style="color: #065f46; font-weight: 700; font-size: 0.9rem;">Verification code sent to your email!</span>
+                    </div>`;
                 
                 startResendTimer(timestamp);
 
@@ -361,12 +393,15 @@
                 console.error("Auth Error:", error);
                 const errMsg = error.message || "An unexpected network error occurred.";
                 messageDiv.innerHTML = `
-                    <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 12px; margin-top: 15px; text-align: center;">
-                        <p style="color: #ef4444; font-weight: 700; margin: 0 0 5px 0;">Error</p>
-                        <p style="color: #dc2626; font-size: 0.9rem; margin: 0 0 10px 0;">${errMsg}</p>
-                        <span style="font-size: 0.8rem; color: #7f1d1d;">(Tip: Try using <strong>Firefox</strong> if this persists)</span>
+                    <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 16px; margin-top: 15px; text-align: left; display: flex; gap: 12px; align-items: flex-start;">
+                        <svg style="width: 24px; height: 24px; color: #ef4444; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <div>
+                            <p style="color: #991b1b; font-weight: 800; margin: 0 0 5px 0;">Connection Error</p>
+                            <p style="color: #dc2626; font-size: 0.85rem; margin: 0 0 5px 0; font-weight: 500; line-height: 1.5;">${errMsg}</p>
+                            <span style="font-size: 0.8rem; color: #7f1d1d; font-weight: 600;">(Tip: Try using Firefox if this persists)</span>
+                        </div>
                     </div>`;
-                btn.innerText = originalText;
+                btn.innerHTML = originalHTML;
                 btn.disabled = false;
             }
         };
@@ -381,7 +416,7 @@
             document.getElementById('secure-otp').value = '';
             
             const btn = document.getElementById('secure-request-btn');
-            btn.innerText = "Continue with Email";
+            btn.innerHTML = `Continue with Email <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
             btn.disabled = false;
         };
 
@@ -389,7 +424,7 @@
         window.resendCode = async function() {
             const btn = document.getElementById('resend-code-btn');
             btn.disabled = true;
-            btn.innerText = "Sending...";
+            btn.innerHTML = `<svg class="animate-spin" style="width:14px; height:14px;" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sending...`;
             
             const email = document.getElementById('secure-email').value.toLowerCase().trim();
             const messageDiv = document.getElementById('auth-message');
@@ -406,20 +441,28 @@
                 localStorage.setItem('afit_otp_request', JSON.stringify({ email: email, timestamp: newTimestamp }));
                 startResendTimer(newTimestamp);
                 
-                messageDiv.innerHTML = `<p style="color: #10b981; background: #dcfce7; padding: 10px; border-radius: 8px; font-weight: 600; margin-top: 15px; text-align: center;">New code sent successfully!</p>`;
+                messageDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px; border-radius: 12px; margin-top: 15px;">
+                        <svg style="width: 20px; height: 20px; color: #10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                        <span style="color: #065f46; font-weight: 700; font-size: 0.9rem;">New code sent successfully!</span>
+                    </div>`;
             } catch (error) {
                 console.error(error);
-                messageDiv.innerHTML = `<p style="color: #dc2626; background: #fef2f2; padding: 10px; border-radius: 8px; font-weight: 600; margin-top: 15px; text-align: center;">${error.message || "Failed to resend code."}</p>`;
+                messageDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: 12px; margin-top: 15px;">
+                        <svg style="width: 20px; height: 20px; color: #ef4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <span style="color: #991b1b; font-weight: 700; font-size: 0.9rem;">${error.message || "Failed to resend code."}</span>
+                    </div>`;
                 btn.disabled = false;
-                btn.innerText = "Resend Code";
+                btn.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Resend Code`;
             }
         };
 
         window.handleOtpSubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('secure-verify-btn');
-            const originalText = btn.innerText;
-            btn.innerText = "Verifying...";
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<svg class="animate-spin" style="width:20px;height:20px;" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Verifying Identity...`;
             btn.disabled = true;
 
             const email = document.getElementById('secure-email').value.toLowerCase().trim();
@@ -428,7 +471,7 @@
 
             try {
                 if (typeof supabaseClient === 'undefined') {
-                    throw new Error("Your browser is blocking the secure connection. Please try using a different browser like Firefox.");
+                    throw new Error("Your browser is blocking the secure connection. Please try using Firefox.");
                 }
 
                 const { data, error } = await supabaseClient.auth.verifyOtp({
@@ -451,7 +494,7 @@
                 // Clears memory so next time they log out, they start fresh
                 localStorage.removeItem('afit_otp_request');
 
-                btn.innerText = "Routing...";
+                btn.innerHTML = `<svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg> Routing...`;
 
                 const { data: profile } = await supabaseClient
                     .from('profiles')
@@ -469,11 +512,14 @@
                 console.error("Verification Error:", error);
                 const errMsg = error.message || error.error_description || "An unexpected network error occurred.";
                 messageDiv.innerHTML = `
-                    <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 12px; margin-top: 15px; text-align: center;">
-                        <p style="color: #ef4444; font-weight: 700; margin: 0 0 5px 0;">Verification Failed</p>
-                        <p style="color: #dc2626; font-size: 0.9rem; margin: 0 0 10px 0;">${errMsg}</p>
+                    <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 12px; margin-top: 15px; text-align: left; display: flex; gap: 12px; align-items: flex-start;">
+                        <svg style="width: 24px; height: 24px; color: #ef4444; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <div>
+                            <p style="color: #991b1b; font-weight: 800; margin: 0 0 5px 0;">Verification Failed</p>
+                            <p style="color: #dc2626; font-size: 0.85rem; margin: 0; font-weight: 500; line-height: 1.5;">${errMsg}</p>
+                        </div>
                     </div>`;
-                btn.innerText = originalText;
+                btn.innerHTML = originalHTML;
                 btn.disabled = false;
             }
         };
