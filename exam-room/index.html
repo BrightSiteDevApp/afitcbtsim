@@ -45,11 +45,12 @@
         .start-gate {
             position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px);
             z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 1.5rem;
+            padding: 1.5rem; overflow-y: auto; /* Fix: Allow scrolling if height exceeds viewport */
         }
         .start-card {
             background: white; border-radius: 24px; padding: 3rem; max-width: 600px; width: 100%;
             text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+            margin: auto; /* Fix: Prevents clipping at the top in flex containers */
         }
         .start-icon {
             width: 70px; height: 70px; background: #eff6ff; color: #2563eb; border-radius: 20px;
@@ -226,15 +227,22 @@
         }
         .strike-btn:hover { transform: translateY(-2px); background: #1e293b;}
 
-        /* 🚀 STRICT MOBILE RESPONSIVENESS PRESERVED */
+        /* 🚀 STRICT MOBILE RESPONSIVENESS PRESERVED & IMPROVED */
         @media (max-width: 900px) {
             body.exam-mode { overflow-y: auto; }
             .exam-layout { height: auto; min-height: 100vh; }
             .exam-main { display: flex; flex-direction: column; height: auto; overflow: visible;}
             
-            .start-card { padding: 2.5rem 1.5rem; border-radius: 20px; }
+            /* FIX: Allow scrolling properly on small screens for the Start Gate */
+            .start-gate { 
+                display: block; /* Turns off flex centering to prevent top clipping */
+                padding: 2rem 1rem; 
+            }
+            .start-card { 
+                padding: 2.5rem 1.5rem; border-radius: 20px; 
+                margin: 0 auto 2rem auto; /* Creates space so it scrolls cleanly */
+            }
             .start-card h1 { font-size: 1.6rem; }
-            /* 🚀 MOBILE START BUTTON FIX */
             .start-btn { padding: 0.8rem 1rem; font-size: 0.95rem; }
 
             .nav-sidebar { padding: 1rem 1.5rem; border-right: none; border-bottom: 1px solid #e2e8f0; height: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
@@ -265,7 +273,6 @@
             <h1>Post-UTME Examination</h1>
             <p style="color: #64748b; font-size: 1rem; font-weight: 500; margin-bottom: 1.5rem;">You are about to enter a secure testing environment.</p>
             
-            <!-- 🚀 FIXED NEUTRAL WARNING BOX -->
             <div class="start-warning">
                 <div class="warning-header">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -411,7 +418,7 @@
             };
 
             const startBtn = document.getElementById('init-btn');
-            startBtn.innerHTML = 'Start Examination <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>';
+            startBtn.innerHTML = 'I Understand - Start Exam <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>';
             startBtn.disabled = false;
         });
 
@@ -455,8 +462,8 @@
                 totalQuestions: questions.length || 50,
                 correctCount: 0,
                 breakdown: { english: 0, mathematics: 0, physics: 0, chemistry: 0, gns: 0, economics: 0, literature: 0, government: 0, commerce: 0 },
-                questions: questions, // Saves the questions
-                userAnswers: userAnswers // Saves the answers
+                questions: questions, // 🚀 Saves the questions
+                userAnswers: userAnswers // 🚀 Saves the answers
             };
             localStorage.setItem('cbt_recent_exam', JSON.stringify(examData));
             window.location.href = '../result/index.html';
@@ -492,6 +499,7 @@
             if (elem.requestFullscreen) elem.requestFullscreen().catch(err => console.log(err));
         }
 
+        // 🚀 THE ULTIMATE UNIVERSAL MOJIBAKE DECODER
         const MOJIBAKE_MAP = {
             "a\u0161": "\\sqrt{", "â€²â€²": "-", "âr′": "-", "\\l_s": "\\theta", "\\l,": "\\theta", "i\\in": "\\pi", "Î\\_s": "\\theta",
             "kgmal": "kgm^{-3}", "Nma 2": "Nm^{-2}", "msâˆ’1": "ms^{-1}", "msâˆ’2": "ms^{-2}",
@@ -522,12 +530,14 @@
             if (!txt) return "";
             let c = txt;
  
+            // 1. Decode Mojibake First
             for (let i = 0; i < MOJIBAKE_KEYS.length; i++) {
                 const corrupted = MOJIBAKE_KEYS[i];
                 const fixed = MOJIBAKE_MAP[corrupted];
                 c = c.split(corrupted).join(fixed);
             }
  
+            // 2. The Auto-Delimiter (Wraps raw latex in \( \))
             const mathCommands = ['\\frac', '\\theta', '\\pi', '\\sqrt', '\\alpha', '\\beta', '\\int', '\\sum', '\\sin', '\\cos', '\\tan', '^'];
             const hasMath = mathCommands.some(cmd => c.includes(cmd));
             const hasDelimiters = c.includes('$') || c.includes('\\(') || c.includes('\\[');
@@ -559,11 +569,15 @@
 
                 const fetchPromises = subjectsToFetch.map((subj, idx) => {
                     if (userProfile.has_paid) {
+                        // PREMIUM TIER: True Randomization
                         return supabaseClient.rpc('get_random_questions', {
                             subj_param: subj,
                             lim_param: limits[idx]
                         });
                     } else {
+                        // 🚀 FREE TIER ANTI-ABUSE ALGORITHM
+                        // Always grabs the first exact X questions ordered by ID.
+                        // It will NEVER randomize, so free users always get the exact same test.
                         return supabaseClient.from('questions')
                             .select('*')
                             .ilike('subject', `%${subj}%`)
@@ -585,6 +599,8 @@
                     return;
                 }
  
+                // Only shuffle questions if they are a premium user
+                // Free users will see the exact same layout order every time.
                 if (userProfile.has_paid) {
                     for (let i = allQuestions.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
@@ -628,8 +644,9 @@
             const q = questions[index];
  
             document.getElementById('q-subject-text').innerText = `${(q.subject || "Subject").toUpperCase()} • Q${index + 1} of ${questions.length}`;
-            document.getElementById('q-db-id').innerText = `${q.short_id || q.id}`;
+            document.getElementById('q-db-id').innerText = `Report ID: ${q.short_id || q.id}`;
  
+            // 🚀 FIXED: Switched from innerText to innerHTML so formatting tags (, , <u>) work properly!
             document.getElementById('q-body').innerHTML = prepText(q.question_text);
             document.getElementById('text-A').innerHTML = prepText(q.option_a);
             document.getElementById('text-B').innerHTML = prepText(q.option_b);
@@ -693,7 +710,7 @@
                 }
             });
 
-            // 🚀 ROUTES CORRECTLY TO ../result/index.html
+            // 🚀 UPDATE: Now we are saving the questions and userAnswers too!
             const examData = {
                 totalQuestions: questions.length,
                 correctCount: correctCount,
@@ -707,7 +724,6 @@
             alert("Exam Submitted! Grading paper and routing to Results...");
             window.location.href = '../result/index.html';
         }
-        
         function startTimer(duration) {
             let timer = duration, minutes, seconds;
             let display = document.getElementById('exam-timer');
