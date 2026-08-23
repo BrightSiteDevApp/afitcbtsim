@@ -411,7 +411,7 @@
             <aside class="nav-sidebar">
                 <div style="font-size: 0.8rem; font-weight: 800; color: #94a3b8; margin-bottom: 1.2rem; text-transform: uppercase; letter-spacing: 0.5px;">Question Map</div>
                 <div class="grid-status" id="dot-grid"></div>
-                <button class="btn-submit" onclick="submitExam()">
+                <button class="btn-submit" onclick="submitExam(false)">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                     Submit Exam
                 </button>
@@ -532,7 +532,7 @@
         </div>
     </div>
 
-    <!-- 🚀 SCRIPTS -->
+   <!-- 🚀 SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../static/app.js"></script>
 
@@ -588,7 +588,6 @@
             document.getElementById('alert-container').style.display = 'none';
 
             try {
-                // 🚀 USING THE NEW RPC FUNCTION
                 const { data, error } = await supabaseClient.rpc('check_mock_23_eligibility', { 
                     check_email: email, 
                     check_phone: phone 
@@ -734,8 +733,8 @@
         // 🚀 PHASE 3: GRADING & AGGREGATE CALCULATION
         async function submitExam(isAuto = false) {
             if (!isAuto && examActive && !confirm("Are you sure you want to submit your Mock Exam?")) return;
-            examActive = false;
             
+            examActive = false;
             document.body.style.overflow = 'auto'; // Restore scrolling
 
             let correctCount = 0;
@@ -756,7 +755,7 @@
 
             const totalQuestions = questions.length || 50;
             const postUtmeScore = Math.round((correctCount / totalQuestions) * 50);
-            const jambScore = studentData.jamb;
+            const jambScore = studentData.jamb || 0; 
             const jambWeight = parseFloat((jambScore / 8).toFixed(1));
             const finalAggregate = parseFloat((jambWeight + postUtmeScore).toFixed(1));
 
@@ -769,16 +768,15 @@
                 breakdown.jamb_score = jambScore;
                 breakdown.course = studentData.course; 
 
-                // 🚀 ROUTING TO NEW MOCK_23_RESULTS TABLE
-                await supabaseClient.from('mock_23_results').insert([{
+                // 🚀 INSERT DIRECTLY INTO MOCK_23_RESULTS
+                const { error: insertError } = await supabaseClient.from('mock_23_results').insert([{
                     email: studentData.email,
                     full_name: studentData.name,
                     total_score: postUtmeScore,
                     breakdown: breakdown
                 }]);
 
-                // 🚀 UPDATE PROFILE LOCK FOR 23RD
-                await supabaseClient.from('profiles').update({ mock_23_taken: true }).eq('email', studentData.email);
+                if (insertError) throw insertError;
 
                 document.getElementById('saving-loader').remove();
                 document.getElementById('result-screen').style.display = 'block';
@@ -807,7 +805,7 @@
                 document.getElementById('card-date').innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
             } catch (err) {
-                alert("Critical Error saving result. Score: " + correctCount);
+                alert("Critical Error saving result: " + (err.message || "Please check connection."));
             }
         }
 
