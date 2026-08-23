@@ -496,10 +496,12 @@
             document.getElementById('mobile-overlay').classList.toggle('active');
         }
 
-        // 🚀 PROMO BANNER DISMISSAL LOGIC
+        // 🚀 PROMO BANNER DISMISSAL LOGIC (Daily Reset)
         function closePromoBanner() {
             document.getElementById('vip-promo-banner').style.display = 'none';
-            localStorage.setItem('hide_vip_promo', 'true');
+            // Save today's exact date
+            const todayStr = new Date().toLocaleDateString('en-CA');
+            localStorage.setItem('vip_promo_hidden_date', todayStr);
         }
 
         function openVenueModal(locId) {
@@ -604,10 +606,15 @@
             const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
             globalProfileData = profile; 
 
-            // Check promo banner preference
-            if (localStorage.getItem('hide_vip_promo') === 'true') {
+            // 🚀 Check promo banner preference (Daily Reset logic)
+            const todayStr = new Date().toLocaleDateString('en-CA');
+            if (localStorage.getItem('vip_promo_hidden_date') === todayStr) {
+                // If they already closed it TODAY, hide it.
                 const banner = document.getElementById('vip-promo-banner');
                 if (banner) banner.style.display = 'none';
+            } else {
+                // It's a brand new day! Clear the memory so it shows up.
+                localStorage.removeItem('vip_promo_hidden_date');
             }
 
             const { data: resultsData } = await supabaseClient.from('results').select('id').eq('student_id', session.user.id);
@@ -627,7 +634,6 @@
             const actionContainer = document.getElementById('action-buttons-container');
             actionContainer.innerHTML = '';
 
-            const todayStr = new Date().toLocaleDateString('en-CA');
             const lastPopup = localStorage.getItem('last_upsell_date');
             let showPopup = (lastPopup !== todayStr);
 
@@ -685,7 +691,10 @@
 
         function initiatePayment(email, userId, paymentType) {
             let handler = PaystackPop.setup({
-                key: 'pk_live_f1ca0bad0d6913267fb525e6c58cd2c447a1ae29', email: email, amount: 1050 * 100, currency: 'NGN',
+                key: 'pk_live_f1ca0bad0d6913267fb525e6c58cd2c447a1ae29', 
+                email: email, 
+                amount: 1050 * 100, 
+                currency: 'NGN',
                 ref: 'AFIT_' + Math.floor((Math.random() * 1000000000) + 1),
                 metadata: { custom_fields: [{ display_name: "Student ID", variable_name: "student_id", value: userId }, { display_name: "Payment Type", variable_name: "payment_type", value: paymentType }] },
                 callback: function(response) { alert('Payment successful! Verifying account upgrade.'); setTimeout(() => { window.location.reload(); }, 3000); },
