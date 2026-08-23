@@ -441,7 +441,7 @@
             document.getElementById(`tab-${tabName}`).classList.add('active');
         }
 
-        async function fetchAdminData() {
+       async function fetchAdminData() {
             try {
                 const pTotalUsers = supabaseClient.from('profiles').select('*', { count: 'exact', head: true });
                 const pPremiumUsers = supabaseClient.from('profiles').select('*', { count: 'exact', head: true }).eq('has_paid', true);
@@ -450,9 +450,18 @@
 
                 const startOfDay = new Date();
                 startOfDay.setHours(0, 0, 0, 0);
-                const pTodayExams = supabaseClient.from('results')
-                    .select('*, profiles(full_name, course_applied)')
+                
+                // 🚀 THE FIX 1: Only ask for the exact count of today's exams (bypasses 1000 limit)
+                const pTodayExamsCount = supabaseClient.from('results')
+                    .select('*', { count: 'exact', head: true })
                     .gte('submitted_at', startOfDay.toISOString());
+
+                // 🚀 THE FIX 2: Ask Supabase to sort the scores and ONLY return the Top 5
+                const pTodayTopScorers = supabaseClient.from('results')
+                    .select('*, profiles(full_name, course_applied)')
+                    .gte('submitted_at', startOfDay.toISOString())
+                    .order('total_score', { ascending: false })
+                    .limit(5);
 
                 const pRecentResults = supabaseClient.from('results')
                     .select('*, profiles(full_name, course_applied)')
@@ -464,28 +473,24 @@
                     { count: premiumUsers }, 
                     { count: qbankUsers },
                     { count: totalExams }, 
-                    { data: todayResults },
+                    { count: examsToday },      // 🚀 Uses the new Count query
+                    { data: todayTopData },     // 🚀 Uses the new Top 5 query
                     { data: recentResults }
-                ] = await Promise.all([pTotalUsers, pPremiumUsers, pQbankUsers, pTotalExams, pTodayExams, pRecentResults]);
-
-                const examsToday = todayResults ? todayResults.length : 0;
+                ] = await Promise.all([pTotalUsers, pPremiumUsers, pQbankUsers, pTotalExams, pTodayExamsCount, pTodayTopScorers, pRecentResults]);
 
                 // Inject KPI Values
                 document.getElementById('kpi-users').innerText = totalUsers || 0;
                 document.getElementById('kpi-premium').innerText = premiumUsers || 0;
                 document.getElementById('kpi-qbank').innerText = qbankUsers || 0;
                 document.getElementById('kpi-exams').innerText = totalExams || 0;
-                document.getElementById('kpi-today').innerText = examsToday;
+                document.getElementById('kpi-today').innerText = examsToday || 0;
                 
-                document.getElementById('img-total-exams').innerText = `${examsToday} Exams Taken Today`;
+                document.getElementById('img-total-exams').innerText = `${examsToday || 0} Exams Taken Today`;
 
-                todayTopScorers = [];
-                if (todayResults && todayResults.length > 0) {
-                    const sortedToday = [...todayResults].sort((a, b) => b.total_score - a.total_score);
-                    todayTopScorers = sortedToday.slice(0, 5);
-                }
+                // Set the Top Scorers array directly
+                todayTopScorers = todayTopData || [];
 
-                // --- 🚀 THE FIX: PAGINATED FETCH FOR ALL DEMOGRAPHICS ---
+                // --- PAGINATED FETCH FOR ALL DEMOGRAPHICS (Already handling 1000+ limit) ---
                 let allProfiles = [];
                 let fetchStart = 0;
                 const fetchLimit = 1000;
