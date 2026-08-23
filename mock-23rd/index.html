@@ -30,11 +30,13 @@
         }
         
         /* 🚀 CLEAN & MODERN AUTH GATE STYLES */
-        #auth-gate { display: flex; justify-content: center; align-items: center; min-height: 100vh; min-height: 100dvh; padding: 20px; }
+        #auth-gate { display: flex; justify-content: center; align-items: center; min-height: 100vh; min-height: 100dvh; padding: 20px; overflow-y: auto;}
+        
         .gate-card { 
             background: white; width: 100%; max-width: 480px; border-radius: 24px; 
             box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; 
             text-align: center; padding: 3rem 2.5rem; animation: fadeSlideUp 0.4s ease forwards;
+            margin: auto;
         }
 
         .kaduna-badge { 
@@ -218,7 +220,7 @@
             #exam-layout { height: auto !important; min-height: 100vh !important; overflow: visible !important; }
             .exam-main { display: flex; flex-direction: column; height: auto; overflow: visible;}
             
-            .gate-card { padding: 2.5rem 1.5rem; margin: 15px; border-radius: 20px;}
+            .gate-card { padding: 2.5rem 1.5rem; margin: 15px auto; border-radius: 20px;}
             .gate-card h1 { font-size: 1.6rem; }
             .btn-action-main { padding: 0.9rem 1rem; font-size: 1rem; }
             
@@ -532,7 +534,7 @@
         </div>
     </div>
 
-   <!-- 🚀 SCRIPTS -->
+    <!-- 🚀 SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../static/app.js"></script>
 
@@ -588,6 +590,7 @@
             document.getElementById('alert-container').style.display = 'none';
 
             try {
+                // 🚀 USING THE NEW RPC FUNCTION
                 const { data, error } = await supabaseClient.rpc('check_mock_23_eligibility', { 
                     check_email: email, 
                     check_phone: phone 
@@ -768,7 +771,7 @@
                 breakdown.jamb_score = jambScore;
                 breakdown.course = studentData.course; 
 
-                // 🚀 INSERT DIRECTLY INTO MOCK_23_RESULTS
+                // 🚀 ROUTING TO NEW MOCK_23_RESULTS TABLE
                 const { error: insertError } = await supabaseClient.from('mock_23_results').insert([{
                     email: studentData.email,
                     full_name: studentData.name,
@@ -777,6 +780,9 @@
                 }]);
 
                 if (insertError) throw insertError;
+
+                // 🚀 TEAR THE TICKET (Set mock_23_paid back to false)
+                await supabaseClient.from('profiles').update({ mock_23_paid: false }).eq('email', studentData.email);
 
                 document.getElementById('saving-loader').remove();
                 document.getElementById('result-screen').style.display = 'block';
