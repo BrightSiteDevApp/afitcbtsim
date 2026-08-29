@@ -35,15 +35,42 @@
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 15px;
         }
 
+        /* 🚀 VERIFICATION TOOL STYLES */
+        .verify-card {
+            background: white; padding: 2rem; border-radius: 24px; border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); margin-bottom: 2.5rem; width: 100%; box-sizing: border-box;
+        }
+        .verify-card h2 { margin: 0 0 5px 0; font-size: 1.4rem; font-weight: 800; color: #0f172a; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px;}
+        .verify-card h2 svg { width: 22px; height: 22px; color: #2563eb; }
+        .verify-card p { margin: 0 0 1.5rem 0; color: #64748b; font-size: 0.9rem; font-weight: 500; }
+        
+        .verify-controls { display: grid; grid-template-columns: 2fr 1.2fr auto; gap: 12px; }
+        
+        .modern-input { 
+            width: 100%; padding: 1rem 1.2rem; border-radius: 12px; border: 2px solid #e2e8f0; 
+            background: #f8fafc; font-family: 'Poppins', sans-serif; font-size: 0.95rem; 
+            transition: all 0.3s ease; color: #1e293b; font-weight: 600; box-sizing: border-box;
+        }
+        .modern-input:focus { border-color: #2563eb; background: #ffffff; outline: none; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+        .modern-input::placeholder { color: #94a3b8; font-weight: 500; }
+        select.modern-input { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23475569%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 1rem top 50%; background-size: 0.65rem auto; padding-right: 2.5rem; }
+
+        .btn-main {
+            background: #2563eb; color: white; border: none; padding: 1rem 2rem; border-radius: 12px;
+            font-weight: 800; cursor: pointer; transition: all 0.2s; font-family: 'Poppins', sans-serif; font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(37,99,235,0.3); white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-main:hover { background: #1d4ed8; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37,99,235,0.4); }
+        .btn-main:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* DATA PANEL & TABLES */
         .data-panel {
             background: white; padding: 1.5rem; border-radius: 24px; border: 1px solid #e2e8f0;
             box-shadow: 0 15px 35px -10px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box;
         }
 
-        /* Responsive Table Wrapper */
         .table-container { width: 100%; overflow-x: auto; max-height: 70vh; -webkit-overflow-scrolling: touch; }
 
-        /* TABLES */
         .admin-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 700px; }
         .admin-table th { 
             color: #475569; font-size: 0.8rem; text-transform: uppercase; padding: 1.2rem 1rem; 
@@ -56,7 +83,7 @@
         /* BUTTONS */
         .btn-action {
             background: white; border: 1px solid #cbd5e1; padding: 0.6rem 1rem; border-radius: 8px; 
-            font-weight: 700; cursor: pointer; color: #1e293b; transition: all 0.2s; font-family: 'Poppins'; font-size: 0.85rem;
+            font-weight: 700; cursor: pointer; color: #1e293b; transition: all 0.2s; font-family: 'Poppins', sans-serif; font-size: 0.85rem;
             display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
             white-space: nowrap;
         }
@@ -84,20 +111,19 @@
         @media (max-width: 768px) {
             .admin-nav { padding: 0 1rem; height: 60px; }
             .admin-nav-title { font-size: 1rem; }
-            .admin-nav-title svg { width: 24px; height: 24px; }
-            
             .admin-wrapper { padding: 0 1rem; margin: 1rem auto; }
             
             .header-actions { flex-direction: column; align-items: flex-start; gap: 12px; }
             .header-actions h1 { font-size: 1.5rem !important; }
-            .header-actions p { font-size: 0.85rem !important; }
             
+            .verify-card { padding: 1.5rem; border-radius: 20px;}
+            .verify-controls { grid-template-columns: 1fr; }
+            .btn-main { width: 100%; }
+
             .data-panel { padding: 1rem; border-radius: 16px; }
-            
             .admin-table th { padding: 1rem 0.5rem; font-size: 0.75rem; }
             .admin-table td { padding: 1rem 0.5rem; font-size: 0.85rem; }
             
-            /* Scale down action buttons inside the table */
             td .btn-action { padding: 0.4rem 0.6rem; font-size: 0.75rem; gap: 4px;}
         }
     </style>
@@ -123,12 +149,33 @@
                 </svg>
                 PREMIUM GROUP ADMIN
             </div>
-            <!-- 🚀 UPDATED BACK BUTTON LINK -->
             <button onclick="window.location.href='../profile/index.html'" class="btn-action" style="padding: 0.5rem 1rem; font-size: 0.85rem; background: #334155; color: white; border: none;">← Back to Profile</button>
         </nav>
 
         <div class="admin-wrapper">
             
+            <!-- 🚀 NEW: STUDENT VERIFICATION TOOL -->
+            <div class="verify-card">
+                <h2>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    Student Verification Tool
+                </h2>
+                <p>Instantly check a student's Premium Plan or VIP Group status using their email.</p>
+                
+                <div class="verify-controls">
+                    <input type="email" id="verify-email" class="modern-input" placeholder="Enter student email address..." />
+                    <select id="verify-type" class="modern-input">
+                        <option value="premium">Check Premium Plan</option>
+                        <option value="vip">Check VIP Group Status</option>
+                    </select>
+                    <button class="btn-main" onclick="verifyStudent()" id="verify-btn">Verify</button>
+                </div>
+                
+                <div id="verify-result-box" style="display: none; margin-top: 1.5rem; padding: 1.2rem 1.5rem; border-radius: 16px; text-align: left;">
+                    <!-- Result dynamically injected here -->
+                </div>
+            </div>
+
             <div class="header-actions">
                 <div>
                     <h1 style="margin: 0; font-size: 1.8rem; font-weight: 800; color: #0f172a; letter-spacing: -0.5px;">Pending Approvals</h1>
@@ -193,6 +240,91 @@
             
             fetchPendingVIPs();
         });
+
+        // 🚀 NEW: VERIFY STUDENT LOGIC
+        async function verifyStudent() {
+            const emailInput = document.getElementById('verify-email').value.trim();
+            const checkType = document.getElementById('verify-type').value;
+            const btn = document.getElementById('verify-btn');
+            const resultBox = document.getElementById('verify-result-box');
+
+            if (!emailInput) {
+                alert("Please enter a valid email address.");
+                return;
+            }
+
+            btn.innerHTML = 'Checking...';
+            btn.disabled = true;
+            resultBox.style.display = 'none';
+
+            try {
+                // Fetch the student
+                const { data: student, error } = await supabaseClient
+                    .from('profiles')
+                    .select('full_name, has_paid, vip_group_status, whatsapp_number')
+                    .ilike('email', emailInput) // ilike makes it case-insensitive
+                    .maybeSingle();
+
+                if (error) throw error;
+
+                resultBox.style.display = 'block';
+
+                // Scenario A: Email not found
+                if (!student) {
+                    resultBox.style.background = '#fef2f2';
+                    resultBox.style.border = '1px solid #fecaca';
+                    resultBox.innerHTML = `<span style="color: #ef4444; font-weight: 800; font-size: 1.1rem;">❌ Not Found</span><br><span style="color: #475569; font-weight: 500; margin-top: 5px; display: inline-block;">No aspirant found matching the email <strong>${emailInput}</strong>.</span>`;
+                    return;
+                }
+
+                const name = student.full_name || 'Aspirant';
+
+                // Scenario B: Checking Premium Status
+                if (checkType === 'premium') {
+                    if (student.has_paid) {
+                        resultBox.style.background = '#ecfdf5';
+                        resultBox.style.border = '1px solid #a7f3d0';
+                        resultBox.innerHTML = `<span style="color: #10b981; font-weight: 800; font-size: 1.1rem;">✅ Premium Active</span><br><span style="color: #475569; font-weight: 500; margin-top: 5px; display: inline-block;"><strong>${name}</strong> is currently on the Premium Plan.</span>`;
+                    } else {
+                        resultBox.style.background = '#fef2f2';
+                        resultBox.style.border = '1px solid #fecaca';
+                        resultBox.innerHTML = `<span style="color: #ef4444; font-weight: 800; font-size: 1.1rem;">❌ Free Tier</span><br><span style="color: #475569; font-weight: 500; margin-top: 5px; display: inline-block;"><strong>${name}</strong> has NOT paid for Premium.</span>`;
+                    }
+                } 
+                // Scenario C: Checking VIP Group Status
+                else if (checkType === 'vip') {
+                    const waNum = student.whatsapp_number || 'No number saved';
+                    
+                    if (student.vip_group_status === 'approved') {
+                        resultBox.style.background = '#ecfdf5';
+                        resultBox.style.border = '1px solid #a7f3d0';
+                        resultBox.innerHTML = `
+                            <span style="color: #10b981; font-weight: 800; font-size: 1.1rem;">✅ VIP Approved</span><br>
+                            <span style="color: #475569; font-weight: 500; margin-top: 5px; display: inline-block;"><strong>${name}</strong> is verified and approved for the Premium WhatsApp Group.</span><br>
+                            <div style="margin-top: 12px; background: white; padding: 8px 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: inline-block;">
+                                <span style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase;">WhatsApp Number:</span><br>
+                                <span style="font-size: 1.1rem; font-weight: 800; color: #0f172a; font-family: monospace;">${waNum}</span>
+                            </div>
+                        `;
+                    } else if (student.vip_group_status === 'pending') {
+                        resultBox.style.background = '#fffbeb';
+                        resultBox.style.border = '1px solid #fde68a';
+                        resultBox.innerHTML = `<span style="color: #d97706; font-weight: 800; font-size: 1.1rem;">⏳ Pending Approval</span><br><span style="color: #475569; font-weight: 500; margin-top: 5px; display: inline-block;"><strong>${name}</strong> has paid but is waiting to be added to the group.</span>`;
+                    } else {
+                        resultBox.style.background = '#fef2f2';
+                        resultBox.style.border = '1px solid #fecaca';
+                        resultBox.innerHTML = `<span style="color: #ef4444; font-weight: 800; font-size: 1.1rem;">❌ Not In VIP Group</span><br><span style="color: #475569; font-weight: 500; margin-top: 5px; display: inline-block;"><strong>${name}</strong> has not paid for or requested access to the VIP group.</span>`;
+                    }
+                }
+
+            } catch (err) {
+                console.error("Verification Error:", err);
+                alert("An error occurred while communicating with the database.");
+            } finally {
+                btn.innerHTML = 'Verify';
+                btn.disabled = false;
+            }
+        }
 
         async function fetchPendingVIPs() {
             const tbody = document.getElementById('vip-body');
